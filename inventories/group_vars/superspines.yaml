@@ -1,0 +1,5 @@
+#superspines.yaml
+# /opt/dcf_iac_project/inventories/group_vars/superspines.yaml
+# Variables specific to superspine switches
+# These are the high-level aggregation switches used in large data centers.
+# This file contains settings like fabric interconnects, routing protocols, and PIM configurations.

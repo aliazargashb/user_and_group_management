@@ -1,0 +1,3 @@
+# Global variables for all switches
+# This file contains variables that apply to every switch in the environment.
+# Typically used for general configurations like DNS servers, NTP settings, etc.

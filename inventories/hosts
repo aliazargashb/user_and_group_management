@@ -1,0 +1,68 @@
+all:
+  vars:
+    ansible_user: admin
+    ansible_password: 1qaz!QAZ
+  
+  children:
+    all:
+      hosts:
+        bmi_superspine:
+          ansible_host: 100.120.23.100
+        bmi_spine1:
+          ansible_host: 100.120.23.11
+        bmi_leaf1:
+          ansible_host: 100.120.23.101
+        sic_superspine:
+          ansible_host: 100.120.23.200
+        sic_spine1:
+          ansible_host: 100.120.23.21
+        sic_leaf1:
+          ansible_host: 100.120.23.201
+        sic_leaf2:
+          ansible_host: 100.120.23.203
+
+    superspines:
+      hosts:
+        bmi_superspine:
+          ansible_host: 100.120.23.100
+        sic_superspine:
+          ansible_host: 100.120.23.200
+
+    spines:
+      hosts:
+        bmi_spine1:
+          ansible_host: 100.120.23.11
+        sic_spine1:
+          ansible_host: 100.120.23.21
+          
+    leafs:
+      hosts:
+        bmi_leaf1:
+          ansible_host: 100.120.23.101
+        sic_leaf1:
+          ansible_host: 100.120.23.201
+        sic_leaf2:
+          ansible_host: 100.120.23.203
+
+
+    bmi_spines:
+      hosts:
+        bmi_spine1:
+          ansible_host: 100.120.23.11
+
+    bmi_leafs:
+      hosts:
+        bmi_leaf1:
+          ansible_host: 100.120.23.101
+
+    sic_spines:
+      hosts:
+        sic_spine1:
+          ansible_host: 100.120.23.21
+
+    sic_leafs:
+      hosts:
+        sic_leaf1:
+          ansible_host: 100.120.23.201
+        sic_leaf2:
+          ansible_host: 100.120.23.203

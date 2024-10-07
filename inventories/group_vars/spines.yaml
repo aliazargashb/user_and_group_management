@@ -1,0 +1,4 @@
+#spines.yaml
+# /opt/dcf_iac_project/inventories/group_vars/spines.yaml
+# Variables specific to spine switches
+# This file contains settings like routing protocols, and PIM configurations.

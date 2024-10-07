@@ -1,0 +1,5 @@
+#leafs.yaml
+# /opt/dcf_iac_project/inventories/group_vars/leafs.yaml
+# Variables specific to leaf switches
+# These settings are applied to all devices in the 'leafs' group.
+# Used for configuring VLANs, trunking, routing protocols, and other leaf-specific configurations.
