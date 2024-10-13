@@ -1,2 +1,9 @@
 #sic_leafs.yaml
 # /opt/dcf_iac_project/inventories/group_vars/sic_leafs.yaml
+
+
+ospf_site_area_id: 0.0.0.2
+
+bgp:   #name should be changed / bind to spines loopback0 ip
+  - bgp_neighbor_addr: 10.0.0.21
+  - bgp_neighbor_addr: 10.0.0.22

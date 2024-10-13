@@ -3,3 +3,113 @@
 # Variables specific to leaf switches
 # These settings are applied to all devices in the 'leafs' group.
 # Used for configuring VLANs, trunking, routing protocols, and other leaf-specific configurations.
+
+
+#leafs.yaml (vars)
+
+features:   
+  - nv overlay
+  - ospf
+  - bgp
+  - pim
+  - interface-vlan
+  - vn-segment-vlan-based
+  - lacp
+  - vpc
+
+anycast_gw_mac: "0000.0000.1111" 
+
+pim_rp_ip: "10.3.0.255"
+pim_mgroup: "239.0.0.0/8"
+
+l2rd: "auto"
+l2rt: "auto"
+
+anycast_gw_mac_status: true
+svi_status: true
+ipforward: true
+
+vpc_po_id: 1
+vpc_pl_sw_mode: trunk
+vpc_po_mode: active
+vpc_native_vlan: 3333
+vpc_pl: true
+
+vpc_pkl_src: mgmt0
+vpc_delay_restore: 150
+vpc_auto_recovery: 360
+
+OSPF:
+  - ospf_rid: "loopback 0" # check
+
+l2vlans:
+  - vlan_id: 10
+    vlan_name: "VLAN_10_TEST"
+    vnid: 100010
+    vrf_name: Tenant-1
+    bgp_prefix: 192.168.21.0/24
+  - vlan_id: 20
+    vlan_name: "VLAN_20_TEST"
+    vnid: 100020
+    vrf_name: Tenant-1
+    bgp_prefix: 192.168.31.0/24
+
+l3vlans:
+  - vlan_id: 30
+    vlan_name: "VLAN_30"
+    vnid: 100030
+    vrf_name: "Tenant-2"
+    vlan_id_ip: 192.168.41.1
+    vlan_id_subnet: 24
+    bgp_prefix: 192.168.41.0/24
+  - vlan_id: 40
+    vlan_name: "VLAN_40"
+    vnid: 100040
+    vrf_name: "Tenant-1"
+    vlan_id_ip: 192.168.51.1
+    vlan_id_subnet: 24
+    bgp_prefix: 192.168.51.0/24
+  - vlan_id: 99
+    vlan_name: "VLAN_99"
+    vnid: 100099
+    vrf_name: "Tenant-2"
+    vlan_id_ip: 192.168.61.1
+    vlan_id_subnet: 24
+    bgp_prefix: 192.168.61.0/24
+
+vrf_config:
+  - vrf_name: "management"
+    vnid: "default"
+    vrf_rd: "default"
+    vrf_mcast_group: 239.1.1.1
+    address_family: "ipv4"
+  - vrf_name: "operation"
+    vnid: "1000999"
+    vrf_rd: "auto"
+    address_family: "ipv4"
+    vrf_mcast_group: 239.1.1.15
+  - vrf_name: "Tenant-1"
+    vnid: "1000200"
+    vrf_rd: "auto"
+    address_family: "ipv4"
+    vrf_mcast_group: 239.1.1.50
+  - vrf_name: "Tenant-2"
+    vnid: "1000400"
+    vrf_rd: "auto"
+    address_family: "ipv4"
+    vrf_mcast_group: 239.1.1.12
+
+nve_intf_name: nve1
+
+bgp_neighbor_template: "Leaf_Spine_Peering"
+bgp_update_src: "loopback0"
+ebgp_multihop: 2
+peer_status: "false"
+
+nve:
+  nve_src_intf: Loopback1
+  intf_status: false
+
+vpc_pl_po_members:
+  - vpc_pl_mem: "1/49"
+  - vpc_pl_mem: "1/50"

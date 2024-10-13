@@ -1,2 +1,4 @@
 #bmi_spines.yaml
 # /opt/dcf_iac_project/inventories/group_vars/bmi_spines.yaml
+
+ospf_site_area_id: 0.0.0.1

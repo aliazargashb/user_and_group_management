@@ -1,0 +1,223 @@
+---
+- name: Configure Cisco Nexus Switch - SIC Super Spine
+  hosts: switch1
+  gather_facts: false
+  connection: network_cli
+  vars:
+    ansible_network_os: cisco.nxos.nxos
+
+  tasks:
+    - name: Enable necessary features   #OK.
+      cisco.nxos.nxos_feature:
+        feature: "{{ item }}"
+        state: enabled
+      loop: "{{ features }}"
+      tags:
+        - enable_features
+
+    - name: Create user account   #OK.
+      cisco.nxos.nxos_user:
+        name: "{{ device_user }}"
+        configured_password: "{{ device_pass }}"
+        role: "{{ user_role }}"
+      tags:
+        - create_user
+
+    - name: Configure PIM RP address   #OK.
+      cisco.nxos.nxos_pim_rp_address:
+        rp_address: "{{ pim_rp_ip }}"
+        group_list: "{{ pim_mgroup }}"
+      tags: 
+        - pim_multicast
+
+    - name: Configure Route-Map   #OK.
+      cisco.nxos.nxos_route_maps:
+        config:
+          - route_map: "{{ item.bgp_route_map }}"
+            entries:
+              - sequence: "{{ item.bgp_route_map_seq }}"
+                action: "{{ item.bgp_route_map_action }}"
+                set:
+                  ip:
+                    next_hop:
+                      unchanged: true
+        state: merged
+      loop: "{{ route_map }}"
+      tags: configure_route_map
+
+    - name: Configure Loopback Interface Descriptions   #OK.
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: "Loopback{{ item.intf_name }}"
+            description: "{{ item.intf_desc }}"
+            enabled: true
+        state: merged
+      loop: "{{ loopback_interfaces }}"
+      tags:
+        - configure_loopbacks
+
+    - name: Configure IP for Loopback   #OK.
+      cisco.nxos.nxos_l3_interfaces:
+        config:
+          - name: "Loopback{{ item.intf_name }}"
+            ipv4:
+              - address: "{{ item.intf_ip }}/{{ item.intf_subnet }}"
+        state: merged
+      loop: "{{ loopback_interfaces }}"
+      tags:
+        - configure_loopbacks_ip
+
+    - name: Configure Physical Ethernet Ports   #OK.
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: "{{ item.intf_name }}"
+            description: "{{ item.intf_desc }}"
+            enabled: "{{ item.intf_status }}"
+            mode: "{{ item.intf_mode }}"
+        state: merged
+      loop: "{{ physical_interfaces }}"
+      tags:
+        - configure_ports
+
+    - name: Configure IP for Physical Ethernet Ports   #OK.
+      cisco.nxos.nxos_l3_interfaces:
+        config:
+          - name: "{{ item.intf_name }}"
+            ipv4:
+              - address: "{{ item.intf_ip }}/{{ item.intf_subnet }}"
+        state: merged
+      loop: "{{ physical_interfaces }}"
+      tags:
+        - configure_physical_ports_ip
+
+    - name: Configure Interfaces, PIM   #OK.
+      cisco.nxos.nxos_pim_interface:
+        interface: "{{ item.intf_name }}"
+        sparse: true
+      loop: "{{ physical_interfaces }}"
+      tags:
+        - configure_pim_ports
+
+    - name: Configure OSPF   #OK.
+      cisco.nxos.nxos_ospfv2:
+        config:
+          processes:
+            - process_id: "{{ ospf_pro_id }}"
+              router_id: "{{ item.ospf_rid }}"
+      loop: "{{ OSPF }}"
+      tags:
+        - configure_ospf
+
+    - name: Configure Interfaces, OSPF   #CHECK. (ospf_Spine_area_id)
+      cisco.nxos.nxos_ospf_interfaces:
+        config:
+          - name: "{{ item.intf_name }}"
+            address_family:
+              - afi: ipv4
+                network: "{{ ospf_net_type }}"
+                processes:
+                  - process_id: "{{ ospf_pro_id }}"
+                    area:
+                      area_id: "{{ ospf_site_area_id }}"
+      # loop: "{{ OSPF_Interfaces }}"
+      with_items: 
+         - "{{ physical_interfaces }}"
+        #  - "{{ loopback_interfaces }}"
+      tags:
+        - configure_ospf_ports
+
+    - name: Configure BGP templates   #CHECK.
+      cisco.nxos.nxos_bgp_templates:
+        config:
+          as_number: "{{ bgp_asn }}"
+          neighbor:
+            - name: "{{ item.bgp_neighbor_template }}"
+              update_source: "{{ bgp_update_src }}" 
+              ebgp_multihop: "{{ ebgp_multihop }}"   
+              address_family:          
+                - afi: "ipv4"
+                  safi: "unicast"
+                  send_community: "extended"
+                - afi: "l2vpn"
+                  safi: "evpn"
+                  send_community: "extended"
+                  route_map:
+                    outbound: "{{ item.bgp_route_map }}"
+      loop: "{{ bgp }}"
+      tags: configure_bgp_template
+
+    - name: Configure BGP Process and Neighbors   #CHECK.
+      cisco.nxos.nxos_bgp_global:
+        config:
+          as_number: "{{ bgp_asn }}"
+          router_id: "{{ loopback_interfaces[0].intf_ip }}"
+          neighbors:
+            - neighbor_address: "{{ item.neighbor_address }}"
+              remote_as: "{{ item.bgp_peer_asn }}"
+              inherit:
+                peer: "{{ item.bgp_neighbor_template }}"
+              shutdown: false
+        state: merged
+      loop: "{{ bgp }}"
+      tags: configure_bgp_af
+
+    - name: Configure BGP neighbor   #CHECK.
+      cisco.nxos.nxos_bgp_neighbor_address_family:
+        config:
+          as_number: "{{ bgp_asn }}"
+          neighbors:
+            - neighbor_address: "{{ item.neighbor_address }}"
+              address_family:
+                - afi: l2vpn
+                  safi: evpn
+                  rewrite_evpn_rt_asn: true
+        state: merged
+      loop: "{{ bgp }}"
+      tags: bgp_neighbor
+
+    - name:  telemetry configuration destination_groups   #OK.
+      cisco.nxos.nxos_telemetry:
+        config:
+          source_interface: "{{ telemetry_src_intf }}"
+          vrf: "{{ telemetry_src_vrf }}"
+          destination_groups:
+            - id: "{{ item.0.dst_grp_id }}"
+              destination:
+                ip: "{{ item.1.dst_grp_ip }}"
+                port: "{{ item.1.dst_grp_port }}"
+                protocol: "{{ item.1.dst_grp_protocol }}"
+                encoding: "{{ item.1.dst_grp_encoding }}"
+      loop: "{{ destination_groups  | subelements('destination') }}"
+      tags:
+        - telemetry_destination_groups
+
+    - name:  telemetry configuration sensor_groups   #OK.
+      cisco.nxos.nxos_telemetry:
+        config:
+          source_interface: "{{ telemetry_src_intf }}"
+          vrf: "{{ telemetry_src_vrf }}"
+          sensor_groups:
+            - id: "{{ item.0.sns_grp_id }}"
+              data_source: "{{ item.0.sns_grp_data_src }}"
+              path:
+                name: "{{ item.1.sns_grp_path_name }}"
+                depth: "{{ item.1.sns_grp_path_depth }}"
+      loop: "{{ sensor_groups  | subelements('path') }}"  
+      tags:
+        - telemetry_sensor_groups
+
+    - name:  telemetry configuration subscriptions   #OK.
+      cisco.nxos.nxos_telemetry:
+        config:
+          source_interface: "{{ telemetry_src_intf }}"
+          vrf: "{{ telemetry_src_vrf }}"
+          subscriptions:
+            - id: "{{ item.0.sub_grp_id }}"
+              destination_group: "{{ item.0.dst_grp_id }}"
+              sensor_group:
+                id: "{{ item.1.sns_grp_id }}"
+                sample_interval: "{{ item.1.sub_interval }}"
+        state: merged
+      loop: "{{ subscriptions  | subelements('sensor_group') }}"  
+      tags:
+        - telemetry_subscriptions
