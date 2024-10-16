@@ -1,12 +1,6 @@
-#leafs.yaml
-# /opt/dcf_iac_project/inventories/group_vars/leafs.yaml
-# Variables specific to leaf switches
-# These settings are applied to all devices in the 'leafs' group.
-# Used for configuring VLANs, trunking, routing protocols, and other leaf-specific configurations.
+# ADD COMMENT
 
-
-#leafs.yaml (vars)
-
+#OK.$
 features:   
   - nv overlay
   - ospf
@@ -16,32 +10,43 @@ features:
   - vn-segment-vlan-based
   - lacp
   - vpc
+  - tacacs+
 
+#OK.$
 anycast_gw_mac: "0000.0000.1111" 
 
-pim_rp_ip: "10.3.0.255"
-pim_mgroup: "239.0.0.0/8"
-
+#OK.$
 l2rd: "auto"
 l2rt: "auto"
 
+#OK.$
 anycast_gw_mac_status: true
+
+#OK.$
 svi_status: true
+
+#OK.$
 ipforward: true
 
+#OK.$
 vpc_po_id: 1
 vpc_pl_sw_mode: trunk
 vpc_po_mode: active
 vpc_native_vlan: 3333
 vpc_pl: true
 
+#OK.$
 vpc_pkl_src: mgmt0
 vpc_delay_restore: 150
 vpc_auto_recovery: 360
 
-OSPF:
-  - ospf_rid: "loopback 0" # check
+#OK.$
+vpc_pl_po_members:
+  - vpc_pl_mem: "1/49"
+  - vpc_pl_mem: "1/50"
 
+
+#OK.$
 l2vlans:
   - vlan_id: 10
     vlan_name: "VLAN_10_TEST"
@@ -54,6 +59,7 @@ l2vlans:
     vrf_name: Tenant-1
     bgp_prefix: 192.168.31.0/24
 
+#OK.$
 l3vlans:
   - vlan_id: 30
     vlan_name: "VLAN_30"
@@ -77,6 +83,7 @@ l3vlans:
     vlan_id_subnet: 24
     bgp_prefix: 192.168.61.0/24
 
+#OK.$
 vrf_config:
   - vrf_name: "management"
     vnid: "default"
@@ -99,17 +106,13 @@ vrf_config:
     address_family: "ipv4"
     vrf_mcast_group: 239.1.1.12
 
+#OK.$
 nve_intf_name: nve1
 
+#OK.$
 bgp_neighbor_template: "Leaf_Spine_Peering"
-bgp_update_src: "loopback0"
-ebgp_multihop: 2
-peer_status: "false"
 
+#OK.$
 nve:
   nve_src_intf: Loopback1
   intf_status: false
-
-vpc_pl_po_members:
-  - vpc_pl_mem: "1/49"
-  - vpc_pl_mem: "1/50"

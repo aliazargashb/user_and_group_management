@@ -1,24 +1,24 @@
-# host_vars/bmi_leaf1.yaml
+# host_vars/sic_leaf2.yaml
 
 #OK.
-hostname: bmi_leaf1
+hostname: sic_leaf2
 
 #OK.
-bgp_asn: 65101
+bgp_asn: 65202
 
 intf_mtu: 9216
 
 #OK.
 loopback_interfaces:
   - intf_name: Loopback0
-    intf_ip: 10.0.0.101
+    intf_ip: 10.0.0.202
     intf_subnet: 32
     intf_desc: LP0_RID
   - intf_name: Loopback1
-    intf_ip: 10.3.0.101
+    intf_ip: 10.3.0.202
     intf_subnet: 32
     intf_desc: LP1_NVE
-    ip_secondary: "10.0.2.1/32"
+    ip_secondary: "10.0.2.2/32"
     sec_value: true
 
 #OK.
@@ -26,13 +26,13 @@ physical_interfaces:
   - intf_name: Ethernet1/1
     intf_desc: "To_Spine-1"
     intf_status: true
-    intf_ip: 10.0.1.2
+    intf_ip: 10.0.2.6
     intf_subnet: 30
     intf_mode: "layer3"
   - intf_name: Ethernet1/2
     intf_desc: "To_Spine-2"
     intf_status: true
-    intf_ip: 10.0.1.130
+    intf_ip: 10.0.2.134
     intf_subnet: 30
     intf_mode: "layer3"
   - intf_name: Ethernet1/6
@@ -50,8 +50,8 @@ physical_interfaces:
 
 #OK.
 bgp:
-  - bgp_neighbor_addr: 10.0.0.11
-  - bgp_neighbor_addr: 10.0.0.12
+  - bgp_neighbor_addr: 10.0.0.21
+  - bgp_neighbor_addr: 10.0.0.22
 
 #OK.
 vrf_config:

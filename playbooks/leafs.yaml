@@ -1,13 +1,38 @@
 ---
 - name: Configure Cisco Nexus Switch - SIC Leaf
-  hosts: switch1
+  hosts: sic_spine1
   gather_facts: false
   connection: network_cli
   vars:
     ansible_network_os: cisco.nxos.nxos
 
   tasks:
-    - name: Enable necessary features   #OK.
+    - name: Configure AAA   #CHECK. #VARS MUST GO TO ALL
+      cisco.nxos.nxos_config:
+        lines:
+          - aaa authentication login default group AAA_Servers local
+          - aaa authentication login console group AAA_Servers local
+          - aaa authorization commands default group AAA_Servers local
+          - aaa accounting default group AAA_Servers local
+          - aaa authorization config-commands default group AAA_Servers local
+          - aaa authentication login error-enable
+          - tacacs-server directed-request
+          - aaa group server tacacs+ AAA_Servers
+          - tacacs-server host 172.27.0.1 key key1
+          - tacacs-server host 172.27.0.1 key key2
+          - use-vrf management
+          - source-interface management
+      tags: 
+        - aaa_config
+
+    - name: Set Hostname #OK.$
+      cisco.nxos.nxos_hostname:
+        config:
+          hostname: "{{ hostname }}"
+      tags:
+        - set_hostname
+
+    - name: Enable necessary features #OK.$
       cisco.nxos.nxos_feature:
         feature: "{{ item }}"
         state: enabled
@@ -15,7 +40,17 @@
       tags:
         - enable_features
 
-    - name: Create user account   #OK.
+    - name: Configure NTP #OK.$
+      cisco.nxos.nxos_ntp_global:
+        config:
+          servers:
+            - server: "{{ item }}"
+              vrf: "{{ ntp_vrf }}"
+      loop: "{{ ntp_server }}"
+      tags:
+        - ntp_config
+
+    - name: Create user account #OK.$
       cisco.nxos.nxos_user:
         name: "{{ device_user }}"
         configured_password: "{{ device_pass }}"
@@ -23,38 +58,37 @@
       tags:
         - create_user
 
-    - name: Enable NV Overlay EVPN   #OK.
+    - name: Enable NV Overlay EVPN #OK.$
       cisco.nxos.nxos_evpn_global:
         nv_overlay_evpn: true
       tags: evpn_feature
 
-    - name: anycast gateway configuration   #OK.
+    - name: anycast gateway configuration #OK.$
       cisco.nxos.nxos_overlay_global:
         anycast_gateway_mac: "{{ anycast_gw_mac }}"
       tags:
         - anycast_gateway
 
-    - name: Configure PIM RP address   #OK.
+    - name: Configure PIM RP address #OK.$
       cisco.nxos.nxos_pim_rp_address:
         rp_address: "{{ pim_rp_ip }}"
         group_list: "{{ pim_mgroup }}"
-      tags: 
+      tags:
         - pim_multicast
 
-    - name: Ensure VLANs are configured   #OK.
+    - name: Ensure VLANs are configured #OK.$
       cisco.nxos.nxos_vlans:
         config:
           - vlan_id: "{{ item.vlan_id }}"
             name: "{{ item.vlan_name }}"
             mapped_vni: "{{ item.vnid }}"
         state: merged
-      with_items: 
-         - "{{ l2vlans }}"
-         - "{{ l3vlans }}"
+      with_items:
+        - "{{ vrf_config }}"
       tags:
-        - configure_vlans
+        - configure_tenant_l3vni
 
-    - name: Configure VRFs   #OK.
+    - name: Configure VRFs #OK.$
       cisco.nxos.nxos_vrf:
         aggregate:
           - name: "{{ item.vrf_name }}"
@@ -64,7 +98,51 @@
       tags:
         - configure_vrf
 
-    - name: Configure VRF_AF   #OK.
+    - name: LEAF tenants_svi naming confiuration #OK.$
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: "vlan{{ item.vlan_id }}"
+            description: "{{ item.vlan_name }}"
+            enabled: true
+        state: merged
+      loop: "{{ vrf_config }}"
+      tags:
+        - tenant_svi_naming
+
+    - name: LEAF tenants_svi vrf membership confiuration #OK.$
+      cisco.nxos.nxos_vrf_interface:
+        interface: "vlan{{ item.vlan_id }}"
+        vrf: "{{ item.vrf_name }}"
+        state: present
+      loop: "{{ vrf_config }}"
+      tags:
+        - tenant_vrf_mem
+
+    - name: LEAF tenants_svi ip forward confiuration #OK.$
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: "vlan{{ item.vlan_id }}"
+            ip_forward: "{{ ipforward }}"
+            enabled: true
+        state: merged
+      loop: "{{ vrf_config }}"
+      tags:
+        - tenant_ip_forward
+
+    - name: Ensure VLANs are configured #OK.$
+      cisco.nxos.nxos_vlans:
+        config:
+          - vlan_id: "{{ item.vlan_id }}"
+            name: "{{ item.vlan_name }}"
+            mapped_vni: "{{ item.vnid }}"
+        state: merged
+      with_items:
+        - "{{ l2vlans }}"
+        - "{{ l3vlans }}"
+      tags:
+        - configure_vlans
+
+    - name: Configure VRF_AF #OK.$
       cisco.nxos.nxos_vrf_af:
         afi: ipv4
         route_target_both_auto_evpn: true
@@ -78,7 +156,7 @@
       tags:
         - configure_vrf_af
 
-    - name: VNI configuration   #OK.
+    - name: VNI configuration #OK.$
       cisco.nxos.nxos_evpn_vni:
         vni: "{{ item.vnid }}"
         route_distinguisher: "{{ l2rd }}"
@@ -88,7 +166,7 @@
       tags:
         - l2evpn
 
-    - name: LEAF SVI Naming   #OK.
+    - name: LEAF SVI Naming #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "vlan{{ item.vlan_id }}"
@@ -100,7 +178,7 @@
       tags:
         - svi_naming
 
-    - name: LEAF SVI VRF Membership   #OK.
+    - name: LEAF SVI VRF Membership #OK.$
       cisco.nxos.nxos_vrf_interface:
         interface: "vlan{{ item.vlan_id }}"
         vrf: "{{ item.vrf_name }}"
@@ -109,7 +187,7 @@
       tags:
         - svi_vrf_mem
 
-    - name: LEAF SVI IP Address   #OK.
+    - name: LEAF SVI IP Address #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "vlan{{ item.vlan_id }}"
@@ -120,41 +198,10 @@
       tags:
         - svi_ip
 
-    - name: LEAF tenants_svi naming confiuration   #OK.
+    - name: Configure Loopback Interface Descriptions #OK.$
       cisco.nxos.nxos_interfaces:
         config:
-          - name: "vlan{{ item.vlan_id }}"
-            description: "{{ item.vlan_name }}"
-            enabled: true
-        state: merged
-      loop: "{{ l3vlans }}"
-      tags:
-        - tenant_svi_naming
-
-    - name: LEAF tenants_svi vrf membership confiuration   #OK.
-      cisco.nxos.nxos_vrf_interface:
-        interface: "vlan{{ item.vlan_id }}"
-        vrf: "{{ item.vrf_name }}"
-        state: present
-      loop: "{{ l3vlans }}"
-      tags:
-        - tenant_vrf_mem
-
-    - name: LEAF tenants_svi ip forward confiuration   #OK.
-      cisco.nxos.nxos_interfaces:
-        config:
-          - name: "vlan{{ item.vlan_id }}"
-            ip_forward: "{{ ipforward }}"
-            enabled: true
-        state: merged
-      loop: "{{ l3vlans }}"
-      tags:
-        - tenant_ip_forward
-
-    - name: Configure Loopback Interface Descriptions   #OK.
-      cisco.nxos.nxos_interfaces:
-        config:
-          - name: "Loopback{{ item.intf_name }}"
+          - name: "{{ item.intf_name }}"
             description: "{{ item.intf_desc }}"
             enabled: true
         state: merged
@@ -162,18 +209,20 @@
       tags:
         - configure_loopbacks
 
-    - name: Configure IP for Loopback   #OK.
+    - name: Configure IP for Loopback #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
-          - name: "Loopback{{ item.intf_name }}"
+          - name: "{{ item.intf_name }}"
             ipv4:
               - address: "{{ item.intf_ip }}/{{ item.intf_subnet }}"
+              - address: "{{ item.ip_secondary | default('null') }}/{{ item.intf_subnet }}"
+                secondary: "{{ item.sec_value | default('false') }}"
         state: merged
       loop: "{{ loopback_interfaces }}"
       tags:
         - configure_loopbacks_ip
 
-    - name: Configure Physical Ethernet Ports   #OK.
+    - name: Configure Physical Ethernet Ports #OK.$ (CHANGE LOOP NAME)
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -185,7 +234,7 @@
       tags:
         - configure_ports
 
-    - name: Configure IP for Physical Ethernet Ports   #OK.
+    - name: Configure IP for Physical Ethernet Ports #OK.$ (CHANGE LOOP NAME)
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -196,7 +245,7 @@
       tags:
         - configure_physical_ports_ip
 
-    - name: Configure Interfaces, PIM   #OK.
+    - name: Configure Interfaces, PIM #OK.$ (CHANGE LOOP NAME)
       cisco.nxos.nxos_pim_interface:
         interface: "{{ item.intf_name }}"
         sparse: true
@@ -204,17 +253,16 @@
       tags:
         - configure_pim_ports
 
-    - name: Configure OSPF   #OK.
+    - name: Configure OSPF #OK.$
       cisco.nxos.nxos_ospfv2:
         config:
           processes:
             - process_id: "{{ ospf_pro_id }}"
-              router_id: "{{ item.ospf_rid }}"
-      loop: "{{ OSPF }}"
+              router_id: "{{ loopback_interfaces | selectattr('intf_name', 'match', 'Loopback0') | map(attribute='intf_ip') | first }}"
       tags:
         - configure_ospf
 
-    - name: Configure Interfaces, OSPF   #CHECK
+    - name: Configure Interfaces, OSPF #OK.$ (CHANGE LOOP NAME)
       cisco.nxos.nxos_ospf_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -225,14 +273,13 @@
                   - process_id: "{{ ospf_pro_id }}"
                     area:
                       area_id: "{{ ospf_site_area_id }}"
-      # loop: "{{ OSPF_Interfaces }}"
-      with_items: 
-         - "{{ physical_interfaces }}"
-        #  - "{{ loopback_interfaces }}"
+      with_items:
+        - "{{ physical_interfaces }}"
+        - "{{ loopback_interfaces }}"
       tags:
         - configure_ospf_ports
 
-    - name: Configure NVE Interface for VXLAN   #OK.
+    - name: Configure NVE Interface for VXLAN #OK.$
       cisco.nxos.nxos_vxlan_vtep:
         interface: "{{ nve.intf_name }}"
         source_interface: "{{ nve.nve_src_intf }}"
@@ -241,18 +288,20 @@
       tags:
         - configure_nve
 
-    - name: Configure VNIs for NVE l3vlans   #OK.
+    - name: Configure VNIs for NVE vlans #OK.$
       cisco.nxos.nxos_vxlan_vtep_vni:
         interface: "{{ nve_intf_name }}"
         vni: "{{ item.vnid }}"
         multicast_group: "{{ vrf_config | selectattr('vrf_name', 'equalto', item.vrf_name) | map(attribute='vrf_mcast_group') | first }}"
         state: present
         suppress_arp: true
-      loop: "{{ l3vlans }}"
+      with_items:
+        - "{{ l2vlans }}"
+        - "{{ l3vlans }}"
       tags:
-        - configure_l3vlan_multicasts
+        - configure_vlan_multicasts
 
-    - name:  telemetry configuration destination_groups   #OK.
+    - name: telemetry configuration destination_groups #OK.$
       cisco.nxos.nxos_telemetry:
         config:
           source_interface: "{{ telemetry_src_intf }}"
@@ -264,11 +313,11 @@
                 port: "{{ item.1.dst_grp_port }}"
                 protocol: "{{ item.1.dst_grp_protocol }}"
                 encoding: "{{ item.1.dst_grp_encoding }}"
-      loop: "{{ destination_groups  | subelements('destination') }}"
+      loop: "{{ telemetry_destination_groups  | subelements('destination') }}"
       tags:
         - telemetry_destination_groups
 
-    - name:  telemetry configuration sensor_groups   #OK.
+    - name: telemetry configuration sensor_groups #OK.$
       cisco.nxos.nxos_telemetry:
         config:
           source_interface: "{{ telemetry_src_intf }}"
@@ -279,11 +328,11 @@
               path:
                 name: "{{ item.1.sns_grp_path_name }}"
                 depth: "{{ item.1.sns_grp_path_depth }}"
-      loop: "{{ sensor_groups  | subelements('path') }}"  
+      loop: "{{ telemetry_sensor_groups | subelements('path') }}"
       tags:
         - telemetry_sensor_groups
 
-    - name:  telemetry configuration subscriptions   #OK.
+    - name: telemetry configuration subscriptions #OK.
       cisco.nxos.nxos_telemetry:
         config:
           source_interface: "{{ telemetry_src_intf }}"
@@ -295,18 +344,18 @@
                 id: "{{ item.1.sns_grp_id }}"
                 sample_interval: "{{ item.1.sub_interval }}"
         state: merged
-      loop: "{{ subscriptions  | subelements('sensor_group') }}"  
+      loop: "{{ telemetry_subscriptions | subelements('sensor_group') }}"
       tags:
         - telemetry_subscriptions
 
-    - name: Configure BGP templates   #OK.
+    - name: Configure BGP templates #OK.$
       cisco.nxos.nxos_bgp_templates:
         config:
           as_number: "{{ bgp_asn }}"
           neighbor:
             - name: "{{ bgp_neighbor_template }}"
               update_source: "{{ bgp_update_src }}"
-              ebgp_multihop: "{{ ebgp_multihop }}"   
+              ebgp_multihop: "{{ ebgp_multihop }}"
               address_family:
                 - afi: "ipv4"
                   safi: "unicast"
@@ -316,11 +365,11 @@
                   send_community: "extended"
       tags: configure_bgp_template
 
-    - name: Configure BGP Process and Neighbors   #OK.
+    - name: Configure BGP Process and Neighbors #OK.$
       cisco.nxos.nxos_bgp_global:
         config:
           as_number: "{{ bgp_asn }}"
-          router_id: "{{ loopback_interfaces[0].intf_ip }}"
+          router_id: "{{ loopback_interfaces | selectattr('intf_name', 'match', 'Loopback0') | map(attribute='intf_ip') | first}}"
           neighbors:
             - neighbor_address: "{{ item.bgp_neighbor_addr }}"
               remote_as: "{{ bgp_peer_asn }}"
@@ -331,7 +380,7 @@
       loop: "{{ bgp }}"
       tags: configure_bgp_af
 
-    - name: Configure BGP L3VNI VRFs   #OK.
+    - name: Configure BGP L3VNI VRFs #OK.$
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -340,13 +389,13 @@
               afi: ipv4
               safi: unicast
               networks:
-                - prefix:  "{{ item.bgp_prefix }}"
+                - prefix: "{{ item.bgp_prefix }}"
               advertise_l2vpn_evpn: true
         state: merged
       loop: "{{ l3vlans }}"
       tags: configure_bgp_vrf
 
-    - name: Configure BGP neighbor   #OK.
+    - name: Configure BGP neighbor #OK.$
       cisco.nxos.nxos_bgp_neighbor_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -360,17 +409,16 @@
       loop: "{{ bgp }}"
       tags: bgp_neighbor
 
-    - name: Configure VPC domain   #OK.
+    - name: Configure VPC domain #OK.$
       cisco.nxos.nxos_vpc:
-        domain: "{{ item.vpc_domain }}"
-        pkl_dest: "{{ item.vpc_pkl_dest }}"
-        pkl_src: "{{ item.vpc_pkl_src }}"
+        domain: "{{ vpc_domain }}"
+        pkl_dest: "{{ vpc_pkl_dest }}"
+        pkl_src: "{{ vpc_pkl_src }}"
         delay_restore: "{{ vpc_delay_restore }}"
         auto_recovery_reload_delay: "{{ vpc_auto_recovery }}"
-      loop: "{{ vpc }}"
       tags: vpc
 
-    - name: LEAF vpc peer link port channel configuration   #OK.
+    - name: LEAF vpc peer link port channel configuration #OK.$
       cisco.nxos.nxos_lag_interfaces:
         config:
           - name: "{{ vpc_po_id }}"
@@ -382,15 +430,7 @@
       tags:
         - vpc_peerlink_pc
 
-    - name: LEAF vpc domain configuration   #OK.
-      cisco.nxos.nxos_vpc:
-        domain: "{{ item.vpc_domain }}"
-        state: present
-      loop: "{{ vpc }}"
-      tags:
-        - vpc_domain
-
-    - name: vpc peerlink configuration   #OK.
+    - name: vpc peerlink configuration #OK.$
       cisco.nxos.nxos_vpc_interface:
         portchannel: "{{ vpc_po_id }}"
         peer_link: "{{ vpc_pl }}"
@@ -398,18 +438,18 @@
       tags:
         - vpc_pl_po
 
-    - name: vpc peerlink trunk configuration   #OK.
+    - name: vpc peerlink trunk configuration #OK.$
       cisco.nxos.nxos_l2_interfaces:
         config:
           - name: "port-channel{{ vpc_po_id }}"
-            mode: "{{ vpc_pl_sw_mode }}" 
+            mode: "{{ vpc_pl_sw_mode }}"
             trunk:
               native_vlan: "{{ vpc_native_vlan }}"
         state: merged
       tags:
         - vpc_pl_trunk
 
-    - name: leafs vpc peer-link enabling   #OK.
+    - name: leafs vpc peer-link enabling #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "Ethernet{{ item.vpc_pl_mem }}"

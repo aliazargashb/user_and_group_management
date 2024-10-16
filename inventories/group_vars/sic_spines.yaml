@@ -1,4 +1,7 @@
-#sic_spines.yaml
-# /opt/dcf_iac_project/inventories/group_vars/sic_spines.yaml
+# ADD COMMENT
 
+#OK.$
+bgp_asn: 65206
+
+#OK.$
 ospf_site_area_id: 0.0.0.2

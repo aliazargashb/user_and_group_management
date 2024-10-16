@@ -1,0 +1,40 @@
+# ADD COMMENT
+
+#OK.$
+hostname: sic_spine1
+
+#OK.$
+loopback_interfaces:
+  - intf_name: Loopback0
+    intf_ip: 10.0.0.201
+    intf_subnet: 24
+    intf_desc: LP0_RID
+  - intf_name: Loopback1
+    intf_ip: 10.3.0.201
+    intf_subnet: 24
+    intf_desc: LP1_NVE
+  - intf_name: Loopback2
+    intf_ip: 192.168.1.20
+    intf_subnet: 24
+    intf_desc: "Management Loopback 2 for Switch 1"
+
+#OK.$
+physical_interfaces:
+  - intf_name: Ethernet1/4
+    intf_desc: "WAN Connection"
+    intf_status: true
+    intf_ip: 10.2.2.2
+    intf_subnet: 24
+    intf_mode: "layer3"
+  - intf_name: Ethernet1/51
+    intf_desc: "To_Spine-1"
+    intf_status: true
+    intf_ip: 10.0.2.2
+    intf_subnet: 30
+    intf_mode: "layer3"
+  - intf_name: Ethernet1/52
+    intf_desc: "To_Spine-2"
+    intf_status: true
+    intf_ip: 10.0.2.130
+    intf_subnet: 30
+    intf_mode: "layer3"

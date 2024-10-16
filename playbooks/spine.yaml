@@ -7,7 +7,32 @@
     ansible_network_os: cisco.nxos.nxos
 
   tasks:
-    - name: Enable necessary features   #OK.
+    - name: Configure AAA   #CHECK. #VARS MUST GO TO ALL
+      cisco.nxos.nxos_config:
+        lines:
+          - aaa authentication login default group AAA_Servers local
+          - aaa authentication login console group AAA_Servers local
+          - aaa authorization commands default group AAA_Servers local
+          - aaa accounting default group AAA_Servers local
+          - aaa authorization config-commands default group AAA_Servers local
+          - aaa authentication login error-enable
+          - tacacs-server directed-request
+          - aaa group server tacacs+ AAA_Servers
+          - tacacs-server host 172.27.0.1 key key1
+          - tacacs-server host 172.27.0.2 key key2
+          - use-vrf management
+          - source-interface management
+      tags: 
+        - aaa_config
+
+    - name: Set Hostname   #OK.$
+      cisco.nxos.nxos_hostname:
+        config:
+          hostname: "{{ hostname }}"
+      tags:
+        - set_hostname
+
+    - name: Enable necessary features   #OK.$
       cisco.nxos.nxos_feature:
         feature: "{{ item }}"
         state: enabled
@@ -15,7 +40,17 @@
       tags:
         - enable_features
 
-    - name: Create user account   #OK.
+    - name: Configure NTP #OK.%
+      cisco.nxos.nxos_ntp_global:
+        config:
+          servers:
+            - server: "{{ item }}"
+              vrf: "{{ ntp_vrf }}"
+      loop: "{{ ntp_server }}"
+      tags:
+        - ntp_config
+
+    - name: Create user account   #OK.$
       cisco.nxos.nxos_user:
         name: "{{ device_user }}"
         configured_password: "{{ device_pass }}"
@@ -23,23 +58,22 @@
       tags:
         - create_user
 
-    - name: Configure PIM RP address   #OK.
+    - name: Configure PIM RP address   #OK.$
       cisco.nxos.nxos_pim_rp_address:
         rp_address: "{{ pim_rp_ip }}"
         group_list: "{{ pim_mgroup }}"
       tags: 
         - pim_multicast
 
-#CHECK MODULES
-    - name: Configure PIM Anycast-RP addresses   #OK.
+    - name: Configure PIM Anycast-RP addresses   #OK.$
       cisco.nxos.nxos_config:
         lines:
-          - ip pim anycast-rp 10.3.0.254 10.3.0.21
-          - ip pim anycast-rp 10.3.0.254 10.3.0.22
+          - ip pim anycast-rp {{ anycast_rp_addr }} {{ item }}
+      loop: "{{ rp_addr }}"
       tags: 
         - pim_anycast_rp
 
-    - name: Configure Loopback Interface Descriptions   #OK.
+    - name: Configure Loopback Interface Descriptions   #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "Loopback{{ item.intf_name }}"
@@ -50,18 +84,20 @@
       tags:
         - configure_loopbacks
 
-    - name: Configure IP for Loopback   #OK.
+    - name: Configure IP for Loopback #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
-          - name: "Loopback{{ item.intf_name }}"
+          - name: "{{ item.intf_name }}"
             ipv4:
               - address: "{{ item.intf_ip }}/{{ item.intf_subnet }}"
+              - address: "{{ item.ip_secondary | default('null') }}/{{ item.intf_subnet }}"
+                secondary: "{{ item.sec_value | default('false') }}"
         state: merged
       loop: "{{ loopback_interfaces }}"
       tags:
         - configure_loopbacks_ip
 
-    - name: Configure Physical Ethernet Ports   #OK.
+    - name: Configure Physical Ethernet Ports   #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -73,7 +109,7 @@
       tags:
         - configure_ports
 
-    - name: Configure IP for Physical Ethernet Ports   #OK.
+    - name: Configure IP for Physical Ethernet Ports   #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -84,7 +120,7 @@
       tags:
         - configure_physical_ports_ip
 
-    - name: Configure Interfaces, PIM   #OK.
+    - name: Configure Interfaces, PIM   #OK.$
       cisco.nxos.nxos_pim_interface:
         interface: "{{ item.intf_name }}"
         sparse: true
@@ -92,17 +128,16 @@
       tags:
         - configure_pim_ports
 
-    - name: Configure OSPF   #OK.
+    - name: Configure OSPF   #OK.$
       cisco.nxos.nxos_ospfv2:
         config:
           processes:
             - process_id: "{{ ospf_pro_id }}"
-              router_id: "{{ item.ospf_rid }}"
-      loop: "{{ OSPF }}"
+              router_id: "{{ loopback_interfaces | selectattr('intf_name', 'match', 'Loopback0') | map(attribute='intf_ip') | first }}"
       tags:
         - configure_ospf
 
-    - name: Configure Interfaces, OSPF   #CHECK. (ospf_Spine_area_id)
+    - name: Configure Interfaces, OSPF   #OK.$ (IMP)
       cisco.nxos.nxos_ospf_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -113,14 +148,26 @@
                   - process_id: "{{ ospf_pro_id }}"
                     area:
                       area_id: "{{ ospf_site_area_id }}"
-      # loop: "{{ OSPF_Interfaces }}"
-      with_items: 
-         - "{{ physical_interfaces }}"
-        #  - "{{ loopback_interfaces }}"
+      loop: "{{ to_site_ospf_intf }}"
       tags:
-        - configure_ospf_ports
+        - configure_site_ospf_ports
 
-    - name: Configure BGP templates   #CHECK.
+    - name: Configure Interfaces, OSPF   #OK.$ (IMP)
+      cisco.nxos.nxos_ospf_interfaces:
+        config:
+          - name: "{{ item.intf_name }}"
+            address_family:
+              - afi: ipv4
+                network: "{{ ospf_net_type }}"
+                processes:
+                  - process_id: "{{ ospf_pro_id }}"
+                    area:
+                      area_id: "{{ ospf_dci_area_id }}"
+      loop: "{{ to_dci_ospf_intf }}"
+      tags:
+        - configure_dci_ospf_ports
+
+    - name: Configure BGP templates   #OK.$
       cisco.nxos.nxos_bgp_templates:
         config:
           as_number: "{{ bgp_asn }}"
@@ -136,15 +183,15 @@
                   safi: "evpn"
                   send_community: "extended"
                   route_map:
-                    outbound: "{{ item.bgp_route_map }}"
+                    outbound: "{{ bgp_route_map }}"
       loop: "{{ bgp }}"
       tags: configure_bgp_template
 
-    - name: Configure BGP Process and Neighbors   #CHECK.
+    - name: Configure BGP Process and Neighbors   #OK.$
       cisco.nxos.nxos_bgp_global:
         config:
           as_number: "{{ bgp_asn }}"
-          router_id: "{{ loopback_interfaces[0].intf_ip }}"
+          router_id: "{{ loopback_interfaces | selectattr('intf_name', 'match', 'Loopback0') | map(attribute='intf_ip') | first}}"
           neighbors:
             - neighbor_address: "{{ item.neighbor_address }}"
               remote_as: "{{ item.bgp_peer_asn }}"
@@ -155,7 +202,7 @@
       loop: "{{ bgp }}"
       tags: configure_bgp_af
 
-    - name: Configure BGP neighbor   #CHECK.
+    - name: Configure BGP neighbor   #OK.$
       cisco.nxos.nxos_bgp_neighbor_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -169,22 +216,21 @@
       loop: "{{ bgp }}"
       tags: bgp_neighbor
 
-    - name: Configure Route-Map   #OK.
+    - name: Configure Route-Map   #OK.$
       cisco.nxos.nxos_route_maps:
         config:
-          - route_map: "{{ item.bgp_route_map }}"
+          - route_map: "{{ bgp_route_map }}"
             entries:
-              - sequence: "{{ item.bgp_route_map_seq }}"
-                action: "{{ item.bgp_route_map_action }}"
+              - sequence: "{{ bgp_route_map_seq }}"
+                action: "{{ bgp_route_map_action }}"
                 set:
                   ip:
                     next_hop:
                       unchanged: true
         state: merged
-      loop: "{{ route_map }}"
       tags: configure_route_map
 
-    - name:  telemetry configuration destination_groups   #OK.
+    - name:  telemetry configuration destination_groups   #OK.$
       cisco.nxos.nxos_telemetry:
         config:
           source_interface: "{{ telemetry_src_intf }}"
@@ -196,11 +242,11 @@
                 port: "{{ item.1.dst_grp_port }}"
                 protocol: "{{ item.1.dst_grp_protocol }}"
                 encoding: "{{ item.1.dst_grp_encoding }}"
-      loop: "{{ destination_groups  | subelements('destination') }}"
+      loop: "{{ telemetry_destination_groups  | subelements('destination') }}"
       tags:
         - telemetry_destination_groups
 
-    - name:  telemetry configuration sensor_groups   #OK.
+    - name:  telemetry configuration sensor_groups   #OK.$
       cisco.nxos.nxos_telemetry:
         config:
           source_interface: "{{ telemetry_src_intf }}"
@@ -211,11 +257,11 @@
               path:
                 name: "{{ item.1.sns_grp_path_name }}"
                 depth: "{{ item.1.sns_grp_path_depth }}"
-      loop: "{{ sensor_groups  | subelements('path') }}"  
+      loop: "{{ telemetry_sensor_groups  | subelements('path') }}"  
       tags:
         - telemetry_sensor_groups
 
-    - name:  telemetry configuration subscriptions   #OK.
+    - name:  telemetry configuration subscriptions   #OK.$
       cisco.nxos.nxos_telemetry:
         config:
           source_interface: "{{ telemetry_src_intf }}"
@@ -227,6 +273,6 @@
                 id: "{{ item.1.sns_grp_id }}"
                 sample_interval: "{{ item.1.sub_interval }}"
         state: merged
-      loop: "{{ subscriptions  | subelements('sensor_group') }}"  
+      loop: "{{ telemetry_subscriptions  | subelements('sensor_group') }}"  
       tags:
         - telemetry_subscriptions

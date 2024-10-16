@@ -1,4 +1,19 @@
-#spines.yaml
-# /opt/dcf_iac_project/inventories/group_vars/spines.yaml
-# Variables specific to spine switches
-# This file contains settings like routing protocols, and PIM configurations.
+# ADD COMMENT
+
+#OK.$
+features:
+  - nv overlay
+  - ospf
+  - bgp
+  - pim
+
+#OK.$
+bgp_route_map: Retain_NH_Addr
+bgp_route_map_seq: 10
+bgp_route_map_action: permit
+
+#OK.$
+anycast_rp_addr: 10.3.0.254
+rp_addr:
+  - 10.3.0.21
+  - 10.3.0.22
