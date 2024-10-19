@@ -1,5 +1,5 @@
 # Ansible Project Structure
-This project is structured to manage network infrastructure using Ansible, organized with inventories, group variables, host-specific configurations, and playbooks to configure different sets of devices such as leafs, spines, and superspines.
+This project is structured to manage data center fabric infrastructure using Ansible, organized with inventories, group variables, host-specific configurations, and playbooks to configure different sets of devices such as leafs, spines, and superspines.
 
 ## Project Structure
 ```bash
@@ -37,7 +37,6 @@ This project is structured to manage network infrastructure using Ansible, organ
 ```
 
 ## Cloning the Project
-
 To get started with this project, follow the steps below to clone the repository and set it up locally.
 
 ### Prerequisites
@@ -45,10 +44,9 @@ To get started with this project, follow the steps below to clone the repository
 - Optionally, make sure Python and a virtual environment tool (e.g., `venv`, `virtualenv`) are set up to isolate your Ansible dependencies.
 
 ### Steps to Clone
-
 1. **Clone the Repository**
 
-   Open your terminal and run the following command to clone the project repository:
+Open your terminal and run the following command to clone the project repository:
 ```bash
    git clone <repository_url>
 ```
