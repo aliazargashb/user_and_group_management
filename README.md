@@ -113,6 +113,7 @@ Contains variables that are specific to individual hosts.
 - `bmi_spine1.yaml`, `sic_spine1.yaml`, etc.: Files that define host-specific variables for individual BMI and SIC switches (e.g., spines, leafs).
 
 ### `playbooks`
+
 This directory contains the Ansible playbooks used to configure different network devices.
 - `leafs.yaml`: Playbook for configuring leaf switches.
 - `spine.yaml`: Playbook for configuring spine switches.
