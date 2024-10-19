@@ -49,8 +49,7 @@ To get started with this project, follow the steps below to clone the repository
 1. **Clone the Repository**
 
    Open your terminal and run the following command to clone the project repository:
-
-   ```bash
+```bash
    git clone <repository_url>
 ```
 
