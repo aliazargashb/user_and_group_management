@@ -4,7 +4,7 @@ all:
     ansible_password: 1qaz!QAZ
   
   children:
-    all:
+    dcf:
       hosts:
         bmi_superspine:
           ansible_host: 100.120.23.100

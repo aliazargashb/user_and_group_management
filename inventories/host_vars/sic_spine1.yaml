@@ -37,7 +37,7 @@ physical_interfaces:
   - intf_name: Ethernet1/1
     intf_desc: "To_Leaf-1"
     intf_status: true
-    intf_ip: 10.0.2.2
+    intf_ip: 10.0.2.1
     intf_subnet: 30
     intf_mode: "layer3"
   - intf_name: Ethernet1/2
@@ -70,6 +70,7 @@ to_site_ospf_intf:
   - intf_name: Ethernet1/1
   - intf_name: Ethernet1/2
   - intf_name: Ethernet1/5
+
 #OK.$
 to_dci_ospf_intf:
   - intf_name: Ethernet1/3

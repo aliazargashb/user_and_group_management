@@ -1,13 +1,21 @@
 ---
 - name: Configure Cisco Nexus Switch - SIC Spine
-  hosts: sic_spine1
+  hosts: spines
   gather_facts: false
   connection: network_cli
   vars:
     ansible_network_os: cisco.nxos.nxos
 
   tasks:
-    - name: Configure AAA   #OK.$ #NEW ADD
+    - name: Enable necessary features   #OK.$
+      cisco.nxos.nxos_feature:
+        feature: "{{ item }}"
+        state: enabled
+      loop: "{{ features }}"
+      tags:
+        - enable_features
+
+    - name: Configure AAA   #OK.$
       cisco.nxos.nxos_config:
         lines:
           - aaa authentication login default group {{ aaa_srv_grp }} local
@@ -21,7 +29,7 @@
       tags: 
         - aaa_config
 
-    - name: Configure TACACS   #OK.$ #NEW ADD
+    - name: Configure TACACS   #OK.$
       cisco.nxos.nxos_config:
         lines:
           - tacacs-server host {{ item.tacacs_srv_host }} key {{ item.tacacs_srv_key }}
@@ -40,14 +48,6 @@
       tags:
         - set_hostname
 
-    - name: Enable necessary features   #OK.$
-      cisco.nxos.nxos_feature:
-        feature: "{{ item }}"
-        state: enabled
-      loop: "{{ features }}"
-      tags:
-        - enable_features
-
     - name: Configure NTP   #OK.$
       cisco.nxos.nxos_ntp_global:
         config:
@@ -65,6 +65,11 @@
         role: "{{ user_role }}"
       tags:
         - create_user
+
+    - name: Enable NV Overlay EVPN   #OK.$
+      cisco.nxos.nxos_evpn_global:
+        nv_overlay_evpn: true
+      tags: evpn_feature
 
     - name: Configure PIM RP address   #OK.$
       cisco.nxos.nxos_pim_rp_address:
@@ -87,7 +92,6 @@
           - name: "Loopback{{ item.intf_name }}"
             description: "{{ item.intf_desc }}"
             enabled: true
-            mtu: "{{ intf_mtu }}" #NEW ADD
         state: merged
       loop: "{{ loopback_interfaces }}"
       tags:
@@ -99,8 +103,6 @@
           - name: "{{ item.intf_name }}"
             ipv4:
               - address: "{{ item.intf_ip }}/{{ item.intf_subnet }}"
-              # - address: "{{ item.ip_secondary | default('null') }}/{{ item.intf_subnet }}"   #NO NEED
-              #   secondary: "{{ item.sec_value | default('false') }}"   #NO NEED
         state: merged
       loop: "{{ loopback_interfaces }}"
       tags:
@@ -113,7 +115,7 @@
             description: "{{ item.intf_desc }}"
             enabled: "{{ item.intf_status }}"
             mode: "{{ item.intf_mode }}"
-            mtu: "{{ intf_mtu }}" #NEW ADD
+            mtu: "{{ intf_mtu }}"
         state: merged
       loop: "{{ physical_interfaces }}"
       tags:
@@ -163,6 +165,21 @@
     #     - "{{ loopback_interfaces }}"
     #   tags:
     #     - configure_ospf_ports
+
+    - name: Configure Interfaces, OSPF   #OK.$ (IMP)
+      cisco.nxos.nxos_ospf_interfaces:
+        config:
+          - name: "{{ item.intf_name }}"
+            address_family:
+              - afi: ipv4
+                network: "{{ ospf_net_type }}"
+                processes:
+                  - process_id: "{{ ospf_pro_id }}"
+                    area:
+                      area_id: "{{ ospf_site_area_id }}"
+      loop: "{{ loopback_interfaces }}"
+      tags:
+        - configure_loopback_ospf_ports
 
     - name: Configure Interfaces, OSPF   #OK.$ (IMP)
       cisco.nxos.nxos_ospf_interfaces:
@@ -289,7 +306,7 @@
     - name:  telemetry configuration destination_groups   #OK.$
       cisco.nxos.nxos_telemetry:
         config:
-          source_interface: "{{ telemetry_src_intf }}"
+          # source_interface: "{{ telemetry_src_intf }}"
           vrf: "{{ telemetry_src_vrf }}"
           destination_groups:
             - id: "{{ item.0.dst_grp_id }}"
@@ -305,7 +322,7 @@
     - name:  telemetry configuration sensor_groups   #OK.$
       cisco.nxos.nxos_telemetry:
         config:
-          source_interface: "{{ telemetry_src_intf }}"
+          # source_interface: "{{ telemetry_src_intf }}"
           vrf: "{{ telemetry_src_vrf }}"
           sensor_groups:
             - id: "{{ item.0.sns_grp_id }}"
@@ -320,7 +337,7 @@
     - name:  telemetry configuration subscriptions   #OK.$
       cisco.nxos.nxos_telemetry:
         config:
-          source_interface: "{{ telemetry_src_intf }}"
+          # source_interface: "{{ telemetry_src_intf }}"
           vrf: "{{ telemetry_src_vrf }}"
           subscriptions:
             - id: "{{ item.0.sub_grp_id }}"
@@ -332,3 +349,9 @@
       loop: "{{ telemetry_subscriptions  | subelements('sensor_group') }}"  
       tags:
         - telemetry_subscriptions
+
+    # - name: Copy running config to startup config
+    #   cisco.nxos.nxos_config:
+    #     backup: yes
+    #     save_when: always
+    #   tags: write

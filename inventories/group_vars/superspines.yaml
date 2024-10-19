@@ -1,5 +1,12 @@
 # ADD COMMENT
 
+features:
+  - nv overlay
+  - ospf
+  - bgp
+  - pim
+  - tacacs+
+
 #OK.$
 bgp_asn: 65000
 

@@ -6,6 +6,7 @@ features:
   - ospf
   - bgp
   - pim
+  - tacacs+
 
 #OK.$
 bgp_route_map: Retain_NH_Addr

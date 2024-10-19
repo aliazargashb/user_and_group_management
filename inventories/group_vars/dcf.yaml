@@ -1,9 +1,9 @@
 # ADD COMMENT
 
-#OK.$ #NEW ADD
+#OK.$
 aaa_srv_grp: AAA_Servers
 
-#OK.$ #NEW ADD
+#OK.$
 tacacs_host:
   - tacacs_srv_host: "172.27.0.1"
     tacacs_srv_key: key1
@@ -32,10 +32,10 @@ pim_rp_ip: "10.3.0.254"
 pim_mgroup: "239.0.0.0/8"
 
 #OK.$
-telemetry_src_intf: "mgmt0" 
+# telemetry_src_intf: "mgmt0" 
 telemetry_src_vrf: "management"
 
-#DF(Don'tFragment???)
+#OK.$
 intf_mtu: 9216
 
 #OK.$

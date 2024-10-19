@@ -1,13 +1,21 @@
 ---
 - name: Configure Cisco Nexus Switch - SIC Leaf
-  hosts: sic_leaf1
+  hosts: leafs
   gather_facts: false
   connection: network_cli
   vars:
     ansible_network_os: cisco.nxos.nxos
 
   tasks:
-    - name: Configure AAA   #OK.$ #NEW ADD
+    - name: Enable necessary features   #OK.$
+      cisco.nxos.nxos_feature:
+        feature: "{{ item }}"
+        state: enabled
+      loop: "{{ features }}"
+      tags:
+        - enable_features
+
+    - name: Configure AAA   #OK.$
       cisco.nxos.nxos_config:
         lines:
           - aaa authentication login default group {{ aaa_srv_grp }} local
@@ -21,7 +29,7 @@
       tags: 
         - aaa_config
 
-    - name: Configure TACACS   #OK.$ #NEW ADD
+    - name: Configure TACACS   #OK.$
       cisco.nxos.nxos_config:
         lines:
           - tacacs-server host {{ item.tacacs_srv_host }} key {{ item.tacacs_srv_key }}
@@ -39,14 +47,6 @@
           hostname: "{{ hostname }}"
       tags:
         - set_hostname
-
-    - name: Enable necessary features   #OK.$
-      cisco.nxos.nxos_feature:
-        feature: "{{ item }}"
-        state: enabled
-      loop: "{{ features }}"
-      tags:
-        - enable_features
 
     - name: Configure NTP   #OK.$
       cisco.nxos.nxos_ntp_global:
@@ -145,7 +145,7 @@
             mapped_vni: "{{ item.vnid }}"
         state: merged
       with_items:
-        - "{{ l2vlans }}"
+        # - "{{ l2vlans }}"
         - "{{ l3vlans }}"
       tags:
         - configure_vlans
@@ -164,15 +164,15 @@
       tags:
         - configure_vrf_af
 
-    - name: VNI configuration   #OK.$
-      cisco.nxos.nxos_evpn_vni:
-        vni: "{{ item.vnid }}"
-        route_distinguisher: "{{ l2rd }}"
-        route_target_both: "{{ l2rt }}"
-        state: "present"
-      loop: "{{ l2vlans }}"
-      tags:
-        - l2evpn
+    # - name: VNI configuration   #OK.$
+    #   cisco.nxos.nxos_evpn_vni:
+    #     vni: "{{ item.vnid }}"
+    #     route_distinguisher: "{{ l2rd }}"
+    #     route_target_both: "{{ l2rt }}"
+    #     state: "present"
+    #   loop: "{{ l2vlans }}"
+    #   tags:
+    #     - l2evpn
 
     - name: LEAF SVI Naming   #OK.$
       cisco.nxos.nxos_interfaces:
@@ -212,7 +212,6 @@
           - name: "{{ item.intf_name }}"
             description: "{{ item.intf_desc }}"
             enabled: true
-            mtu: "{{ intf_mtu }}" #NEW ADD
         state: merged
       loop: "{{ loopback_interfaces }}"
       tags:
@@ -238,7 +237,7 @@
             description: "{{ item.intf_desc }}"
             enabled: "{{ item.intf_status }}"
             mode: "{{ item.intf_mode }}"
-            mtu: "{{ intf_mtu }}" #NEW ADD
+            mtu: "{{ intf_mtu }}"
         state: merged
       loop: "{{ physical_interfaces }}"
       tags:
@@ -255,7 +254,8 @@
       tags:
         - configure_physical_ports_ip
 
-    - name: Configure L2 Interfaces to Servers   #OK.$ #NEW ADD
+#CHECK
+    - name: Configure L2 Interfaces to Servers   #OK.$
       cisco.nxos.nxos_l2_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -266,8 +266,9 @@
       loop: "{{ server_interfaces }}"
       tags:
         - configure_l2_interfaces
+#CHECK
 
-    - name: Configure LAG Interfaces   #OK.$ #NEW ADD
+    - name: Configure LAG Interfaces   #OK.$
       cisco.nxos.nxos_lag_interfaces:
         config:
           - name: "{{ item.intf_po }}"
@@ -278,7 +279,69 @@
       tags:
         - configure_lag_interfaces
 
-    - name: vpc-portchannel configuration   #OK.$ #NEW ADD
+#ERROR AFTER 1st RUN WITH NXOS_VPC MODULE, PAY ATTENTION TO THE NEXT TASK WITH NXOS_CONFIG
+    # - name: Configure VPC domain   #OK.$
+    #   cisco.nxos.nxos_vpc:
+    #     domain: "{{ vpc_domain }}"
+    #     pkl_dest: "{{ vpc_pkl_dest }}"
+    #     # pkl_src: "{{ vpc_pkl_src }}"
+    #     delay_restore: "{{ vpc_delay_restore }}"
+    #     auto_recovery_reload_delay: "{{ vpc_auto_recovery }}"
+    #   tags: vpc
+
+    - name: Configure VPC domain   #OK.$
+      cisco.nxos.nxos_config:
+        lines:
+          - peer-keepalive destination {{ vpc_pkl_dest }}
+          - delay restore {{vpc_delay_restore}}
+          - auto-recovery reload-delay {{vpc_auto_recovery}}
+        parents: vpc domain {{ vpc_domain }}
+        save_when: modified
+      tags:
+        - vpc_domain
+
+    - name: LEAF vpc peer link port channel configuration   #OK.$
+      cisco.nxos.nxos_lag_interfaces:
+        config:
+          - name: "{{ vpc_po_id }}"
+            members:
+              - member: "Ethernet{{ item.vpc_pl_mem }}"
+                mode: "{{ vpc_po_mode }}"
+        state: merged
+      loop: "{{ vpc_pl_po_members }}"
+      tags:
+        - vpc_peerlink_pc
+
+    - name: vpc peerlink configuration   #OK.$
+      cisco.nxos.nxos_vpc_interface:
+        portchannel: "{{ vpc_po_id }}"
+        peer_link: "{{ vpc_pl }}"
+        state: present
+      tags:
+        - vpc_pl_po
+
+    - name: vpc peerlink trunk configuration   #OK.$
+      cisco.nxos.nxos_l2_interfaces:
+        config:
+          - name: "port-channel{{ vpc_po_id }}"
+            mode: "{{ vpc_pl_sw_mode }}"
+            trunk:
+              native_vlan: "{{ vpc_native_vlan }}"
+        state: merged
+      tags:
+        - vpc_pl_trunk
+
+    - name: leafs vpc peer-link enabling   #OK.$
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: "Ethernet{{ item.vpc_pl_mem }}"
+            enabled: true
+        state: merged
+      loop: "{{ vpc_pl_po_members }}"
+      tags:
+        - vpc_pl_enable
+
+    - name: vpc-portchannel configuration   #OK.$
       cisco.nxos.nxos_vpc_interface:
         portchannel: "{{ item.intf_po }}"
         vpc: "{{ item.intf_po }}"
@@ -323,10 +386,11 @@
 
     - name: Configure NVE Interface for VXLAN   #OK.$
       cisco.nxos.nxos_vxlan_vtep:
-        interface: "{{ nve.intf_name }}"
-        source_interface: "{{ nve.nve_src_intf }}"
-        advertise_virtual_rmac: true #NEW ADD
-        shutdown: "{{ nve.intf_status }}"
+        interface: "{{ nve_intf_name }}"
+        source_interface: "{{ nve_src_intf }}"
+        advertise_virtual_rmac: true
+        shutdown: "{{ nve_intf_status }}"
+        host_reachability: true
         state: present
       tags:
         - configure_nve
@@ -339,15 +403,24 @@
         state: present
         suppress_arp: true
       with_items:
-        - "{{ l2vlans }}"
+        # - "{{ l2vlans }}"
         - "{{ l3vlans }}"
       tags:
         - configure_vlan_multicasts
 
+    - name: Configure VNIs for NVE vlans   #OK.$
+      cisco.nxos.nxos_vxlan_vtep_vni:
+        interface: "{{ nve_intf_name }}"
+        vni: "{{ item.vnid }}"
+        assoc_vrf: true
+      loop: "{{ vrf_config }}"
+      tags:
+        - configure_assoc_vrf
+
     - name: telemetry configuration destination_groups   #OK.$
       cisco.nxos.nxos_telemetry:
         config:
-          source_interface: "{{ telemetry_src_intf }}"
+          # source_interface: "{{ telemetry_src_intf }}"
           vrf: "{{ telemetry_src_vrf }}"
           destination_groups:
             - id: "{{ item.0.dst_grp_id }}"
@@ -363,7 +436,7 @@
     - name: telemetry configuration sensor_groups   #OK.$
       cisco.nxos.nxos_telemetry:
         config:
-          source_interface: "{{ telemetry_src_intf }}"
+          # source_interface: "{{ telemetry_src_intf }}"
           vrf: "{{ telemetry_src_vrf }}"
           sensor_groups:
             - id: "{{ item.0.sns_grp_id }}"
@@ -378,7 +451,7 @@
     - name: telemetry configuration subscriptions   #OK.$
       cisco.nxos.nxos_telemetry:
         config:
-          source_interface: "{{ telemetry_src_intf }}"
+          # source_interface: "{{ telemetry_src_intf }}"
           vrf: "{{ telemetry_src_vrf }}"
           subscriptions:
             - id: "{{ item.0.sub_grp_id }}"
@@ -438,18 +511,18 @@
       loop: "{{ l3vlans }}"
       tags: configure_bgp_vrf
 
-    - name: Configure BGP VPC-Pairs Advertisement   #OK.$ #NEW ADD
+    - name: Configure BGP VPC-Pairs Advertisement   #OK.$
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
           address_family:
             - afi: l2vpn
               safi: evpn
-              advertise_pip: true #NEW ADD
+              advertise_pip: true
         state: merged
       tags: configure_bgp_vpc_adv
 
-    - name: Configure BGP Maximum Paths   #OK.$ #NEW ADD
+    - name: Configure BGP Maximum Paths   #OK.$
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -479,52 +552,8 @@
       loop: "{{ bgp }}"
       tags: bgp_neighbor
 
-    - name: Configure VPC domain   #OK.$
-      cisco.nxos.nxos_vpc:
-        domain: "{{ vpc_domain }}"
-        pkl_dest: "{{ vpc_pkl_dest }}"
-        pkl_src: "{{ vpc_pkl_src }}"
-        delay_restore: "{{ vpc_delay_restore }}"
-        auto_recovery_reload_delay: "{{ vpc_auto_recovery }}"
-      tags: vpc
-
-    - name: LEAF vpc peer link port channel configuration   #OK.$
-      cisco.nxos.nxos_lag_interfaces:
-        config:
-          - name: "{{ vpc_po_id }}"
-            members:
-              - member: "Ethernet{{ item.vpc_pl_mem }}"
-                mode: "{{ vpc_po_mode }}"
-        state: merged
-      loop: "{{ vpc_pl_po_members }}"
-      tags:
-        - vpc_peerlink_pc
-
-    - name: vpc peerlink configuration   #OK.$
-      cisco.nxos.nxos_vpc_interface:
-        portchannel: "{{ vpc_po_id }}"
-        peer_link: "{{ vpc_pl }}"
-        state: present
-      tags:
-        - vpc_pl_po
-
-    - name: vpc peerlink trunk configuration   #OK.$
-      cisco.nxos.nxos_l2_interfaces:
-        config:
-          - name: "port-channel{{ vpc_po_id }}"
-            mode: "{{ vpc_pl_sw_mode }}"
-            trunk:
-              native_vlan: "{{ vpc_native_vlan }}"
-        state: merged
-      tags:
-        - vpc_pl_trunk
-
-    - name: leafs vpc peer-link enabling   #OK.$
-      cisco.nxos.nxos_interfaces:
-        config:
-          - name: "Ethernet{{ item.vpc_pl_mem }}"
-            enabled: true
-        state: merged
-      loop: "{{ vpc_pl_po_members }}"
-      tags:
-        - vpc_pl_enable
+    # - name: Copy running config to startup config
+    #   cisco.nxos.nxos_config:
+    #     backup: yes
+    #     save_when: always
+    #   tags: write

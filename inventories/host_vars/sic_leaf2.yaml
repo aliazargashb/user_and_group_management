@@ -13,14 +13,14 @@ vpc_pkl_dest: "100.120.23.201"
 #OK.$
 loopback_interfaces:
   - intf_name: Loopback0
-    intf_ip: 10.0.0.201
+    intf_ip: 10.0.0.202
     intf_subnet: 32
     intf_desc: LP0_RID
   - intf_name: Loopback1
-    intf_ip: 10.3.0.201
+    intf_ip: 10.3.0.202
     intf_subnet: 32
     intf_desc: LP1_NVE
-    ip_secondary: "10.0.2.2/32"
+    ip_secondary: 10.2.2.2
     sec_value: true
 
 #OK.$
@@ -37,18 +37,20 @@ physical_interfaces:
     intf_ip: 10.0.2.134
     intf_subnet: 30
     intf_mode: "layer3"
+
+#OK.$
 server_interfaces:
   - intf_name: Ethernet1/6
     intf_desc: "To_Subnet11-SRVs"
     intf_status: true
-    switchport_mode: "Access"
+    switchport_mode: "access"
     access_vlan: 11
     intf_mode: "layer2"
     intf_po: 11
   - intf_name: Ethernet1/7
     intf_desc: "To_Subnet12-SRVs"
     intf_status: true
-    switchport_mode: "Access"
+    switchport_mode: "access"
     access_vlan: 12
     intf_mode: "layer2"
     intf_po: 12

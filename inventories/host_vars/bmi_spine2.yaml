@@ -60,6 +60,7 @@ physical_interfaces:
 to_site_ospf_intf:
   - intf_name: Ethernet1/1
   - intf_name: Ethernet1/2
+
 #OK.$
 to_dci_ospf_intf:
   - intf_name: Ethernet1/3
