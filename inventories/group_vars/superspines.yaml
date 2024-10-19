@@ -1,7 +1,7 @@
 # ADD COMMENT
 
 #OK.$
-bgp_asn: 65206
+bgp_asn: 65000
 
 #OK.$
 bgp_route_map: Retain_NH_Addr
@@ -10,9 +10,15 @@ bgp_route_map_action: permit
 
 #OK.$
 bgp:
- - neighbor_address: 10.0.0.202
-   bgp_peer_asn: 65202
+ - neighbor_address: 10.0.0.21
+   bgp_peer_asn: 65200
    bgp_neighbor_template: Leaf_Spine_Peering
- - neighbor_address: 10.0.0.1
-   bgp_peer_asn: 65000
+ - neighbor_address: 10.0.0.22
+   bgp_peer_asn: 65200
+   bgp_neighbor_template: Leaf_Spine_Peering
+ - neighbor_address: 10.0.0.11
+   bgp_peer_asn: 65100
+   bgp_neighbor_template: Spine_SuperSpine_Peering
+ - neighbor_address: 10.0.0.12
+   bgp_peer_asn: 65100
    bgp_neighbor_template: Spine_SuperSpine_Peering

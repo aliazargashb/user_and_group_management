@@ -1,213 +1,66 @@
+# ADD COMMENT
+
+#OK.$
 hostname: bmi_spine2
 
+#OK.$
 bgp:
-  ebgp_an_number: "65100"
-  ebgp_rid: "loopback0"
-  ebgp_multihop_value: "2"
-  neighbors: 
-    - neighbor: "10.0.0.101"
-      description: "Leaf1"
-      ebgp_peer_asn: "65101"
-      ebgp_neighbor_template: "Leaf_Spine_Peering"
-    # - neighbor: "10.0.0.102"
-    #   description: "Leaf2"
-    #   ebgp_peer_asn: "65101"
-    #   ebgp_neighbor_template: "Leaf_Spine_Peering"
-    # - neighbor: "10.0.0.103"
-    #   description: "Leaf3"
-    #   ebgp_peer_asn: "65103"
-    #   ebgp_neighbor_template: "Leaf_Spine_Peering"
-    # - neighbor: "10.0.0.104"
-    #   description: "Leaf4"
-    #   ebgp_peer_asn: "65103"
-    #   ebgp_neighbor_template: "Leaf_Spine_Peering"
-    # - neighbor: "10.0.0.105"
-    #   description: "Leaf5"
-    #   ebgp_peer_asn: "65105"
-    #   ebgp_neighbor_template: "Leaf_Spine_Peering"
-    # - neighbor: "10.0.0.106"
-    #   description: "Leaf6"
-    #   ebgp_peer_asn: "65105"
-    #   ebgp_neighbor_template: "Leaf_Spine_Peering"
-    # - neighbor: "10.0.0.107"
-    #   description: "Leaf7"
-    #   ebgp_peer_asn: "65107"
-    #   ebgp_neighbor_template: "Leaf_Spine_Peering"
-    # - neighbor: "10.0.0.108"
-    #   description: "Leaf8"
-    #   ebgp_peer_asn: "65107"
-    #   ebgp_neighbor_template: "Leaf_Spine_Peering"
-    # - neighbor: "10.0.0.109"
-    #   description: "Leaf9"
-    #   ebgp_peer_asn: "65109"
-    #   ebgp_neighbor_template: "Leaf_Spine_Peering"
-    # - neighbor: "10.0.0.110"
-    #   description: "Leaf10"
-    #   ebgp_peer_asn: "65109"
-    #   ebgp_neighbor_template: "Leaf_Spine_Peering"
-    - neighbor: "10.0.0.2"
-      description: "SIC_SuperSpine-1"
-      ebgp_peer_asn: "65000"
-      ebgp_neighbor_template: "Spine_SuperSpine_Peering"
-    - neighbor: "10.0.0.1"
-      description: "BMI_SuperSpine-1"
-      ebgp_peer_asn: "65000"
-      ebgp_neighbor_template: "Spine_SuperSpine_Peering"
+ - neighbor_address: 10.0.0.101
+   bgp_peer_asn: 65101
+   bgp_neighbor_template: Leaf_Spine_Peering
+ - neighbor_address: 10.0.0.111
+   bgp_peer_asn: 65111
+   bgp_neighbor_template: Leaf_Spine_Peering
+ - neighbor_address: 10.0.0.2
+   bgp_peer_asn: 65000
+   bgp_neighbor_template: Spine_SuperSpine_Peering
+ - neighbor_address: 10.0.0.1
+   bgp_peer_asn: 65000
+   bgp_neighbor_template: Spine_SuperSpine_Peering
 
-ospf:
-  underlay_ospf_process_id: "underlay"
+#OK.$
+loopback_interfaces:
+  - intf_name: Loopback0
+    intf_ip: 10.0.0.12
+    intf_subnet: 32
+    intf_desc: LP0_RID
+  - intf_name: Loopback1
+    intf_ip: 10.3.0.254
+    intf_subnet: 32
+    intf_desc: LP1_RP
 
-interfaces:
-  Physical_Interfaces:
-    - interface: "ethernet1/1"
-      no_switchport: "True"
-      no_shutdown: "True"
-      description: "To_Leaf-1"
-      intf_mtu_value: "9216"
-      intf_ip_address: "10.0.1.129/30"
-      ospf_network_type: "point-to-point"
-      multicast_pim_mode: "sparse-mode"
-      underlay_ospf_area: "1"
-      underlay_ospf_process_id: "underlay"
-    # - interface: "ethernet1/2"
-    #   no_switchport: "True"
-    #   no_shutdown: "True"
-    #   description: "To_Leaf-2"
-    #   intf_mtu_value: "9216"
-    #   intf_ip_address: "10.0.1.133/30"
-    #   ospf_network_type: "point-to-point"
-    #   multicast_pim_mode: "sparse-mode"
-    #   underlay_ospf_area: "1"
-    #   underlay_ospf_process_id: "underlay1"
-    # - interface: "ethernet1/3"
-    #   no_switchport: "True"
-    #   no_shutdown: "True"
-    #   description: "To_Leaf-3"
-    #   intf_mtu_value: "9216"
-    #   intf_ip_address: "10.0.1.137/30"
-    #   ospf_network_type: "point-to-point"
-    #   multicast_pim_mode: "sparse-mode"
-    #   underlay_ospf_area: "1"
-    #   underlay_ospf_process_id: "underlay"
-    # - interface: "ethernet1/4"
-    #   no_switchport: "True"
-    #   no_shutdown: "True"
-    #   description: "To_Leaf-4"
-    #   intf_mtu_value: "9216"
-    #   intf_ip_address: "10.0.1.141/30"
-    #   ospf_network_type: "point-to-point"
-    #   multicast_pim_mode: "sparse-mode"
-    #   underlay_ospf_area: "1"
-    #   underlay_ospf_process_id: "underlay"
-    # - interface: "ethernet1/5"
-    #   no_switchport: "True"
-    #   no_shutdown: "True"
-    #   description: "To_Leaf-5"
-    #   intf_mtu_value: "9216"
-    #   intf_ip_address: "10.0.1.145/30"
-    #   ospf_network_type: "point-to-point"
-    #   multicast_pim_mode: "sparse-mode"
-    #   underlay_ospf_area: "1"
-    #   underlay_ospf_process_id: "underlay"
-    # - interface: "ethernet1/6"
-    #   no_switchport: "True"
-    #   no_shutdown: "True"
-    #   description: "To_Leaf-6"
-    #   intf_mtu_value: "9216"
-    #   intf_ip_address: "10.0.1.149/30"
-    #   ospf_network_type: "point-to-point"
-    #   multicast_pim_mode: "sparse-mode"
-    #   underlay_ospf_area: "1"
-    #   underlay_ospf_process_id: "underlay"
-    # - interface: "ethernet1/7"
-    #   no_switchport: "True"
-    #   no_shutdown: "True"
-    #   description: "To_Leaf-7"
-    #   intf_mtu_value: "9216"
-    #   intf_ip_address: "10.0.1.153/30"
-    #   ospf_network_type: "point-to-point"
-    #   multicast_pim_mode: "sparse-mode"
-    #   underlay_ospf_area: "1"
-    #   underlay_ospf_process_id: "underlay"
-    # - interface: "ethernet1/8"
-    #   no_switchport: "True"
-    #   no_shutdown: "True"
-    #   description: "To_Leaf-8"
-    #   intf_mtu_value: "9216"
-    #   intf_ip_address: "10.0.1.157/30"
-    #   ospf_network_type: "point-to-point"
-    #   multicast_pim_mode: "sparse-mode"
-    #   underlay_ospf_area: "1"
-    #   underlay_ospf_process_id: "underlay"
-    # - interface: "ethernet1/9"
-    #   no_switchport: "True"
-    #   no_shutdown: "True"
-    #   description: "To_Leaf-9"
-    #   intf_mtu_value: "9216"
-    #   intf_ip_address: "10.0.1.161/30"
-    #   ospf_network_type: "point-to-point"
-    #   multicast_pim_mode: "sparse-mode"
-    #   underlay_ospf_area: "1"
-    #   underlay_ospf_process_id: "underlay"
-    # - interface: "ethernet1/10"
-    #   no_switchport: "True"
-    #   no_shutdown: "True"
-    #   description: "To_Leaf-10"
-    #   intf_mtu_value: "9216"
-    #   intf_ip_address: "10.0.1.165/30"
-    #   ospf_network_type: "point-to-point"
-    #   multicast_pim_mode: "sparse-mode"
-    #   underlay_ospf_area: "1"
-    #   underlay_ospf_process_id: "underlay"
-    - interface: "ethernet1/2"
-      no_switchport: "True"
-      no_shutdown: "True"
-      description: "To_Border_Leaf_1"
-      intf_mtu_value: "9216"
-      intf_ip_address: "10.0.1.169/30"
-      ospf_network_type: "point-to-point"
-      multicast_pim_mode: "sparse-mode"
-      underlay_ospf_area: "1"
-      underlay_ospf_process_id: "underlay"
-    - interface: "ethernet1/3"
-      no_switchport: "True"
-      no_shutdown: "True"
-      description: "To_BMI_SuperSpine"
-      intf_mtu_value: "9216"
-      intf_ip_address: "10.0.1.250/30"
-      ospf_network_type: "point-to-point"
-      multicast_pim_mode: "sparse-mode"
-      underlay_ospf_area: "0"
-      underlay_ospf_process_id: "underlay"
-    - interface: "ethernet1/4"
-      no_switchport: "True"
-      no_shutdown: "True"
-      description: "To_SIC_SuperSpine"
-      intf_mtu_value: "9216"
-      intf_ip_address: "10.0.2.234/30"
-      ospf_network_type: "point-to-point"
-      multicast_pim_mode: "sparse-mode"
-      underlay_ospf_area: "0"
-      underlay_ospf_process_id: "underlay"
-  Logical_Interfaces:
-    Loopback_Intfs:
-      - interface: "loopback0"
-        description: "LP0_RID"
-        intf_ip_address: "10.0.0.12/32"
-        underlay_ospf_area: "0"
-        underlay_ospf_process_id: "underlay"
-        multicast_pim_mode: "sparse-mode"
-      - interface: "loopback1"
-        description: "LP1_RP"
-        intf_ip_address: "10.3.0.12/32"
-        secondary_ip_address: "10.3.0.255/32"
-        underlay_ospf_area: "0"
-        underlay_ospf_process_id: "underlay"
-        multicast_pim_mode: "sparse-mode"
-    Management_Intf:
-      - interface: "management"
-        description: "MGMT_OOB_Intf"
-        intf_ip_address: "100.120.23.12/24"
-        vrf_membership: "management"
-        # mgmt_oob_gw: "100.120.22.254"
+#OK.$
+physical_interfaces:
+  - intf_name: Ethernet1/1
+    intf_desc: "To_Leaf-1"
+    intf_status: true
+    intf_ip: 10.0.1.129
+    intf_subnet: 30
+    intf_mode: "layer3"
+  - intf_name: Ethernet1/4
+    intf_desc: "To_SIC_SuperSpine"
+    intf_status: true
+    intf_ip: 10.0.2.234
+    intf_subnet: 30
+    intf_mode: "layer3"
+  - intf_name: Ethernet1/2
+    intf_desc: "To_BorderLeaf"
+    intf_status: true
+    intf_ip: 10.0.1.169
+    intf_subnet: 30
+    intf_mode: "layer3"
+  - intf_name: Ethernet1/3
+    intf_desc: "To_BMI_SuperSpine"
+    intf_status: true
+    intf_ip: 10.0.1.250
+    intf_subnet: 30
+    intf_mode: "layer3"
 
+#OK.$
+to_site_ospf_intf:
+  - intf_name: Ethernet1/1
+  - intf_name: Ethernet1/2
+#OK.$
+to_dci_ospf_intf:
+  - intf_name: Ethernet1/3
+  - intf_name: Ethernet1/4

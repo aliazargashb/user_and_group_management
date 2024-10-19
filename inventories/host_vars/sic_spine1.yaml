@@ -5,9 +5,18 @@ hostname: sic_spine1
 
 #OK.$
 bgp:
+ - neighbor_address: 10.0.0.201
+   bgp_peer_asn: 65202
+   bgp_neighbor_template: Leaf_Spine_Peering
  - neighbor_address: 10.0.0.202
    bgp_peer_asn: 65202
    bgp_neighbor_template: Leaf_Spine_Peering
+ - neighbor_address: 10.0.0.211
+   bgp_peer_asn: 65202
+   bgp_neighbor_template: Leaf_Spine_Peering
+ - neighbor_address: 10.0.0.2
+   bgp_peer_asn: 65000
+   bgp_neighbor_template: Spine_SuperSpine_Peering
  - neighbor_address: 10.0.0.1
    bgp_peer_asn: 65000
    bgp_neighbor_template: Spine_SuperSpine_Peering
@@ -15,44 +24,53 @@ bgp:
 #OK.$
 loopback_interfaces:
   - intf_name: Loopback0
-    intf_ip: 10.0.0.201
-    intf_subnet: 24
+    intf_ip: 10.0.0.21
+    intf_subnet: 32
     intf_desc: LP0_RID
   - intf_name: Loopback1
-    intf_ip: 10.3.0.201
-    intf_subnet: 24
-    intf_desc: LP1_NVE
-  - intf_name: Loopback2
-    intf_ip: 192.168.1.20
-    intf_subnet: 24
-    intf_desc: "Management Loopback 2 for Switch 1"
+    intf_ip: 10.3.0.254
+    intf_subnet: 32
+    intf_desc: LP1_RP
 
 #OK.$
 physical_interfaces:
-  - intf_name: Ethernet1/4
-    intf_desc: "WAN Connection"
-    intf_status: true
-    intf_ip: 10.2.2.2
-    intf_subnet: 24
-    intf_mode: "layer3"
-  - intf_name: Ethernet1/51
-    intf_desc: "To_Spine-1"
+  - intf_name: Ethernet1/1
+    intf_desc: "To_Leaf-1"
     intf_status: true
     intf_ip: 10.0.2.2
     intf_subnet: 30
     intf_mode: "layer3"
-  - intf_name: Ethernet1/52
-    intf_desc: "To_Spine-2"
+  - intf_name: Ethernet1/2
+    intf_desc: "To_Leaf-2"
     intf_status: true
-    intf_ip: 10.0.2.130
+    intf_ip: 10.0.2.5
+    intf_subnet: 30
+    intf_mode: "layer3"
+  - intf_name: Ethernet1/3
+    intf_desc: "To_SIC_SuperSpine"
+    intf_status: true
+    intf_ip: 10.0.2.254
+    intf_subnet: 30
+    intf_mode: "layer3"
+  - intf_name: Ethernet1/4
+    intf_desc: "To_BMI_SuperSpine"
+    intf_status: true
+    intf_ip: 10.0.1.238
+    intf_subnet: 30
+    intf_mode: "layer3"
+  - intf_name: Ethernet1/5
+    intf_desc: "To_SIC-BorderLeaf"
+    intf_status: true
+    intf_ip: 10.0.2.41
     intf_subnet: 30
     intf_mode: "layer3"
 
 #OK.$
 to_site_ospf_intf:
-  - intf_name: Ethernet1/4
-
+  - intf_name: Ethernet1/1
+  - intf_name: Ethernet1/2
+  - intf_name: Ethernet1/5
 #OK.$
 to_dci_ospf_intf:
+  - intf_name: Ethernet1/3
   - intf_name: Ethernet1/4
-  - intf_name: Loopback1

@@ -1,29 +1,37 @@
 ---
 - name: Configure Cisco Nexus Switch - SIC Spine
-  hosts: sic_spine1
+  hosts: sic_superspine1
   gather_facts: false
   connection: network_cli
   vars:
     ansible_network_os: cisco.nxos.nxos
 
   tasks:
-    - name: Configure AAA   #CHECK. #VARS MUST GO TO ALL
+    - name: Configure AAA   #OK.$ #NEW ADD
       cisco.nxos.nxos_config:
         lines:
-          - aaa authentication login default group AAA_Servers local
-          - aaa authentication login console group AAA_Servers local
-          - aaa authorization commands default group AAA_Servers local
-          - aaa accounting default group AAA_Servers local
-          - aaa authorization config-commands default group AAA_Servers local
+          - aaa authentication login default group {{ aaa_srv_grp }} local
+          - aaa authentication login console group {{ aaa_srv_grp }} local
+          - aaa authorization commands default group {{ aaa_srv_grp }} local
+          - aaa accounting default group {{ aaa_srv_grp }} local
+          - aaa authorization config-commands default group {{ aaa_srv_grp }} local
           - aaa authentication login error-enable
           - tacacs-server directed-request
-          - aaa group server tacacs+ AAA_Servers
-          - tacacs-server host 172.27.0.1 key key1
-          - tacacs-server host 172.27.0.2 key key2
-          - use-vrf management
-          - source-interface management
+          - aaa group server tacacs+ {{ aaa_srv_grp }}
       tags: 
         - aaa_config
+
+    - name: Configure TACACS   #OK.$ #NEW ADD
+      cisco.nxos.nxos_config:
+        lines:
+          - tacacs-server host {{ item.tacacs_srv_host }} key {{ item.tacacs_srv_key }}
+          - tacacs-server host {{ item.tacacs_srv_host }} key {{ item.tacacs_srv_key }}
+          # - use-vrf management
+          # - source-interface mgmt0
+        parents: aaa group server tacacs+ AAA_Servers
+      loop: "{{ tacacs_host }}"
+      tags: 
+        - tacacs_config
 
     - name: Set Hostname   #OK.$
       cisco.nxos.nxos_hostname:
@@ -40,7 +48,7 @@
       tags:
         - enable_features
 
-    - name: Configure NTP #OK.%
+    - name: Configure NTP   #OK.$
       cisco.nxos.nxos_ntp_global:
         config:
           servers:
@@ -71,19 +79,20 @@
           - name: "Loopback{{ item.intf_name }}"
             description: "{{ item.intf_desc }}"
             enabled: true
+            mtu: "{{ intf_mtu }}" #NEW ADD
         state: merged
       loop: "{{ loopback_interfaces }}"
       tags:
         - configure_loopbacks
 
-    - name: Configure IP for Loopback #OK.$
+    - name: Configure IP for Loopback   #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
             ipv4:
               - address: "{{ item.intf_ip }}/{{ item.intf_subnet }}"
-              - address: "{{ item.ip_secondary | default('null') }}/{{ item.intf_subnet }}"
-                secondary: "{{ item.sec_value | default('false') }}"
+              # - address: "{{ item.ip_secondary | default('null') }}/{{ item.intf_subnet }}"   #NO NEED
+              #   secondary: "{{ item.sec_value | default('false') }}"   #NO NEED
         state: merged
       loop: "{{ loopback_interfaces }}"
       tags:
@@ -96,6 +105,7 @@
             description: "{{ item.intf_desc }}"
             enabled: "{{ item.intf_status }}"
             mode: "{{ item.intf_mode }}"
+            mtu: "{{ intf_mtu }}" #NEW ADD
         state: merged
       loop: "{{ physical_interfaces }}"
       tags:
@@ -194,6 +204,35 @@
         state: merged
       loop: "{{ bgp }}"
       tags: bgp_neighbor
+
+    - name: Configure bgp route target   #OK.$ #NEW ADD
+      cisco.nxos.nxos_bgp_address_family:
+        config:
+          as_number: "{{ bgp_asn }}"
+          address_family:
+            - afi: l2vpn
+              safi: evpn
+              retain:
+                route_target:
+                  retain_all: true
+        state: merged
+      tags: bgp_route_target
+
+    - name: Configure BGP Maximum Paths   #OK.$ #NEW ADD
+      cisco.nxos.nxos_bgp_address_family:
+        config:
+          as_number: "{{ bgp_asn }}"
+          address_family:
+            - afi: l2vpn
+              safi: evpn
+              maximum_paths:
+                parallel_paths: "{{ bgp_maximum_path }}"
+            - afi: ipv4
+              safi: unicast
+              maximum_paths:
+                parallel_paths: "{{ bgp_maximum_path }}"
+        state: merged
+      tags: configure_bgp_max_path
 
     - name: Configure Route-Map   #OK.$
       cisco.nxos.nxos_route_maps:

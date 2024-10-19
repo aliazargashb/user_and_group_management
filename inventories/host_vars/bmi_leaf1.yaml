@@ -1,14 +1,16 @@
-# host_vars/bmi_leaf1.yaml
+# ADD COMMENT
 
-#OK.
+#OK.$
 hostname: bmi_leaf1
 
-#OK.
+#OK.$
 bgp_asn: 65101
 
-intf_mtu: 9216
+#OK.$
+vpc_domain: 1
+vpc_pkl_dest: "100.120.23.102"
 
-#OK.
+#OK.$
 loopback_interfaces:
   - intf_name: Loopback0
     intf_ip: 10.0.0.101
@@ -21,7 +23,7 @@ loopback_interfaces:
     ip_secondary: "10.0.2.1/32"
     sec_value: true
 
-#OK.
+#OK.$
 physical_interfaces:
   - intf_name: Ethernet1/1
     intf_desc: "To_Spine-1"
@@ -35,37 +37,25 @@ physical_interfaces:
     intf_ip: 10.0.1.130
     intf_subnet: 30
     intf_mode: "layer3"
+server_interfaces:
   - intf_name: Ethernet1/6
-    intf_desc: "To_Subnet11-SRVs"
+    intf_desc: "Tenant1_Subnet11-SRVs"
     intf_status: true
-    # switchport_mode: "Access"
-    # access_vlan: 11
+    switchport_mode: "Access"
+    access_vlan: 11
     intf_mode: "layer2"
+    intf_po: 11
   - intf_name: Ethernet1/7
-    intf_desc: "To_Subnet12-SRVs"
+    intf_desc: "Tenant1_Subnet12-SRVs"
     intf_status: true
-    # switchport_mode: "Access"
-    # access_vlan: 12
+    switchport_mode: "Access"
+    access_vlan: 12
     intf_mode: "layer2"
-
-#OK.
-bgp:
-  - bgp_neighbor_addr: 10.0.0.11
-  - bgp_neighbor_addr: 10.0.0.12
-
-#OK.
-vrf_config:
-  - vrf_name: "Tenant-1"
-    vnid: "1000200"
-    vrf_rd: "auto"
-    vrf_mcast_group: 239.0.0.1
-    address_family: "ipv4"
-    vlan_id: 200
-    vlan_name: "Tenant-1-L3VLAN"
-  - vrf_name: "Tenant-2"
-    vnid: "1000201"
-    vrf_rd: "auto"
-    address_family: "ipv4"
-    vrf_mcast_group: 239.0.0.2
-    vlan_id: 201
-    vlan_name: "Tenant-2-L3VLAN"
+    intf_po: 12
+  - intf_name: Ethernet1/5
+    intf_desc: "Tenant2_Subnet13-SRVs"
+    intf_status: true
+    switchport_mode: "Access"
+    access_vlan: 13
+    intf_mode: "layer2"
+    intf_po: 13

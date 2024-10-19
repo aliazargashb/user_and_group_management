@@ -1,7 +1,7 @@
 # ADD COMMENT
 
 #OK.$
-bgp_asn: 65206
+bgp_asn: 65200
 
 #OK.$
 ospf_site_area_id: 0.0.0.2

@@ -1,27 +1,29 @@
-# host_vars/sic_leaf2.yaml
+# ADD COMMENT
 
-#OK.
+#OK.$
 hostname: sic_leaf2
 
-#OK.
+#OK.$
 bgp_asn: 65202
 
-intf_mtu: 9216
+#OK.$
+vpc_domain: 2
+vpc_pkl_dest: "100.120.23.201"
 
-#OK.
+#OK.$
 loopback_interfaces:
   - intf_name: Loopback0
-    intf_ip: 10.0.0.202
+    intf_ip: 10.0.0.201
     intf_subnet: 32
     intf_desc: LP0_RID
   - intf_name: Loopback1
-    intf_ip: 10.3.0.202
+    intf_ip: 10.3.0.201
     intf_subnet: 32
     intf_desc: LP1_NVE
     ip_secondary: "10.0.2.2/32"
     sec_value: true
 
-#OK.
+#OK.$
 physical_interfaces:
   - intf_name: Ethernet1/1
     intf_desc: "To_Spine-1"
@@ -35,37 +37,18 @@ physical_interfaces:
     intf_ip: 10.0.2.134
     intf_subnet: 30
     intf_mode: "layer3"
+server_interfaces:
   - intf_name: Ethernet1/6
     intf_desc: "To_Subnet11-SRVs"
     intf_status: true
-    # switchport_mode: "Access"
-    # access_vlan: 11
+    switchport_mode: "Access"
+    access_vlan: 11
     intf_mode: "layer2"
+    intf_po: 11
   - intf_name: Ethernet1/7
     intf_desc: "To_Subnet12-SRVs"
     intf_status: true
-    # switchport_mode: "Access"
-    # access_vlan: 12
+    switchport_mode: "Access"
+    access_vlan: 12
     intf_mode: "layer2"
-
-#OK.
-bgp:
-  - bgp_neighbor_addr: 10.0.0.21
-  - bgp_neighbor_addr: 10.0.0.22
-
-#OK.
-vrf_config:
-  - vrf_name: "Tenant-1"
-    vnid: "1000200"
-    vrf_rd: "auto"
-    vrf_mcast_group: 239.0.0.1
-    address_family: "ipv4"
-    vlan_id: 200
-    vlan_name: "Tenant-1-L3VLAN"
-  - vrf_name: "Tenant-2"
-    vnid: "1000201"
-    vrf_rd: "auto"
-    address_family: "ipv4"
-    vrf_mcast_group: 239.0.0.2
-    vlan_id: 201
-    vlan_name: "Tenant-2-L3VLAN"
+    intf_po: 12

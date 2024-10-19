@@ -1,58 +1,38 @@
+# ADD COMMENT
+
+#OK.$
 hostname: bmi_superspine
 
-interfaces:
-  Physical_Interfaces:
-    - interface: "ethernet1/1"
-      no_switchport: "True"
-      no_shutdown: "True"
-      description: "TO_SIC_Spine-1"
-      intf_mtu_value: "9216"
-      intf_ip_address: "10.0.1.237/30"
-      ospf_network_type: "point-to-point"
-      multicast_pim_mode: "sparse-mode"
-      underlay_ospf_area: "0"
-      underlay_ospf_process_id: "underlay"
-    - interface: "ethernet1/2"
-      no_switchport: "True"
-      no_shutdown: "True"
-      description: "To_SIC_Spine-2"
-      intf_mtu_value: "9216"
-      intf_ip_address: "10.0.1.233/30"
-      ospf_network_type: "point-to-point"
-      multicast_pim_mode: "sparse-mode"
-      underlay_ospf_area: "0"
-      underlay_ospf_process_id: "underlay"
-    - interface: "ethernet1/3"
-      no_switchport: "True"
-      no_shutdown: "True"
-      description: "To_BMI_Spine-2"
-      intf_mtu_value: "9216"
-      intf_ip_address: "10.0.1.249/30"
-      ospf_network_type: "point-to-point"
-      multicast_pim_mode: "sparse-mode"
-      underlay_ospf_area: "0"
-      underlay_ospf_process_id: "underlay"
-    - interface: "ethernet1/4"
-      no_switchport: "True"
-      no_shutdown: "True"
-      description: "To_BMI_Spine-1"
-      intf_mtu_value: "9216"
-      intf_ip_address: "10.0.1.253/30"
-      ospf_network_type: "point-to-point"
-      multicast_pim_mode: "sparse-mode"
-      underlay_ospf_area: "0"
-      underlay_ospf_process_id: "underlay"
-  Logical_Interfaces:
-    Loopback_Intfs:
-      - interface: "loopback0"
-        description: "LP0_RID"
-        intf_ip_address: "10.0.0.1/32"
-        underlay_ospf_area: "0"
-        underlay_ospf_process_id: "underlay"
-        multicast_pim_mode: "sparse-mode"
-    Management_Intf:
-      - interface: "management"
-        description: "MGMT_OOB_Intf"
-        intf_ip_address: "100.120.23.100/24"
-        vrf_membership: "management"
-        # mgmt_oob_gw: "100.120.22.254"
+#OK.$
+loopback_interfaces:
+  - intf_name: Loopback0
+    intf_ip: 10.0.0.1
+    intf_subnet: 32
+    intf_desc: LP0_RID
+
+#OK.$
+physical_interfaces:
+  - intf_name: Ethernet1/1
+    intf_desc: "To_SIC_Spine-1"
+    intf_status: true
+    intf_ip: 10.0.1.237
+    intf_subnet: 30
+    intf_mode: "layer3"
+  - intf_name: Ethernet1/2
+    intf_desc: "To_SIC_Spine-2"
+    intf_status: true
+    intf_ip: 10.0.1.233
+    intf_subnet: 30
+    intf_mode: "layer3"
+  - intf_name: Ethernet1/4
+    intf_desc: "To_BMI_Spine-1"
+    intf_status: true
+    intf_ip: 10.0.1.253
+    intf_subnet: 30
+    intf_mode: "layer3"
+  - intf_name: Ethernet1/3
+    intf_desc: "To_BMI_Spine-2"
+    intf_status: true
+    intf_ip: 10.0.1.249
+    intf_subnet: 30
+    intf_mode: "layer3"

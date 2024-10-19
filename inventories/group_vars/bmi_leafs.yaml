@@ -1,8 +1,12 @@
-#bmi_leafs.yaml
-# /opt/dcf_iac_project/inventories/group_vars/bmi_leafs.yaml
+# ADD COMMENT
 
+#OK.$
 ospf_site_area_id: 0.0.0.1
 
-bgp:   #name should be changed / bind to spines loopback0 ip
+#OK.$   #BIND TO THE SPINE VAR
+bgp_peer_asn: 65100
+
+#OK.$ 
+bgp:   #MUST CHANGE / BIND TO SPINE LOOPBACK0 IP
   - bgp_neighbor_addr: 10.0.0.11
   - bgp_neighbor_addr: 10.0.0.12
