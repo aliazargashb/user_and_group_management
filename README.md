@@ -118,5 +118,3 @@ This directory contains the Ansible playbooks used to configure different networ
 - `leafs.yaml`: Playbook for configuring leaf switches.
 - `spine.yaml`: Playbook for configuring spine switches.
 - `superspine.yaml`: Playbook for configuring superspine switches.
-
-![DCF LAB] (iac/DCF-LAB.png)
