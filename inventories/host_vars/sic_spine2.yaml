@@ -8,8 +8,8 @@ bgp:
  - neighbor_address: 10.0.0.201
    bgp_peer_asn: 65202
    bgp_neighbor_template: Leaf_Spine_Peering
- - neighbor_address: 10.0.0.202
-   bgp_peer_asn: 65202
+ - neighbor_address: 10.0.0.203
+   bgp_peer_asn: 65203
    bgp_neighbor_template: Leaf_Spine_Peering
  - neighbor_address: 10.0.0.211
    bgp_peer_asn: 65211

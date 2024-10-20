@@ -302,3 +302,10 @@
     #     backup: yes
     #     save_when: always
     #   tags: write
+
+    - name: Confiuration Saving   #OK.$
+      cisco.nxos.nxos_config:
+        lines:
+          - copy running-config startup-config
+      tags: 
+        - write

@@ -20,8 +20,8 @@ loopback_interfaces:
     intf_ip: 10.3.0.201
     intf_subnet: 32
     intf_desc: LP1_NVE
-    ip_secondary: 10.2.2.2
-    sec_value: true
+    # ip_secondary: 10.2.2.2
+    # sec_value: true
 
 #OK.$
 physical_interfaces:

@@ -46,17 +46,22 @@ vpc_pl_po_members:
   - vpc_pl_mem: "1/4"
 
 #OK.$
-# l2vlans:
-#   - vlan_id: 11
-#     vlan_name: "Subnet-11"
-#     vnid: 1000011
-#     vrf_name: Tenant-1
-#     bgp_prefix: 192.168.11.0/24
-#   - vlan_id: 12
-#     vlan_name: "Subnet-12"
-#     vnid: 1000012
-#     vrf_name: Tenant-1
-#     bgp_prefix: 192.168.12.0/24
+l2vlans:
+  - vlan_id: 11
+    vlan_name: "Subnet-11"
+    vnid: 1000011
+    vrf_name: Tenant-1
+    bgp_prefix: 192.168.11.0/24
+  - vlan_id: 12
+    vlan_name: "Subnet-12"
+    vnid: 1000012
+    vrf_name: Tenant-1
+    bgp_prefix: 192.168.12.0/24
+  - vlan_id: 13
+    vlan_name: "Subnet-12"
+    vnid: 1000013
+    vrf_name: Tenant-2
+    bgp_prefix: 192.168.13.0/24
 
 #OK.$
 l3vlans:

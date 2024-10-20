@@ -260,7 +260,7 @@
       loop: "{{ bgp }}"
       tags: bgp_neighbor
 
-    - name: Configure BGP route target   #OK.$ #NEW ADD
+    - name: Configure BGP route target   #OK.$
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -273,7 +273,7 @@
         state: merged
       tags: bgp_route_target
 
-    - name: Configure BGP Maximum Paths   #OK.$ #NEW ADD
+    - name: Configure BGP Maximum Paths   #OK.$
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -355,3 +355,10 @@
     #     backup: yes
     #     save_when: always
     #   tags: write
+
+    - name: Confiuration Saving   #OK.$
+      cisco.nxos.nxos_config:
+        lines:
+          - copy running-config startup-config
+      tags: 
+        - write

@@ -145,7 +145,7 @@
             mapped_vni: "{{ item.vnid }}"
         state: merged
       with_items:
-        # - "{{ l2vlans }}"
+        - "{{ l2vlans }}"
         - "{{ l3vlans }}"
       tags:
         - configure_vlans
@@ -164,15 +164,15 @@
       tags:
         - configure_vrf_af
 
-    # - name: VNI configuration   #OK.$
-    #   cisco.nxos.nxos_evpn_vni:
-    #     vni: "{{ item.vnid }}"
-    #     route_distinguisher: "{{ l2rd }}"
-    #     route_target_both: "{{ l2rt }}"
-    #     state: "present"
-    #   loop: "{{ l2vlans }}"
-    #   tags:
-    #     - l2evpn
+    - name: VNI configuration   #OK.$
+      cisco.nxos.nxos_evpn_vni:
+        vni: "{{ item.vnid }}"
+        route_distinguisher: "{{ l2rd }}"
+        route_target_both: "{{ l2rt }}"
+        state: "present"
+      loop: "{{ l2vlans }}"
+      tags:
+        - l2evpn
 
     - name: LEAF SVI Naming   #OK.$
       cisco.nxos.nxos_interfaces:
@@ -289,66 +289,66 @@
     #     auto_recovery_reload_delay: "{{ vpc_auto_recovery }}"
     #   tags: vpc
 
-    - name: Configure VPC domain   #OK.$
-      cisco.nxos.nxos_config:
-        lines:
-          - peer-keepalive destination {{ vpc_pkl_dest }}
-          - delay restore {{vpc_delay_restore}}
-          - auto-recovery reload-delay {{vpc_auto_recovery}}
-        parents: vpc domain {{ vpc_domain }}
-        save_when: modified
-      tags:
-        - vpc_domain
+    # - name: Configure VPC domain   #OK.$
+    #   cisco.nxos.nxos_config:
+    #     lines:
+    #       - peer-keepalive destination {{ vpc_pkl_dest }}
+    #       - delay restore {{vpc_delay_restore}}
+    #       - auto-recovery reload-delay {{vpc_auto_recovery}}
+    #     parents: vpc domain {{ vpc_domain }}
+    #     save_when: modified
+    #   tags:
+    #     - vpc_domain
 
-    - name: LEAF vpc peer link port channel configuration   #OK.$
-      cisco.nxos.nxos_lag_interfaces:
-        config:
-          - name: "{{ vpc_po_id }}"
-            members:
-              - member: "Ethernet{{ item.vpc_pl_mem }}"
-                mode: "{{ vpc_po_mode }}"
-        state: merged
-      loop: "{{ vpc_pl_po_members }}"
-      tags:
-        - vpc_peerlink_pc
+    # - name: LEAF vpc peer link port channel configuration   #OK.$
+    #   cisco.nxos.nxos_lag_interfaces:
+    #     config:
+    #       - name: "{{ vpc_po_id }}"
+    #         members:
+    #           - member: "Ethernet{{ item.vpc_pl_mem }}"
+    #             mode: "{{ vpc_po_mode }}"
+    #     state: merged
+    #   loop: "{{ vpc_pl_po_members }}"
+    #   tags:
+    #     - vpc_peerlink_pc
 
-    - name: vpc peerlink configuration   #OK.$
-      cisco.nxos.nxos_vpc_interface:
-        portchannel: "{{ vpc_po_id }}"
-        peer_link: "{{ vpc_pl }}"
-        state: present
-      tags:
-        - vpc_pl_po
+    # - name: vpc peerlink configuration   #OK.$
+    #   cisco.nxos.nxos_vpc_interface:
+    #     portchannel: "{{ vpc_po_id }}"
+    #     peer_link: "{{ vpc_pl }}"
+    #     state: present
+    #   tags:
+    #     - vpc_pl_po
 
-    - name: vpc peerlink trunk configuration   #OK.$
-      cisco.nxos.nxos_l2_interfaces:
-        config:
-          - name: "port-channel{{ vpc_po_id }}"
-            mode: "{{ vpc_pl_sw_mode }}"
-            trunk:
-              native_vlan: "{{ vpc_native_vlan }}"
-        state: merged
-      tags:
-        - vpc_pl_trunk
+    # - name: vpc peerlink trunk configuration   #OK.$
+    #   cisco.nxos.nxos_l2_interfaces:
+    #     config:
+    #       - name: "port-channel{{ vpc_po_id }}"
+    #         mode: "{{ vpc_pl_sw_mode }}"
+    #         trunk:
+    #           native_vlan: "{{ vpc_native_vlan }}"
+    #     state: merged
+    #   tags:
+    #     - vpc_pl_trunk
 
-    - name: leafs vpc peer-link enabling   #OK.$
-      cisco.nxos.nxos_interfaces:
-        config:
-          - name: "Ethernet{{ item.vpc_pl_mem }}"
-            enabled: true
-        state: merged
-      loop: "{{ vpc_pl_po_members }}"
-      tags:
-        - vpc_pl_enable
+    # - name: leafs vpc peer-link enabling   #OK.$
+    #   cisco.nxos.nxos_interfaces:
+    #     config:
+    #       - name: "Ethernet{{ item.vpc_pl_mem }}"
+    #         enabled: true
+    #     state: merged
+    #   loop: "{{ vpc_pl_po_members }}"
+    #   tags:
+    #     - vpc_pl_enable
 
-    - name: vpc-portchannel configuration   #OK.$
-      cisco.nxos.nxos_vpc_interface:
-        portchannel: "{{ item.intf_po }}"
-        vpc: "{{ item.intf_po }}"
-        state: present
-      loop: "{{ server_interfaces }}"
-      tags:
-        - vpc_po
+    # - name: vpc-portchannel configuration   #OK.$
+    #   cisco.nxos.nxos_vpc_interface:
+    #     portchannel: "{{ item.intf_po }}"
+    #     vpc: "{{ item.intf_po }}"
+    #     state: present
+    #   loop: "{{ server_interfaces }}"
+    #   tags:
+    #     - vpc_po
 
     - name: Configure Interfaces, PIM   #OK.$ (CHANGE LOOP NAME)
       cisco.nxos.nxos_pim_interface:
@@ -403,7 +403,7 @@
         state: present
         suppress_arp: true
       with_items:
-        # - "{{ l2vlans }}"
+        - "{{ l2vlans }}"
         - "{{ l3vlans }}"
       tags:
         - configure_vlan_multicasts
@@ -557,3 +557,10 @@
     #     backup: yes
     #     save_when: always
     #   tags: write
+
+    - name: Confiuration Saving   #OK.$
+      cisco.nxos.nxos_config:
+        lines:
+          - copy running-config startup-config
+      tags: 
+        - write
