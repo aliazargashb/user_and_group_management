@@ -11,7 +11,7 @@ This project is structured to manage data center fabric infrastructure using Ans
 
 ## Project Structure
 ```bash
-├── ansible.cfg
+├── **ansible.cfg**
 ├── inventories
 │   ├── group_vars
 │   │   ├── all.yaml
