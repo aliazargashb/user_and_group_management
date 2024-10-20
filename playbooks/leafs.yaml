@@ -15,6 +15,7 @@
       tags:
         - enable_features
 
+#CHECK & TEST - USE MODULE
     - name: Configure AAA   #OK.$
       cisco.nxos.nxos_config:
         lines:
@@ -29,6 +30,7 @@
       tags: 
         - aaa_config
 
+#CHECK & TEST - USE MODULE
     - name: Configure TACACS   #OK.$
       cisco.nxos.nxos_config:
         lines:
@@ -280,7 +282,7 @@
         - configure_lag_interfaces
 
 #ERROR AFTER 1st RUN WITH NXOS_VPC MODULE, PAY ATTENTION TO THE NEXT TASK WITH NXOS_CONFIG
-    # - name: Configure VPC domain   #OK.$
+    # - name: Configure VPC domain   #OK.$ #CHECK MORE
     #   cisco.nxos.nxos_vpc:
     #     domain: "{{ vpc_domain }}"
     #     pkl_dest: "{{ vpc_pkl_dest }}"
@@ -289,7 +291,7 @@
     #     auto_recovery_reload_delay: "{{ vpc_auto_recovery }}"
     #   tags: vpc
 
-    # - name: Configure VPC domain   #OK.$
+    # - name: Configure VPC domain   #OK.$ #CHECK ABOVE TASK
     #   cisco.nxos.nxos_config:
     #     lines:
     #       - peer-keepalive destination {{ vpc_pkl_dest }}
@@ -511,7 +513,7 @@
       loop: "{{ l3vlans }}"
       tags: configure_bgp_vrf
 
-    - name: Configure BGP VPC-Pairs Advertisement   #OK.$
+    - name: Advertise PIP in AF   #OK.$
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -520,7 +522,7 @@
               safi: evpn
               advertise_pip: true
         state: merged
-      tags: configure_bgp_vpc_adv
+      tags: adv_pip
 
     - name: Configure BGP Maximum Paths   #OK.$
       cisco.nxos.nxos_bgp_address_family:
