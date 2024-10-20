@@ -73,6 +73,11 @@ If you want to use a virtual environment to manage dependencies, create and acti
 conda create --name <NAME> python=<PYTHON VERSION>
 conda activate <NAME>
 ```
+OR
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
 4. **Install Required Dependencies (if any)**
 
