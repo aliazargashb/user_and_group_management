@@ -1,6 +1,8 @@
 ![Ansible](https://img.shields.io/badge/ansible-2.17.4-blue?style=flat-square&logo=ansible)
 ![Git](https://img.shields.io/badge/Git-2.30.0-orange?logo=git)
 ![Conda](https://img.shields.io/badge/Conda-4.10.3-green?logo=anaconda)
+![GitLab](https://img.shields.io/badge/GitLab-CI/CD-orange?logo=gitlab)
+![GitLab](https://img.shields.io/badge/GitLab-14.10-blue?logo=gitlab)
 
 # Ansible Project Structure
 This project is structured to manage data center fabric infrastructure using Ansible, organized with inventories, group variables, host-specific configurations, and playbooks to configure different sets of devices such as leafs, spines, and superspines.
