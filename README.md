@@ -119,4 +119,4 @@ This directory contains the Ansible playbooks used to configure different networ
 - `spine.yaml`: Playbook for configuring spine switches.
 - `superspine.yaml`: Playbook for configuring superspine switches.
 
-![DCF LAB] (/DCF-LAB.png)
+![DCF LAB] (iac/DCF-LAB.png)
