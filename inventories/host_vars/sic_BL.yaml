@@ -37,6 +37,13 @@ physical_interfaces:
     intf_ip: 10.0.2.170
     intf_subnet: 30
     intf_mode: "layer3"
+external_interfaces:
+  - intf_name: Ethernet1/3
+    intf_desc: "To_External-SIC-L3FW"
+    intf_status: true
+    intf_ip: 10.0.4.4
+    intf_subnet: 30
+    intf_mode: "layer3"
 
 #OK.$
 server_interfaces:
