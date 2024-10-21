@@ -4,11 +4,8 @@
 aaa_srv_grp: AAA_Servers
 
 #OK.$
-tacacs_host:
-  - tacacs_srv_host: "172.27.0.1"
-    tacacs_srv_key: key1
-  - tacacs_srv_host: "172.27.0.2"
-    tacacs_srv_key: key2
+tacacs_srv_host: "172.27.0.1"
+tacacs_srv_key: key1
 
 #OK.$
 ospf_pro_id: underlay
