@@ -1,3 +1,4 @@
+#ON-GOING
 ---
 - name: Configure Cisco Nexus Switch - SIC Leaf
   hosts: all
@@ -225,8 +226,6 @@
           - name: "{{ item.intf_name }}"
             ipv4:
               - address: "{{ item.intf_ip }}/{{ item.intf_subnet }}"
-              - address: "{{ item.ip_secondary | default('null') }}/{{ item.intf_subnet }}"
-                secondary: "{{ item.sec_value | default('false') }}"
         state: merged
       loop: "{{ loopback_interfaces }}"
       tags:
@@ -281,79 +280,6 @@
       tags:
         - configure_lag_interfaces
 
-#ERROR AFTER 1st RUN WITH NXOS_VPC MODULE, PAY ATTENTION TO THE NEXT TASK WITH NXOS_CONFIG
-    # - name: Configure VPC domain   #OK.$ #CHECK MORE
-    #   cisco.nxos.nxos_vpc:
-    #     domain: "{{ vpc_domain }}"
-    #     pkl_dest: "{{ vpc_pkl_dest }}"
-    #     # pkl_src: "{{ vpc_pkl_src }}"
-    #     delay_restore: "{{ vpc_delay_restore }}"
-    #     auto_recovery_reload_delay: "{{ vpc_auto_recovery }}"
-    #   tags: vpc
-
-#CHECK
-    - name: Configure VPC domain   #OK.$ #CHECK ABOVE TASK
-      cisco.nxos.nxos_config:
-        lines:
-          - peer-keepalive destination {{ vpc_pkl_dest }}
-          - delay restore {{vpc_delay_restore}}
-          - auto-recovery reload-delay {{vpc_auto_recovery}}
-        parents: vpc domain {{ vpc_domain }}
-        save_when: modified
-      tags:
-        - vpc_domain
-
-    - name: LEAF vpc peer link port channel configuration   #OK.$
-      cisco.nxos.nxos_lag_interfaces:
-        config:
-          - name: "{{ vpc_po_id }}"
-            members:
-              - member: "Ethernet{{ item.vpc_pl_mem }}"
-                mode: "{{ vpc_po_mode }}"
-        state: merged
-      loop: "{{ vpc_pl_po_members }}"
-      tags:
-        - vpc_peerlink_pc
-
-    - name: vpc peerlink configuration   #OK.$
-      cisco.nxos.nxos_vpc_interface:
-        portchannel: "{{ vpc_po_id }}"
-        peer_link: "{{ vpc_pl }}"
-        state: present
-      tags:
-        - vpc_pl_po
-
-    - name: vpc peerlink trunk configuration   #OK.$
-      cisco.nxos.nxos_l2_interfaces:
-        config:
-          - name: "port-channel{{ vpc_po_id }}"
-            mode: "{{ vpc_pl_sw_mode }}"
-            trunk:
-              native_vlan: "{{ vpc_native_vlan }}"
-        state: merged
-      tags:
-        - vpc_pl_trunk
-
-    - name: leafs vpc peer-link enabling   #OK.$
-      cisco.nxos.nxos_interfaces:
-        config:
-          - name: "Ethernet{{ item.vpc_pl_mem }}"
-            enabled: true
-        state: merged
-      loop: "{{ vpc_pl_po_members }}"
-      tags:
-        - vpc_pl_enable
-
-    - name: vpc-portchannel configuration   #OK.$
-      cisco.nxos.nxos_vpc_interface:
-        portchannel: "{{ item.intf_po }}"
-        vpc: "{{ item.intf_po }}"
-        state: present
-      loop: "{{ server_interfaces }}"
-      tags:
-        - vpc_po
-#CHECK
-
     - name: Configure Interfaces, PIM   #OK.$ (CHANGE LOOP NAME)
       cisco.nxos.nxos_pim_interface:
         interface: "{{ item.intf_name }}"
@@ -394,7 +320,6 @@
       cisco.nxos.nxos_vxlan_vtep:
         interface: "{{ nve_intf_name }}"
         source_interface: "{{ nve_src_intf }}"
-        advertise_virtual_rmac: true
         shutdown: "{{ nve_intf_status }}"
         host_reachability: true
         state: present
@@ -407,7 +332,7 @@
         vni: "{{ item.vnid }}"
         multicast_group: "{{ vrf_config | selectattr('vrf_name', 'equalto', item.vrf_name) | map(attribute='vrf_mcast_group') | first }}"
         state: present
-        suppress_arp: true   #CHECK
+        suppress_arp: true
       with_items:
         - "{{ l2vlans }}"
         - "{{ l3vlans }}"
@@ -517,17 +442,6 @@
         state: merged
       loop: "{{ l3vlans }}"
       tags: configure_bgp_vrf
-
-    - name: Advertise PIP in AF   #OK.$
-      cisco.nxos.nxos_bgp_address_family:
-        config:
-          as_number: "{{ bgp_asn }}"
-          address_family:
-            - afi: l2vpn
-              safi: evpn
-              advertise_pip: true
-        state: merged
-      tags: adv_pip
 
     - name: Configure BGP Maximum Paths   #OK.$
       cisco.nxos.nxos_bgp_address_family:

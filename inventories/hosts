@@ -102,6 +102,8 @@ all:
       hosts:
         bmi_leaf1:
           ansible_host: 100.120.23.101
+        bmi_BL:
+          ansible_host: 100.120.23.111
 
     sic_spines:
       hosts:
@@ -116,3 +118,5 @@ all:
           ansible_host: 100.120.23.201
         sic_leaf2:
           ansible_host: 100.120.23.203
+        sic_BL:
+          ansible_host: 100.120.23.211
