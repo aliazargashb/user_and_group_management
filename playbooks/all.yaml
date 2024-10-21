@@ -1,5 +1,5 @@
 ---
-- name: Configure Cisco Nexus Switch - SIC Leaf
+- name: Configure Cisco Nexus Switch - ALL
   hosts: all
   gather_facts: false
   connection: network_cli
@@ -117,7 +117,7 @@
       tags:
         - telemetry_subscriptions
 
-    - name: Copy running config to startup config
+    - name: Copy running config to startup config   #OK.$
       cisco.nxos.nxos_config:
         backup: no
         save_when: always

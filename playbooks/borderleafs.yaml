@@ -1,79 +1,13 @@
 #ON-GOING
 ---
 - name: Configure Cisco Nexus Switch - SIC Leaf
-  hosts: all
+  hosts: border_leafs
   gather_facts: false
   connection: network_cli
   vars:
     ansible_network_os: cisco.nxos.nxos
 
   tasks:
-    - name: Enable necessary features   #OK.$
-      cisco.nxos.nxos_feature:
-        feature: "{{ item }}"
-        state: enabled
-      loop: "{{ features }}"
-      tags:
-        - enable_features
-
-#CHECK & TEST - USE MODULE
-    - name: Configure AAA   #OK.$
-      cisco.nxos.nxos_config:
-        lines:
-          - aaa authentication login default group {{ aaa_srv_grp }} local
-          - aaa authentication login console group {{ aaa_srv_grp }} local
-          - aaa authorization commands default group {{ aaa_srv_grp }} local
-          - aaa accounting default group {{ aaa_srv_grp }} local
-          - aaa authorization config-commands default group {{ aaa_srv_grp }} local
-          - aaa authentication login error-enable
-          - tacacs-server directed-request
-          - aaa group server tacacs+ {{ aaa_srv_grp }}
-      tags: 
-        - aaa_config
-
-#CHECK & TEST - USE MODULE
-    - name: Configure TACACS   #OK.$
-      cisco.nxos.nxos_config:
-        lines:
-          - server {{ item.tacacs_srv_host }} key {{ item.tacacs_srv_key }}
-          - server {{ item.tacacs_srv_host }} key {{ item.tacacs_srv_key }}
-          - use-vrf management
-          # - source-interface mgmt0
-        parents: aaa group server tacacs+ AAA_Servers
-      loop: "{{ tacacs_host }}"
-      tags: 
-        - tacacs_config
-
-    - name: Set Hostname   #OK.$
-      cisco.nxos.nxos_hostname:
-        config:
-          hostname: "{{ hostname }}"
-      tags:
-        - set_hostname
-
-    - name: Configure NTP   #OK.$
-      cisco.nxos.nxos_ntp_global:
-        config:
-          servers:
-            - server: "{{ item }}"
-              vrf: "{{ ntp_vrf }}"
-      loop: "{{ ntp_server }}"
-      tags:
-        - ntp_config
-
-    - name: Create user account   #OK.$
-      cisco.nxos.nxos_user:
-        name: "{{ device_user }}"
-        configured_password: "{{ device_pass }}"
-        role: "{{ user_role }}"
-      tags:
-        - create_user
-
-    - name: Enable NV Overlay EVPN   #OK.$
-      cisco.nxos.nxos_evpn_global:
-        nv_overlay_evpn: true
-      tags: evpn_feature
-
     - name: anycast gateway configuration   #OK.$
       cisco.nxos.nxos_overlay_global:
         anycast_gateway_mac: "{{ anycast_gw_mac }}"
@@ -211,7 +145,7 @@
       tags:
         - svi_ip
 
-    - name: Configure Loopback Interface Descriptions   #OK.$ (CHANGE LOOP NAME)
+    - name: Configure Loopback Interface Descriptions   #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -222,7 +156,7 @@
       tags:
         - configure_loopbacks
 
-    - name: Configure IP for Loopback   #OK.$ (CHANGE LOOP NAME)
+    - name: Configure IP for Loopback   #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -233,7 +167,7 @@
       tags:
         - configure_loopbacks_ip
 
-    - name: Configure Physical Ethernet Ports   #OK.$ (CHANGE LOOP NAME)
+    - name: Configure Physical Ethernet Ports   #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -242,34 +176,24 @@
             mode: "{{ item.intf_mode }}"
             mtu: "{{ intf_mtu }}"
         state: merged
-      loop: "{{ physical_interfaces }}"
+      with_items:
+        - "{{ physical_interfaces }}"
+        - "{{ external_interfaces }}"
       tags:
         - configure_ports
 
-    - name: Configure IP for Physical Ethernet Ports   #OK.$ (CHANGE LOOP NAME)
+    - name: Configure IP for Physical Ethernet Ports   #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
             ipv4:
               - address: "{{ item.intf_ip }}/{{ item.intf_subnet }}"
         state: merged
-      loop: "{{ physical_interfaces }}"
+      with_items:
+        - "{{ physical_interfaces }}"
+        - "{{ external_interfaces }}"
       tags:
         - configure_physical_ports_ip
-
-#CHECK
-    - name: Configure L2 Interfaces to Servers   #OK.$
-      cisco.nxos.nxos_l2_interfaces:
-        config:
-          - name: "{{ item.intf_name }}"
-            mode: "{{ item.switchport_mode }}"
-            access:
-              vlan: "{{ item.access_vlan }}"
-        state: merged
-      loop: "{{ server_interfaces }}"
-      tags:
-        - configure_l2_interfaces
-#CHECK
 
     - name: Configure LAG Interfaces   #OK.$
       cisco.nxos.nxos_lag_interfaces:
@@ -282,7 +206,61 @@
       tags:
         - configure_lag_interfaces
 
-    - name: Configure Interfaces, PIM   #OK.$ (CHANGE LOOP NAME)
+#WHEN USAGE
+    - name: Configure L2 Interfaces to Servers   #OK.$
+      cisco.nxos.nxos_l2_interfaces:
+        config:
+          - name: "port-channel{{ item.intf_po }}"
+            mode: "{{ item.switchport_mode }}"
+            access:
+              vlan: "{{ item.access_vlan }}"
+        state: merged
+      loop: "{{ server_interfaces }}"
+      tags:
+        - configure_l2_interfaces
+
+#WRITE THE TASK FOR TRUNKED PORTS
+#WHEN USAGE
+    - name: Configure L2 Interfaces to Servers   #OK.$
+      cisco.nxos.nxos_l2_interfaces:
+        config:
+          - name: "port-channel{{ item.intf_po }}"
+            mode: "{{ item.switchport_mode }}"
+            trunk:
+              allowed_vlans: "{{ item.trunk_vlan }}"
+        state: merged
+      loop: "{{ server_interfaces }}"
+      tags:
+        - configure_l2_interfaces
+
+#WRITE TWO OTHER TASKS WITH NO PORT_CHANNEL (ACCESS, TRUNK)
+#WHEN USAGE
+    - name: Configure L2 Interfaces to Servers-No Port-Channel   #OK.$
+      cisco.nxos.nxos_l2_interfaces:
+        config:
+          - name: "{{ item.intf_name }}"
+            mode: "{{ item.switchport_mode }}"
+            trunk:
+              allowed_vlans: "{{ item.trunk_vlan }}"
+        state: merged
+      loop: "{{ server_interfaces }}"
+      tags:
+        - configure_l2_interfaces
+
+#WHEN USAGE
+    - name: Configure L2 Interfaces to Servers-No Port-Channel   #OK.$
+      cisco.nxos.nxos_l2_interfaces:
+        config:
+          - name: "{{ item.intf_name }}"
+            mode: "{{ item.switchport_mode }}"
+            access:
+              vlan: "{{ item.access_vlan }}"
+        state: merged
+      loop: "{{ server_interfaces }}"
+      tags:
+        - configure_l2_interfaces
+
+    - name: Configure Interfaces, PIM   #OK.$
       cisco.nxos.nxos_pim_interface:
         interface: "{{ item.intf_name }}"
         sparse: true
@@ -301,7 +279,7 @@
       tags:
         - configure_ospf
 
-    - name: Configure Interfaces, OSPF   #OK.$ (CHANGE LOOP NAME)
+    - name: Configure Interfaces, OSPF   #OK.$
       cisco.nxos.nxos_ospf_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -349,53 +327,6 @@
       loop: "{{ vrf_config }}"
       tags:
         - configure_assoc_vrf
-
-    - name: telemetry configuration destination_groups   #OK.$
-      cisco.nxos.nxos_telemetry:
-        config:
-          # source_interface: "{{ telemetry_src_intf }}"
-          vrf: "{{ telemetry_src_vrf }}"
-          destination_groups:
-            - id: "{{ item.0.dst_grp_id }}"
-              destination:
-                ip: "{{ item.1.dst_grp_ip }}"
-                port: "{{ item.1.dst_grp_port }}"
-                protocol: "{{ item.1.dst_grp_protocol }}"
-                encoding: "{{ item.1.dst_grp_encoding }}"
-      loop: "{{ telemetry_destination_groups  | subelements('destination') }}"
-      tags:
-        - telemetry_destination_groups
-
-    - name: telemetry configuration sensor_groups   #OK.$
-      cisco.nxos.nxos_telemetry:
-        config:
-          # source_interface: "{{ telemetry_src_intf }}"
-          vrf: "{{ telemetry_src_vrf }}"
-          sensor_groups:
-            - id: "{{ item.0.sns_grp_id }}"
-              data_source: "{{ item.0.sns_grp_data_src }}"
-              path:
-                name: "{{ item.1.sns_grp_path_name }}"
-                depth: "{{ item.1.sns_grp_path_depth }}"
-      loop: "{{ telemetry_sensor_groups | subelements('path') }}"
-      tags:
-        - telemetry_sensor_groups
-
-    - name: telemetry configuration subscriptions   #OK.$
-      cisco.nxos.nxos_telemetry:
-        config:
-          # source_interface: "{{ telemetry_src_intf }}"
-          vrf: "{{ telemetry_src_vrf }}"
-          subscriptions:
-            - id: "{{ item.0.sub_grp_id }}"
-              destination_group: "{{ item.0.dst_grp_id }}"
-              sensor_group:
-                id: "{{ item.1.sns_grp_id }}"
-                sample_interval: "{{ item.1.sub_interval }}"
-        state: merged
-      loop: "{{ telemetry_subscriptions | subelements('sensor_group') }}"
-      tags:
-        - telemetry_subscriptions
 
     - name: Configure BGP templates   #OK.$
       cisco.nxos.nxos_bgp_templates:
@@ -475,15 +406,15 @@
       loop: "{{ bgp }}"
       tags: bgp_neighbor
 
-    # - name: Copy running config to startup config
-    #   cisco.nxos.nxos_config:
-    #     backup: yes
-    #     save_when: always
-    #   tags: write
-
-    - name: Confiuration Saving   #OK.$
+    - name: Copy running config to startup config   #OK.$
       cisco.nxos.nxos_config:
-        lines:
-          - copy running-config startup-config
-      tags: 
-        - write
+        backup: no
+        save_when: always
+      tags: write
+
+    # - name: Confiuration Saving   #OK.$
+    #   cisco.nxos.nxos_config:
+    #     lines:
+    #       - copy running-config startup-config
+    #   tags: 
+    #     - write

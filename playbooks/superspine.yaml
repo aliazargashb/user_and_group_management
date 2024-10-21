@@ -7,71 +7,6 @@
     ansible_network_os: cisco.nxos.nxos
 
   tasks:
-    - name: Enable necessary features   #OK.$
-      cisco.nxos.nxos_feature:
-        feature: "{{ item }}"
-        state: enabled
-      loop: "{{ features }}"
-      tags:
-        - enable_features
-
-    - name: Configure AAA   #OK.$
-      cisco.nxos.nxos_config:
-        lines:
-          - aaa authentication login default group {{ aaa_srv_grp }} local
-          - aaa authentication login console group {{ aaa_srv_grp }} local
-          - aaa authorization commands default group {{ aaa_srv_grp }} local
-          - aaa accounting default group {{ aaa_srv_grp }} local
-          - aaa authorization config-commands default group {{ aaa_srv_grp }} local
-          - aaa authentication login error-enable
-          - tacacs-server directed-request
-          - aaa group server tacacs+ {{ aaa_srv_grp }}
-      tags: 
-        - aaa_config
-
-#ERROR/KEY
-    - name: Configure TACACS   #OK.$
-      cisco.nxos.nxos_config:
-        lines:
-          - server {{ item.tacacs_srv_host }} key {{ item.tacacs_srv_key }}
-          - server {{ item.tacacs_srv_host }} key {{ item.tacacs_srv_key }}
-          - use-vrf management
-          # - source-interface mgmt0
-        parents: aaa group server tacacs+ AAA_Servers
-      loop: "{{ tacacs_host }}"
-      tags: 
-        - tacacs_config
-
-    - name: Set Hostname   #OK.$
-      cisco.nxos.nxos_hostname:
-        config:
-          hostname: "{{ hostname }}"
-      tags:
-        - set_hostname
-
-    - name: Configure NTP   #OK.$
-      cisco.nxos.nxos_ntp_global:
-        config:
-          servers:
-            - server: "{{ item }}"
-              vrf: "{{ ntp_vrf }}"
-      loop: "{{ ntp_server }}"
-      tags:
-        - ntp_config
-
-    - name: Create user account   #OK.$
-      cisco.nxos.nxos_user:
-        name: "{{ device_user }}"
-        configured_password: "{{ device_pass }}"
-        role: "{{ user_role }}"
-      tags:
-        - create_user
-
-    - name: Enable NV Overlay EVPN   #OK.$
-      cisco.nxos.nxos_evpn_global:
-        nv_overlay_evpn: true
-      tags: evpn_feature
-
     - name: Configure PIM RP address   #OK.$
       cisco.nxos.nxos_pim_rp_address:
         rp_address: "{{ pim_rp_ip }}"
@@ -254,54 +189,7 @@
         state: merged
       tags: configure_route_map
 
-    - name:  telemetry configuration destination_groups   #OK.$
-      cisco.nxos.nxos_telemetry:
-        config:
-          # source_interface: "{{ telemetry_src_intf }}"
-          vrf: "{{ telemetry_src_vrf }}"
-          destination_groups:
-            - id: "{{ item.0.dst_grp_id }}"
-              destination:
-                ip: "{{ item.1.dst_grp_ip }}"
-                port: "{{ item.1.dst_grp_port }}"
-                protocol: "{{ item.1.dst_grp_protocol }}"
-                encoding: "{{ item.1.dst_grp_encoding }}"
-      loop: "{{ telemetry_destination_groups  | subelements('destination') }}"
-      tags:
-        - telemetry_destination_groups
-
-    - name:  telemetry configuration sensor_groups   #OK.$
-      cisco.nxos.nxos_telemetry:
-        config:
-          # source_interface: "{{ telemetry_src_intf }}"
-          vrf: "{{ telemetry_src_vrf }}"
-          sensor_groups:
-            - id: "{{ item.0.sns_grp_id }}"
-              data_source: "{{ item.0.sns_grp_data_src }}"
-              path:
-                name: "{{ item.1.sns_grp_path_name }}"
-                depth: "{{ item.1.sns_grp_path_depth }}"
-      loop: "{{ telemetry_sensor_groups  | subelements('path') }}"  
-      tags:
-        - telemetry_sensor_groups
-
-    - name:  telemetry configuration subscriptions   #OK.$
-      cisco.nxos.nxos_telemetry:
-        config:
-          # source_interface: "{{ telemetry_src_intf }}"
-          vrf: "{{ telemetry_src_vrf }}"
-          subscriptions:
-            - id: "{{ item.0.sub_grp_id }}"
-              destination_group: "{{ item.0.dst_grp_id }}"
-              sensor_group:
-                id: "{{ item.1.sns_grp_id }}"
-                sample_interval: "{{ item.1.sub_interval }}"
-        state: merged
-      loop: "{{ telemetry_subscriptions  | subelements('sensor_group') }}"  
-      tags:
-        - telemetry_subscriptions
-
-    - name: Copy running config to startup config
+    - name: Copy running config to startup config   #OK.$
       cisco.nxos.nxos_config:
         backup: no
         save_when: always
