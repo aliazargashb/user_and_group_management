@@ -15,7 +15,6 @@
       tags:
         - enable_features
 
-#CHECK & TEST - USE MODULE
     - name: Configure AAA   #OK.$
       cisco.nxos.nxos_config:
         lines:
@@ -30,7 +29,7 @@
       tags: 
         - aaa_config
 
-#CHECK & TEST - USE MODULE
+#ERROR/KEY
     - name: Configure TACACS   #OK.$
       cisco.nxos.nxos_config:
         lines:
@@ -172,7 +171,9 @@
         route_distinguisher: "{{ l2rd }}"
         route_target_both: "{{ l2rt }}"
         state: "present"
-      loop: "{{ l2vlans }}"
+      with_items:
+        - "{{ l2vlans }}"
+        - "{{ l3vlans }}"
       tags:
         - l2evpn
 
@@ -208,7 +209,7 @@
       tags:
         - svi_ip
 
-    - name: Configure Loopback Interface Descriptions   #OK.$ (CHANGE LOOP NAME)
+    - name: Configure Loopback Interface Descriptions   #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -219,7 +220,7 @@
       tags:
         - configure_loopbacks
 
-    - name: Configure IP for Loopback   #OK.$ (CHANGE LOOP NAME)
+    - name: Configure IP for Loopback   #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -232,7 +233,7 @@
       tags:
         - configure_loopbacks_ip
 
-    - name: Configure Physical Ethernet Ports   #OK.$ (CHANGE LOOP NAME)
+    - name: Configure Physical Ethernet Ports   #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -245,7 +246,7 @@
       tags:
         - configure_ports
 
-    - name: Configure IP for Physical Ethernet Ports   #OK.$ (CHANGE LOOP NAME)
+    - name: Configure IP for Physical Ethernet Ports   #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -255,20 +256,6 @@
       loop: "{{ physical_interfaces }}"
       tags:
         - configure_physical_ports_ip
-
-#CHECK
-    - name: Configure L2 Interfaces to Servers   #OK.$
-      cisco.nxos.nxos_l2_interfaces:
-        config:
-          - name: "{{ item.intf_name }}"
-            mode: "{{ item.switchport_mode }}"
-            access:
-              vlan: "{{ item.access_vlan }}"
-        state: merged
-      loop: "{{ server_interfaces }}"
-      tags:
-        - configure_l2_interfaces
-#CHECK
 
     - name: Configure LAG Interfaces   #OK.$
       cisco.nxos.nxos_lag_interfaces:
@@ -280,6 +267,24 @@
       loop: "{{ server_interfaces }}"
       tags:
         - configure_lag_interfaces
+
+#CHECK
+    - name: Configure L2 Interfaces to Servers   #OK.$
+      cisco.nxos.nxos_l2_interfaces:
+        config:
+          - name: "port-channel{{ item.intf_po }}"
+            mode: "{{ item.switchport_mode }}"
+            access:
+              vlan: "{{ item.access_vlan }}"
+        state: merged
+      loop: "{{ server_interfaces }}"
+      tags:
+        - configure_l2_interfaces
+#CHECK
+
+#WRITE THE TASK FOR TRUNKED PORTS
+
+#WRITE TWO OTHER TASKS WITH NO PORT_CHANNEL (ACCESS, TRUNK)
 
 #ERROR AFTER 1st RUN WITH NXOS_VPC MODULE, PAY ATTENTION TO THE NEXT TASK WITH NXOS_CONFIG
     # - name: Configure VPC domain   #OK.$ #CHECK MORE
@@ -354,7 +359,7 @@
         - vpc_po
 #CHECK
 
-    - name: Configure Interfaces, PIM   #OK.$ (CHANGE LOOP NAME)
+    - name: Configure Interfaces, PIM   #OK.$
       cisco.nxos.nxos_pim_interface:
         interface: "{{ item.intf_name }}"
         sparse: true
@@ -373,7 +378,7 @@
       tags:
         - configure_ospf
 
-    - name: Configure Interfaces, OSPF   #OK.$ (CHANGE LOOP NAME)
+    - name: Configure Interfaces, OSPF   #OK.$
       cisco.nxos.nxos_ospf_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -559,15 +564,15 @@
       loop: "{{ bgp }}"
       tags: bgp_neighbor
 
-    # - name: Copy running config to startup config
-    #   cisco.nxos.nxos_config:
-    #     backup: yes
-    #     save_when: always
-    #   tags: write
-
-    - name: Confiuration Saving   #OK.$
+    - name: Copy running config to startup config
       cisco.nxos.nxos_config:
-        lines:
-          - copy running-config startup-config
-      tags: 
-        - write
+        backup: no
+        save_when: always
+      tags: write
+
+    # - name: Confiuration Saving   #OK.$
+    #   cisco.nxos.nxos_config:
+    #     lines:
+    #       - copy running-config startup-config
+    #   tags: 
+    #     - write

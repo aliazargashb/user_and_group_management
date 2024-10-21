@@ -173,7 +173,9 @@
         route_distinguisher: "{{ l2rd }}"
         route_target_both: "{{ l2rt }}"
         state: "present"
-      loop: "{{ l2vlans }}"
+      with_items:
+        - "{{ l2vlans }}"
+        - "{{ l3vlans }}"
       tags:
         - l2evpn
 

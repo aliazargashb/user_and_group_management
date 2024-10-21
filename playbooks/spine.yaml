@@ -29,6 +29,7 @@
       tags: 
         - aaa_config
 
+#ERROR/KEY
     - name: Configure TACACS   #OK.$
       cisco.nxos.nxos_config:
         lines:
@@ -353,15 +354,15 @@
       tags:
         - telemetry_subscriptions
 
-    # - name: Copy running config to startup config
-    #   cisco.nxos.nxos_config:
-    #     backup: yes
-    #     save_when: always
-    #   tags: write
-
-    - name: Confiuration Saving   #OK.$
+    - name: Copy running config to startup config
       cisco.nxos.nxos_config:
-        lines:
-          - copy running-config startup-config
-      tags: 
-        - write
+        backup: no
+        save_when: always
+      tags: write
+
+    # - name: Confiuration Saving   #OK.$
+    #   cisco.nxos.nxos_config:
+    #     lines:
+    #       - copy running-config startup-config
+    #   tags: 
+    #     - write
