@@ -201,12 +201,13 @@
           - name: "{{ item.intf_po }}"
             members:
               - member: "{{ item.intf_name }}"
+                mode: "{{ item.intf_lag_mode }}"   #CHECK
         state: merged
       loop: "{{ server_interfaces }}"
+      when: item.intf_po is defined
       tags:
         - configure_lag_interfaces
 
-#WHEN USAGE
     - name: Configure L2 Interfaces to Servers   #OK.$
       cisco.nxos.nxos_l2_interfaces:
         config:
@@ -216,11 +217,10 @@
               vlan: "{{ item.access_vlan }}"
         state: merged
       loop: "{{ server_interfaces }}"
+      when: item.switchport_mode == 'access' and item.intf_po is defined   #CHECK
       tags:
-        - configure_l2_interfaces
+        - configure_l2_interfaces_access
 
-#WRITE THE TASK FOR TRUNKED PORTS
-#WHEN USAGE
     - name: Configure L2 Interfaces to Servers   #OK.$
       cisco.nxos.nxos_l2_interfaces:
         config:
@@ -228,13 +228,13 @@
             mode: "{{ item.switchport_mode }}"
             trunk:
               allowed_vlans: "{{ item.trunk_vlan }}"
-        state: merged
+              native_vlan: "{{ native_vlan_id }}"   #CHECK
+        state: replaced
       loop: "{{ server_interfaces }}"
+      when: item.switchport_mode == 'trunk' and item.intf_po is defined   #CHECK
       tags:
-        - configure_l2_interfaces
+        - configure_l2_interfaces_trunk
 
-#WRITE TWO OTHER TASKS WITH NO PORT_CHANNEL (ACCESS, TRUNK)
-#WHEN USAGE
     - name: Configure L2 Interfaces to Servers-No Port-Channel   #OK.$
       cisco.nxos.nxos_l2_interfaces:
         config:
@@ -242,12 +242,13 @@
             mode: "{{ item.switchport_mode }}"
             trunk:
               allowed_vlans: "{{ item.trunk_vlan }}"
+              native_vlan: "{{ native_vlan_id }}"   #CHECK
         state: merged
       loop: "{{ server_interfaces }}"
+      when: item.switchport_mode == 'trunk' and item.intf_po is not defined
       tags:
-        - configure_l2_interfaces
+        - configure_l2_interfaces_trunk_nopo
 
-#WHEN USAGE
     - name: Configure L2 Interfaces to Servers-No Port-Channel   #OK.$
       cisco.nxos.nxos_l2_interfaces:
         config:
@@ -257,8 +258,9 @@
               vlan: "{{ item.access_vlan }}"
         state: merged
       loop: "{{ server_interfaces }}"
+      when: item.switchport_mode == 'access' and item.intf_po is not defined
       tags:
-        - configure_l2_interfaces
+        - configure_l2_interfaces_access_nopo
 
     - name: Configure Interfaces, PIM   #OK.$
       cisco.nxos.nxos_pim_interface:
