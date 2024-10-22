@@ -44,7 +44,7 @@ server_interfaces:
     intf_desc: "To_Subnet11-SRVs"
     intf_status: true
     switchport_mode: "access"
-    intf_lag_mode: passive
+    intf_lag_mode: active
     access_vlan: 11
     intf_mode: "layer2"
     intf_po: 11
