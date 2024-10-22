@@ -192,6 +192,7 @@
       tags:
         - configure_physical_ports_ip
 
+#CHANGE THE MODE TO LACP
     - name: Configure LAG Interfaces   #OK.$
       cisco.nxos.nxos_lag_interfaces:
         config:
@@ -216,6 +217,7 @@
       tags:
         - configure_l2_interfaces_access
 
+#ADD NATIVE VLAN
     - name: Configure L2 Interfaces to Servers   #OK.$
       cisco.nxos.nxos_l2_interfaces:
         config:
@@ -223,7 +225,7 @@
             mode: "{{ item.switchport_mode }}"
             trunk:
               allowed_vlans: "{{ item.trunk_vlan }}"
-        state: merged
+        state: replaced
       loop: "{{ server_interfaces }}"
       when: item.switchport_mode == 'trunk'
       tags:
@@ -238,7 +240,7 @@
               allowed_vlans: "{{ item.trunk_vlan }}"
         state: merged
       loop: "{{ server_interfaces }}"
-      when: item.switchport_mode == 'trunk'
+      when: item.switchport_mode == 'trunk' and item.intf_po is not defined
       tags:
         - configure_l2_interfaces_trunk_nopo
 
@@ -251,7 +253,7 @@
               vlan: "{{ item.access_vlan }}"
         state: merged
       loop: "{{ server_interfaces }}"
-      when: item.switchport_mode == 'access'
+      when: item.switchport_mode == 'access' and item.intf_po is not defined
       tags:
         - configure_l2_interfaces_access_nopo
 
