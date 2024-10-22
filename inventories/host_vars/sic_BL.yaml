@@ -37,13 +37,24 @@ physical_interfaces:
     intf_ip: 10.0.2.170
     intf_subnet: 30
     intf_mode: "layer3"
-external_interfaces:
-  - intf_name: Ethernet1/3
-    intf_desc: "To_External-SIC-L3FW"
+
+external_l2_vlan:
+      
+external_l2_interfaces:
+  - intf_name: Ethernet1/6
+    intf_desc: "SIC-External-L3FW-1"
     intf_status: true
-    intf_ip: 10.0.4.4
-    intf_subnet: 30
-    intf_mode: "layer3"
+    switchport_mode: "access"
+    access_vlan: 500
+    intf_mode: "layer2"
+    # intf_po: 50
+  - intf_name: Ethernet1/7
+    intf_desc: "SIC-External-L3FW-2"
+    intf_status: true
+    switchport_mode: "access"
+    access_vlan: 500
+    intf_mode: "layer2"
+    # intf_po: 50
 
 #OK.$
 server_interfaces:

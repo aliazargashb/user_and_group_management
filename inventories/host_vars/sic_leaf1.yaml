@@ -58,6 +58,12 @@ server_interfaces:
     intf_desc: "To_Subnet13-SRVs"
     intf_status: true
     switchport_mode: "trunk"
-    trunk_vlan: 13
+    trunk_vlan: 15-20
     intf_mode: "layer2"
     intf_po: 13
+  - intf_name: Ethernet1/9
+    intf_desc: "To_Subnet14-SRVs"
+    intf_status: true
+    switchport_mode: "trunk"
+    trunk_vlan: 50
+    intf_mode: "layer2"
