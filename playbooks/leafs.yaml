@@ -199,8 +199,10 @@
           - name: "{{ item.intf_po }}"
             members:
               - member: "{{ item.intf_name }}"
+                mode: "{{ item.intf_lag_mode }}"
         state: merged
       loop: "{{ server_interfaces }}"
+      when: item.intf_po is defined
       tags:
         - configure_lag_interfaces
 
