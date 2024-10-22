@@ -259,27 +259,25 @@
       tags:
         - configure_l2_interfaces_access_nopo
 
-#ERROR AFTER 1st RUN WITH NXOS_VPC MODULE, PAY ATTENTION TO THE NEXT TASK WITH NXOS_CONFIG
-    # - name: Configure VPC domain   #OK.$ #CHECK MORE
-    #   cisco.nxos.nxos_vpc:
-    #     domain: "{{ vpc_domain }}"
-    #     pkl_dest: "{{ vpc_pkl_dest }}"
-    #     # pkl_src: "{{ vpc_pkl_src }}"
-    #     delay_restore: "{{ vpc_delay_restore }}"
-    #     auto_recovery_reload_delay: "{{ vpc_auto_recovery }}"
-    #   tags: vpc
+    - name: Configure VPC domain   #OK.$ #CHECK MORE
+      cisco.nxos.nxos_vpc:
+        domain: "{{ vpc_domain }}"
+        pkl_dest: "{{ vpc_pkl_dest }}"
+        # pkl_src: "{{ vpc_pkl_src }}"
+        delay_restore: "{{ vpc_delay_restore }}"
+        auto_recovery_reload_delay: "{{ vpc_auto_recovery }}"
+      tags: vpc
 
-#CHECK
-    - name: Configure VPC domain   #OK.$ #CHECK ABOVE TASK
-      cisco.nxos.nxos_config:
-        lines:
-          - peer-keepalive destination {{ vpc_pkl_dest }}
-          - delay restore {{vpc_delay_restore}}
-          - auto-recovery reload-delay {{vpc_auto_recovery}}
-        parents: vpc domain {{ vpc_domain }}
-        save_when: modified
-      tags:
-        - vpc_domain
+    # - name: Configure VPC domain   #OK.$
+    #   cisco.nxos.nxos_config:
+    #     lines:
+    #       - peer-keepalive destination {{ vpc_pkl_dest }}
+    #       - delay restore {{vpc_delay_restore}}
+    #       - auto-recovery reload-delay {{vpc_auto_recovery}}
+    #     parents: vpc domain {{ vpc_domain }}
+    #     save_when: modified
+    #   tags:
+    #     - vpc_domain
 
     - name: LEAF vpc peer link port channel configuration   #OK.$
       cisco.nxos.nxos_lag_interfaces:
