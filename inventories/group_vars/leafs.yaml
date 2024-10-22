@@ -45,6 +45,9 @@ vpc_pl_po_members:
   - vpc_pl_mem: "1/3"
   - vpc_pl_mem: "1/4"
 
+#CHECK
+native_vlan_id: 222
+
 #OK.$
 l2vlans:
   - vlan_id: 11
