@@ -259,7 +259,7 @@
       tags:
         - configure_l2_interfaces_access_nopo
 
-    - name: Configure VPC domain   #OK.$ #CHECK MORE
+    - name: Configure VPC domain   #OK.$ #TESTED ON N5K, n6000-uk9-kickstart.7.3.13.N1.1.bin
       cisco.nxos.nxos_vpc:
         domain: "{{ vpc_domain }}"
         pkl_dest: "{{ vpc_pkl_dest }}"
