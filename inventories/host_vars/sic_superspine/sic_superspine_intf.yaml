@@ -1,0 +1,12 @@
+#SAMPLE ROUTINE
+# e1/1:
+#   disabled: false
+#   mode: access
+#   vlan: 20
+#   description: test1-srv 
+# e1/2:
+#   disabled: true
+#   mode: access
+# e1/3:
+#   disabled: true
+#   mode: trunk
