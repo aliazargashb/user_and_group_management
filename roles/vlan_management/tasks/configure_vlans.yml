@@ -1,0 +1,13 @@
+---
+- name: Ensure VLANs are configured
+  cisco.nxos.nxos_vlans:
+    config:
+      - vlan_id: "{{ item.vlan_id }}"
+        name: "{{ item.vlan_name }}"
+        mapped_vni: "{{ item.vnid }}"
+    state: merged
+  with_items:
+      - "{{ l2vlans }}"
+      - "{{ l3vlans }}"
+  tags:
+    - configure_vlans
