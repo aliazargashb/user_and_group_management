@@ -10,21 +10,27 @@
     - import_role:
         name: enable_features
         tasks_from: enable_features
+
     - import_role:
         name: set_hostname
         tasks_from: set_hostname
+
     - import_role:
         name: create_user
         tasks_from: create_user
+
     - import_role:
         name: aaa_config
         tasks_from: aaa_config
+
     - import_role:
         name: ntp_config
         tasks_from: ntp_config
+
     - import_role:
         name: telemetry
         tasks_from: telemetry
+        
     - import_role:
         name: write_bck
         tasks_from: write_bck
