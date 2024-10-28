@@ -9,4 +9,3 @@
   tasks:
     - import_role:
         name: vlan_management
-        tasks_from: configure_vlans   
