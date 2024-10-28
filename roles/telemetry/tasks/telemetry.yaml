@@ -1,0 +1,47 @@
+---
+    - name: telemetry configuration destination_groups   #OK.$ #Role6 - Role Name: telemetry
+      cisco.nxos.nxos_telemetry:
+        config:
+          # source_interface: "{{ telemetry_src_intf }}"
+          vrf: "{{ telemetry_src_vrf }}"
+          destination_groups:
+            - id: "{{ item.0.dst_grp_id }}"
+              destination:
+                ip: "{{ item.1.dst_grp_ip }}"
+                port: "{{ item.1.dst_grp_port }}"
+                protocol: "{{ item.1.dst_grp_protocol }}"
+                encoding: "{{ item.1.dst_grp_encoding }}"
+      loop: "{{ telemetry_destination_groups  | subelements('destination') }}"
+      tags:
+        - telemetry_destination_groups
+
+    - name: telemetry configuration sensor_groups   #OK.$ #Role6 - Role Name: telemetry
+      cisco.nxos.nxos_telemetry:
+        config:
+          # source_interface: "{{ telemetry_src_intf }}"
+          vrf: "{{ telemetry_src_vrf }}"
+          sensor_groups:
+            - id: "{{ item.0.sns_grp_id }}"
+              data_source: "{{ item.0.sns_grp_data_src }}"
+              path:
+                name: "{{ item.1.sns_grp_path_name }}"
+                depth: "{{ item.1.sns_grp_path_depth }}"
+      loop: "{{ telemetry_sensor_groups | subelements('path') }}"
+      tags:
+        - telemetry_sensor_groups
+
+    - name: telemetry configuration subscriptions   #OK.$ #Role6 - Role Name: telemetry
+      cisco.nxos.nxos_telemetry:
+        config:
+          # source_interface: "{{ telemetry_src_intf }}"
+          vrf: "{{ telemetry_src_vrf }}"
+          subscriptions:
+            - id: "{{ item.0.sub_grp_id }}"
+              destination_group: "{{ item.0.dst_grp_id }}"
+              sensor_group:
+                id: "{{ item.1.sns_grp_id }}"
+                sample_interval: "{{ item.1.sub_interval }}"
+        state: merged
+      loop: "{{ telemetry_subscriptions | subelements('sensor_group') }}"
+      tags:
+        - telemetry_subscriptions

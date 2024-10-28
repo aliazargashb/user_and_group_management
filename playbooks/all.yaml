@@ -7,7 +7,7 @@
     ansible_network_os: cisco.nxos.nxos
 
   tasks:
-    - name: Enable necessary features   #OK.$
+    - name: Enable necessary features   #OK.$ #Role1 - Role Name: enable_features
       cisco.nxos.nxos_feature:
         feature: "{{ item }}"
         state: enabled
@@ -15,12 +15,12 @@
       tags:
         - enable_features
   
-    - name: Enable NV Overlay EVPN   #OK.$
+    - name: Enable NV Overlay EVPN   #OK.$ #Role1 - Role Name: enable_features
       cisco.nxos.nxos_evpn_global:
         nv_overlay_evpn: true
       tags: evpn_feature
 
-    - name: Configure AAA   #OK.$
+    - name: Configure AAA   #OK.$ #Role2 - Role Name: aaa_config
       cisco.nxos.nxos_config:
         lines:
           - aaa authentication login default group {{ aaa_srv_grp }} local
@@ -35,7 +35,7 @@
       tags: 
         - aaa_config
 
-    - name: Configure TACACS   #OK.$
+    - name: Configure TACACS   #OK.$ #Role2 - Role Name: aaa_config
       cisco.nxos.nxos_config:
         lines:
           - server {{ tacacs_srv_host }}
@@ -45,7 +45,7 @@
       tags: 
         - tacacs_config
 
-    - name: Configure NTP   #OK.$
+    - name: Configure NTP   #OK.$ #Role3 - Role Name: ntp_config
       cisco.nxos.nxos_ntp_global:
         config:
           servers:
@@ -55,14 +55,14 @@
       tags:
         - ntp_config
 
-    - name: Set Hostname   #OK.$
+    - name: Set Hostname   #OK.$ #Role4 - Role Name: set_hostname
       cisco.nxos.nxos_hostname:
         config:
           hostname: "{{ hostname }}"
       tags:
         - set_hostname
 
-    - name: Create user account   #OK.$
+    - name: Create user account   #OK.$ #Role5 - Role Name: create_user
       cisco.nxos.nxos_user:
         name: "{{ device_user }}"
         configured_password: "{{ device_pass }}"
@@ -70,7 +70,7 @@
       tags:
         - create_user
 
-    - name: telemetry configuration destination_groups   #OK.$
+    - name: telemetry configuration destination_groups   #OK.$ #Role6 - Role Name: telemetry
       cisco.nxos.nxos_telemetry:
         config:
           # source_interface: "{{ telemetry_src_intf }}"
@@ -86,7 +86,7 @@
       tags:
         - telemetry_destination_groups
 
-    - name: telemetry configuration sensor_groups   #OK.$
+    - name: telemetry configuration sensor_groups   #OK.$ #Role6 - Role Name: telemetry
       cisco.nxos.nxos_telemetry:
         config:
           # source_interface: "{{ telemetry_src_intf }}"
@@ -101,7 +101,7 @@
       tags:
         - telemetry_sensor_groups
 
-    - name: telemetry configuration subscriptions   #OK.$
+    - name: telemetry configuration subscriptions   #OK.$ #Role6 - Role Name: telemetry
       cisco.nxos.nxos_telemetry:
         config:
           # source_interface: "{{ telemetry_src_intf }}"
@@ -117,15 +117,15 @@
       tags:
         - telemetry_subscriptions
 
-    - name: Copy running config to startup config   #OK.$
+    - name: Copy running config to startup config   #OK.$ #Role7 - Role Name: write_bck
       cisco.nxos.nxos_config:
         backup: no
         save_when: always
       tags: write
 
-    # - name: Confiuration Saving   #OK.$
-    #   cisco.nxos.nxos_config:
-    #     lines:
-    #       - copy running-config startup-config
-    #   tags: 
-    #     - write
+    - name: Confiuration Saving   #OK.$ #Role7 - Role Name: write_bck
+      cisco.nxos.nxos_config:
+        lines:
+          - copy running-config startup-config
+      tags: 
+        - write

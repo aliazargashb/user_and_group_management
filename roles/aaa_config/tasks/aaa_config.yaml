@@ -1,0 +1,25 @@
+---
+    - name: Configure AAA   #OK.$ #Role2 - Role Name: aaa_config
+      cisco.nxos.nxos_config:
+        lines:
+          - aaa authentication login default group {{ aaa_srv_grp }} local
+          - aaa authentication login console group {{ aaa_srv_grp }} local
+          - aaa authorization commands default group {{ aaa_srv_grp }} local
+          - aaa accounting default group {{ aaa_srv_grp }} local
+          - aaa authorization config-commands default group {{ aaa_srv_grp }} local
+          - aaa authentication login error-enable
+          - tacacs-server directed-request
+          - aaa group server tacacs+ {{ aaa_srv_grp }}
+          - tacacs-server key {{ tacacs_srv_key }}
+      tags: 
+        - aaa_config
+
+    - name: Configure TACACS   #OK.$ #Role2 - Role Name: aaa_config
+      cisco.nxos.nxos_config:
+        lines:
+          - server {{ tacacs_srv_host }}
+          - use-vrf management
+          # - source-interface mgmt0
+        parents: aaa group server tacacs+ AAA_Servers
+      tags: 
+        - tacacs_config
