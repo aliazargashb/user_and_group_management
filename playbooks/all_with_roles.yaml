@@ -6,8 +6,6 @@
   vars:
     ansible_network_os: cisco.nxos.nxos
 
-#CHECK - IMPORT MORE ROLES AT THE SAME TIME
-#CHECK - IMPORT MORE TASKS AT THE SAME TIME
   tasks:
     - import_role:
         name: enable_features
