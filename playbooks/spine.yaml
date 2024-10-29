@@ -7,7 +7,7 @@
     ansible_network_os: cisco.nxos.nxos
 
   tasks:
-    - name: Configure PIM RP address   #OK.$
+    - name: Configure PIM RP address   #OK.$ #Role9 - Role Name: pim_multicast &
       cisco.nxos.nxos_pim_rp_address:
         rp_address: "{{ pim_rp_ip }}"
         group_list: "{{ pim_mgroup }}"
@@ -22,7 +22,7 @@
       tags: 
         - pim_anycast_rp
 
-    - name: Configure Loopback Interface Descriptions   #OK.$
+    - name: Configure Loopback Interface Descriptions   #OK.$ #Role10 - Role Name: configure_loopbacks &
       cisco.nxos.nxos_interfaces:
         config:
           - name: "Loopback{{ item.intf_name }}"
@@ -33,7 +33,7 @@
       tags:
         - configure_loopbacks
 
-    - name: Configure IP for Loopback   #OK.$
+    - name: Configure IP for Loopback   #OK.$ #Role10 - Role Name: configure_loopbacks &
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -44,7 +44,7 @@
       tags:
         - configure_loopbacks_ip
 
-    - name: Configure Physical Ethernet Ports   #OK.$
+    - name: Configure Physical Ethernet Ports   #OK.$ #Role11 - Role Name: configure_ports &
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -57,7 +57,7 @@
       tags:
         - configure_ports
 
-    - name: Configure IP for Physical Ethernet Ports   #OK.$
+    - name: Configure IP for Physical Ethernet Ports   #OK.$ #Role11 - Role Name: configure_ports &
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"

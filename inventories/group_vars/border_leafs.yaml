@@ -9,7 +9,6 @@ features:
   - interface-vlan
   - vn-segment-vlan-based
   - lacp
-  - vpc
   - tacacs+
 
 #OK.$

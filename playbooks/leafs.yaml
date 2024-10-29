@@ -7,13 +7,13 @@
     ansible_network_os: cisco.nxos.nxos
 
   tasks:
-    - name: anycast gateway configuration   #OK.$
+    - name: anycast gateway configuration   #OK.$ #Role8 - Role Name: 
       cisco.nxos.nxos_overlay_global:
         anycast_gateway_mac: "{{ anycast_gw_mac }}"
       tags:
         - anycast_gateway
 
-    - name: Configure PIM RP address   #OK.$
+    - name: Configure PIM RP address   #OK.$ #Role9 - Role Name: pim_multicast &
       cisco.nxos.nxos_pim_rp_address:
         rp_address: "{{ pim_rp_ip }}"
         group_list: "{{ pim_mgroup }}"
@@ -144,7 +144,7 @@
       tags:
         - svi_ip
 
-    - name: Configure Loopback Interface Descriptions   #OK.$
+    - name: Configure Loopback Interface Descriptions   #OK.$ #Role10 - Role Name: configure_loopbacks &
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -155,7 +155,7 @@
       tags:
         - configure_loopbacks
 
-    - name: Configure IP for Loopback   #OK.$
+    - name: Configure IP for Loopback   #OK.$ #Role10 - Role Name: configure_loopbacks &
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -168,7 +168,7 @@
       tags:
         - configure_loopbacks_ip
 
-    - name: Configure Physical Ethernet Ports   #OK.$
+    - name: Configure Physical Ethernet Ports   #OK.$ #Role11 - Role Name: configure_ports &
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -181,7 +181,7 @@
       tags:
         - configure_ports
 
-    - name: Configure IP for Physical Ethernet Ports   #OK.$
+    - name: Configure IP for Physical Ethernet Ports   #OK.$ #Role11 - Role Name: configure_ports &
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -192,18 +192,18 @@
       tags:
         - configure_physical_ports_ip
 
-    - name: Configure LAG Interfaces   #OK.$
-      cisco.nxos.nxos_lag_interfaces:
-        config:
-          - name: "{{ item.intf_po }}"
-            members:
-              - member: "{{ item.intf_name }}"
-                mode: "{{ item.intf_lag_mode }}"   #CHECK
-        state: merged
-      loop: "{{ server_interfaces }}"
-      when: item.intf_po is defined
-      tags:
-        - configure_lag_interfaces
+    # - name: Configure LAG Interfaces   #OK.$
+    #   cisco.nxos.nxos_lag_interfaces:
+    #     config:
+    #       - name: "{{ item.intf_po }}"
+    #         members:
+    #           - member: "{{ item.intf_name }}"
+    #             mode: "{{ item.intf_lag_mode }}"   #CHECK
+    #     state: merged
+    #   loop: "{{ server_interfaces }}"
+    #   when: item.intf_po is defined
+    #   tags:
+    #     - configure_lag_interfaces
 
     - name: Configure L2 Interfaces to Servers   #OK.$
       cisco.nxos.nxos_l2_interfaces:
@@ -268,16 +268,16 @@
         auto_recovery_reload_delay: "{{ vpc_auto_recovery }}"
       tags: vpc
 
-    # - name: Configure VPC domain   #OK.$
-    #   cisco.nxos.nxos_config:
-    #     lines:
-    #       - peer-keepalive destination {{ vpc_pkl_dest }}
-    #       - delay restore {{vpc_delay_restore}}
-    #       - auto-recovery reload-delay {{vpc_auto_recovery}}
-    #     parents: vpc domain {{ vpc_domain }}
-    #     save_when: modified
-    #   tags:
-    #     - vpc_domain
+    - name: Configure VPC domain   #OK.$
+      cisco.nxos.nxos_config:
+        lines:
+          - peer-keepalive destination {{ vpc_pkl_dest }}
+          - delay restore {{vpc_delay_restore}}
+          - auto-recovery reload-delay {{vpc_auto_recovery}}
+        parents: vpc domain {{ vpc_domain }}
+        save_when: modified
+      tags:
+        - vpc_domain
 
     - name: LEAF vpc peer link port channel configuration   #OK.$
       cisco.nxos.nxos_lag_interfaces:
