@@ -10,6 +10,8 @@
 This project is structured to manage data center fabric infrastructure using Ansible, organized with inventories, group variables, host-specific configurations, and playbooks to configure different sets of devices such as leafs, spines, and superspines.
 
 ## Project Structure
+In the following structure, roles will be placed under the `roles` directory. each role has it's own readme in it's directory.
+
 ```bash
 ├── ansible.cfg
 ├── DCF-LAB.png
@@ -28,73 +30,27 @@ This project is structured to manage data center fabric infrastructure using Ans
 │   │   └── superspines.yaml
 │   ├── hosts
 │   └── host_vars
-│       ├── bmi_BL
-│       │   └── bmi_BL_intf.yaml
 │       ├── bmi_BL.yaml
-│       ├── bmi_leaf1
-│       │   └── bmi_leaf1_intf.yaml
 │       ├── bmi_leaf1.yaml
-│       ├── bmi_spine1
-│       │   └── bmi_spine1_intf.yaml
 │       ├── bmi_spine1.yaml
-│       ├── bmi_spine2
-│       │   └── bmi_spine2_intf.yaml
 │       ├── bmi_spine2.yaml
-│       ├── bmi_superspine
-│       │   └── bmi_superspine_intf.yaml
 │       ├── bmi_superspine.yaml
-│       ├── sic_BL
-│       │   └── sic_BL_intf.yaml
 │       ├── sic_BL.yaml
-│       ├── sic_leaf1
-│       │   └── sic_leaf1_intf.yaml
 │       ├── sic_leaf1.yaml
-│       ├── sic_leaf2
-│       │   └── sic_leaf2_intf.yaml
 │       ├── sic_leaf2.yaml
-│       ├── sic_spine1_intf
-│       │   └── sic_spine1_intf.yaml
 │       ├── sic_spine1.yaml
-│       ├── sic_spine2
-│       │   └── sic_spine2_intf.yaml
 │       ├── sic_spine2.yaml
-│       ├── sic_superspine
-│       │   └── sic_superspine_intf.yaml
 │       └── sic_superspine.yaml
 ├── playbooks
 │   ├── all_with_roles.yaml
 │   ├── all.yaml
 │   ├── borderleafs.yaml
+│   ├── leafs_with_roles.yaml
 │   ├── leafs.yaml
 │   ├── spine.yaml
-│   ├── superspine.yaml
-│   └── vlan_config.yaml
+│   └── superspine.yaml
 ├── README.md
 └── roles
-    ├── aaa_config
-    │   └── tasks
-    │       └── aaa_config.yaml
-    ├── create_user
-    │   └── tasks
-    │       └── create_user.yaml
-    ├── enable_features
-    │   └── tasks
-    │       └── enable_features.yaml
-    ├── ntp_config
-    │   └── tasks
-    │       └── ntp_config.yaml
-    ├── set_hostname
-    │   └── tasks
-    │       └── set_hostname
-    ├── telemetry
-    │   └── tasks
-    │       └── telemetry.yaml
-    ├── vlan_management
-    │   └── tasks
-    │       └── configure_vlans.yaml
-    └── write_bck
-        └── tasks
-            └── write_bck.yaml
 ```
 
 ## Cloning the Project
