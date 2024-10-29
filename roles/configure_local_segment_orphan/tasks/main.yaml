@@ -1,0 +1,2 @@
+---
+- include_tasks: configure_local_segment_orphan.yaml

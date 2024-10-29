@@ -1,3 +1,0 @@
----
-# Include the configure VLANs task file.
-- include_tasks: configure_vlans.yaml

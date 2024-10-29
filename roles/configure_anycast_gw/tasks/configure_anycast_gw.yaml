@@ -1,0 +1,6 @@
+---
+    - name: anycast gateway configuration   #OK.$ #Role15 - Role Name: anycast_gateway
+      cisco.nxos.nxos_overlay_global:
+        anycast_gateway_mac: "{{ anycast_gw_mac }}"
+      tags:
+        - anycast_gateway

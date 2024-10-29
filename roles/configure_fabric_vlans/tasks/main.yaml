@@ -1,0 +1,2 @@
+---
+- include_tasks: configure_fabric_vlans.yaml

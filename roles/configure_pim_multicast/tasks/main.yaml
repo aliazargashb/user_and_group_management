@@ -1,0 +1,2 @@
+---
+- include_tasks: configure_pim_multicast.yaml

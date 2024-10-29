@@ -1,0 +1,67 @@
+---
+    - name: Ensure VLANs are configured   #OK.$ #Role18 - Role Name: configure_tenant
+      cisco.nxos.nxos_vlans:
+        config:
+          - vlan_id: "{{ item.vlan_id }}"
+            name: "{{ item.vlan_name }}"
+            mapped_vni: "{{ item.vnid }}"
+        state: merged
+      with_items:
+        - "{{ vrf_config }}"
+      tags:
+        - configure_tenant_l3vni
+
+    - name: Configure VRFs   #OK.$ #Role18 - Role Name: configure_tenant
+      cisco.nxos.nxos_vrf:
+        aggregate:
+          - name: "{{ item.vrf_name }}"
+            vni: "{{ item.vnid }}"
+            rd: "{{ item.vrf_rd }}"
+      loop: "{{ vrf_config }}"
+      tags:
+        - configure_vrf
+
+    - name: LEAF tenants_svi naming configuration   #OK.$ #Role18 - Role Name: configure_tenant
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: "vlan{{ item.vlan_id }}"
+            description: "{{ item.vlan_name }}"
+            enabled: true
+        state: merged
+      loop: "{{ vrf_config }}"
+      tags:
+        - tenant_svi_naming
+
+    - name: LEAF tenants_svi vrf membership configuration   #OK.$ #Role18 - Role Name: configure_tenant
+      cisco.nxos.nxos_vrf_interface:
+        interface: "vlan{{ item.vlan_id }}"
+        vrf: "{{ item.vrf_name }}"
+        state: present
+      loop: "{{ vrf_config }}"
+      tags:
+        - tenant_vrf_mem
+
+    - name: LEAF tenants_svi ip forward configuration   #OK.$ #Role18 - Role Name: configure_tenant
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: "vlan{{ item.vlan_id }}"
+            ip_forward: "{{ ipforward }}"
+            enabled: true
+        state: merged
+      loop: "{{ vrf_config }}"
+      tags:
+        - tenant_ip_forward
+
+    - name: Configure VRF_AF   #OK.$ #Role18 - Role Name: configure_tenant
+      cisco.nxos.nxos_vrf_af:
+        afi: ipv4
+        route_target_both_auto_evpn: true
+        route_targets:
+          - direction: both
+            rt: auto
+            state: present
+        state: present
+        vrf: "{{ item.vrf_name }}"
+      loop: "{{ vrf_config }}"
+      tags:
+        - configure_vrf_af

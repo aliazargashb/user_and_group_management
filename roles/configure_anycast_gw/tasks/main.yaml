@@ -1,0 +1,2 @@
+---
+- include_tasks: configure_anycast_gw.yaml

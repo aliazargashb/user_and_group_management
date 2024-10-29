@@ -1,0 +1,2 @@
+---
+- include_tasks: configure_nve_intf.yaml

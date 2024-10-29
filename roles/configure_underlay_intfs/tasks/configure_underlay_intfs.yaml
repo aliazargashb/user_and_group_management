@@ -1,0 +1,48 @@
+---
+    - name: Configure Loopback Interface Descriptions   #OK.$ #Role10 - Role Name: configure_underlay_intfs $ &
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: "{{ item.intf_name }}"
+            description: "{{ item.intf_desc }}"
+            enabled: true
+        state: merged
+      loop: "{{ loopback_interfaces }}"
+      tags:
+        - configure_loopbacks
+
+    - name: Configure IP for Loopback   #OK.$ #Role10 - Role Name: configure_underlay_intfs $ &
+      cisco.nxos.nxos_l3_interfaces:
+        config:
+          - name: "{{ item.intf_name }}"
+            ipv4:
+              - address: "{{ item.intf_ip }}/{{ item.intf_subnet }}"
+              - address: "{{ item.ip_secondary | default('null') }}/{{ item.intf_subnet }}"
+                secondary: "{{ item.sec_value | default('false') }}"
+        state: merged
+      loop: "{{ loopback_interfaces }}"
+      tags:
+        - configure_loopbacks_ip
+
+    - name: Configure Physical Ethernet Ports   #OK.$ #Role10 - Role Name: configure_underlay_intfs $ &
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: "{{ item.intf_name }}"
+            description: "{{ item.intf_desc }}"
+            enabled: "{{ item.intf_status }}"
+            mode: "{{ item.intf_mode }}"
+            mtu: "{{ intf_mtu }}"
+        state: merged
+      loop: "{{ physical_interfaces }}"
+      tags:
+        - configure_ports
+
+    - name: Configure IP for Physical Ethernet Ports   #OK.$ #Role10 - Role Name: configure_underlay_intfs $ &
+      cisco.nxos.nxos_l3_interfaces:
+        config:
+          - name: "{{ item.intf_name }}"
+            ipv4:
+              - address: "{{ item.intf_ip }}/{{ item.intf_subnet }}"
+        state: merged
+      loop: "{{ physical_interfaces }}"
+      tags:
+        - configure_physical_ports_ip

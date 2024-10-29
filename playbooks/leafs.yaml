@@ -7,144 +7,68 @@
     ansible_network_os: cisco.nxos.nxos
 
   tasks:
-    - name: anycast gateway configuration   #OK.$ #Role8 - Role Name: 
-      cisco.nxos.nxos_overlay_global:
-        anycast_gateway_mac: "{{ anycast_gw_mac }}"
-      tags:
-        - anycast_gateway
+    - name: Configure VPC domain   #OK.$ #TESTED ON N5K, n6000-uk9-kickstart.7.3.13.N1.1.bin #Role13 - Role Name: configure_vpc $
+      cisco.nxos.nxos_vpc:
+        domain: "{{ vpc_domain }}"
+        pkl_dest: "{{ vpc_pkl_dest }}"
+        # pkl_src: "{{ vpc_pkl_src }}"
+        delay_restore: "{{ vpc_delay_restore }}"
+        auto_recovery_reload_delay: "{{ vpc_auto_recovery }}"
+      tags: vpc
 
-    - name: Configure PIM RP address   #OK.$ #Role9 - Role Name: pim_multicast &
-      cisco.nxos.nxos_pim_rp_address:
-        rp_address: "{{ pim_rp_ip }}"
-        group_list: "{{ pim_mgroup }}"
-      tags:
-        - pim_multicast
+    # - name: Configure VPC domain   #OK.$ #Role13 - Role Name: configure_vpc $
+    #   cisco.nxos.nxos_config:
+    #     lines:
+    #       - peer-keepalive destination {{ vpc_pkl_dest }}
+    #       - delay restore {{vpc_delay_restore}}
+    #       - auto-recovery reload-delay {{vpc_auto_recovery}}
+    #     parents: vpc domain {{ vpc_domain }}
+    #     save_when: modified
+    #   tags:
+    #     - vpc_domain
 
-    - name: Ensure VLANs are configured   #OK.$
-      cisco.nxos.nxos_vlans:
+    - name: LEAF vpc peer link port channel configuration   #OK.$ #Role13 - Role Name: configure_vpc $
+      cisco.nxos.nxos_lag_interfaces:
         config:
-          - vlan_id: "{{ item.vlan_id }}"
-            name: "{{ item.vlan_name }}"
-            mapped_vni: "{{ item.vnid }}"
+          - name: "{{ vpc_po_id }}"
+            members:
+              - member: "Ethernet{{ item.vpc_pl_mem }}"
+                mode: "{{ vpc_po_mode }}"
         state: merged
-      with_items:
-        - "{{ vrf_config }}"
+      loop: "{{ vpc_pl_po_members }}"
       tags:
-        - configure_tenant_l3vni
+        - vpc_peerlink_pc
 
-    - name: Configure VRFs   #OK.$
-      cisco.nxos.nxos_vrf:
-        aggregate:
-          - name: "{{ item.vrf_name }}"
-            vni: "{{ item.vnid }}"
-            rd: "{{ item.vrf_rd }}"
-      loop: "{{ vrf_config }}"
+    - name: vpc peerlink configuration   #OK.$ #Role13 - Role Name: configure_vpc $
+      cisco.nxos.nxos_vpc_interface:
+        portchannel: "{{ vpc_po_id }}"
+        peer_link: "{{ vpc_pl }}"
+        state: present
       tags:
-        - configure_vrf
+        - vpc_pl_po
 
-    - name: LEAF tenants_svi naming configuration   #OK.$
+    - name: vpc peerlink trunk configuration   #OK.$ #Role13 - Role Name: configure_vpc $
+      cisco.nxos.nxos_l2_interfaces:
+        config:
+          - name: "port-channel{{ vpc_po_id }}"
+            mode: "{{ vpc_pl_sw_mode }}"
+            trunk:
+              native_vlan: "{{ vpc_native_vlan }}"
+        state: merged
+      tags:
+        - vpc_pl_trunk
+
+    - name: leafs vpc peer-link enabling   #OK.$ #Role13 - Role Name: configure_vpc $
       cisco.nxos.nxos_interfaces:
         config:
-          - name: "vlan{{ item.vlan_id }}"
-            description: "{{ item.vlan_name }}"
+          - name: "Ethernet{{ item.vpc_pl_mem }}"
             enabled: true
         state: merged
-      loop: "{{ vrf_config }}"
+      loop: "{{ vpc_pl_po_members }}"
       tags:
-        - tenant_svi_naming
+        - vpc_pl_enable
 
-    - name: LEAF tenants_svi vrf membership configuration   #OK.$
-      cisco.nxos.nxos_vrf_interface:
-        interface: "vlan{{ item.vlan_id }}"
-        vrf: "{{ item.vrf_name }}"
-        state: present
-      loop: "{{ vrf_config }}"
-      tags:
-        - tenant_vrf_mem
-
-    - name: LEAF tenants_svi ip forward configuration   #OK.$
-      cisco.nxos.nxos_interfaces:
-        config:
-          - name: "vlan{{ item.vlan_id }}"
-            ip_forward: "{{ ipforward }}"
-            enabled: true
-        state: merged
-      loop: "{{ vrf_config }}"
-      tags:
-        - tenant_ip_forward
-
-    - name: Ensure VLANs are configured   #OK.$
-      cisco.nxos.nxos_vlans:
-        config:
-          - vlan_id: "{{ item.vlan_id }}"
-            name: "{{ item.vlan_name }}"
-            mapped_vni: "{{ item.vnid }}"
-        state: merged
-      with_items:
-        - "{{ l2vlans }}"
-        - "{{ l3vlans }}"
-      tags:
-        - configure_vlans
-
-    - name: Configure VRF_AF   #OK.$
-      cisco.nxos.nxos_vrf_af:
-        afi: ipv4
-        route_target_both_auto_evpn: true
-        route_targets:
-          - direction: both
-            rt: auto
-            state: present
-        state: present
-        vrf: "{{ item.vrf_name }}"
-      loop: "{{ vrf_config }}"
-      tags:
-        - configure_vrf_af
-
-    - name: VNI configuration   #OK.$
-      cisco.nxos.nxos_evpn_vni:
-        vni: "{{ item.vnid }}"
-        route_distinguisher: "{{ l2rd }}"
-        route_target_both: "{{ l2rt }}"
-        state: "present"
-      with_items:
-        - "{{ l2vlans }}"
-        - "{{ l3vlans }}"
-      tags:
-        - l2evpn
-
-    - name: LEAF SVI Naming   #OK.$
-      cisco.nxos.nxos_interfaces:
-        config:
-          - name: "vlan{{ item.vlan_id }}"
-            description: "{{ item.vlan_name }}"
-            fabric_forwarding_anycast_gateway: "{{ anycast_gw_mac_status }}"
-            enabled: "{{ svi_status }}"
-        state: merged
-      loop: "{{ l3vlans }}"
-      tags:
-        - svi_naming
-
-    - name: LEAF SVI VRF Membership   #OK.$
-      cisco.nxos.nxos_vrf_interface:
-        interface: "vlan{{ item.vlan_id }}"
-        vrf: "{{ item.vrf_name }}"
-        state: present
-      loop: "{{ l3vlans }}"
-      tags:
-        - svi_vrf_mem
-
-    - name: LEAF SVI IP Address   #OK.$
-      cisco.nxos.nxos_l3_interfaces:
-        config:
-          - name: "vlan{{ item.vlan_id }}"
-            ipv4:
-              - address: "{{ item.vlan_id_ip }}/{{ item.vlan_id_subnet }}"
-        state: merged
-      loop: "{{ l3vlans }}"
-      tags:
-        - svi_ip
-
-    - name: Configure Loopback Interface Descriptions   #OK.$ #Role10 - Role Name: configure_loopbacks &
+    - name: Configure Loopback Interface Descriptions   #OK.$ #Role10 - Role Name: configure_underlay_intfs $ &
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -155,7 +79,7 @@
       tags:
         - configure_loopbacks
 
-    - name: Configure IP for Loopback   #OK.$ #Role10 - Role Name: configure_loopbacks &
+    - name: Configure IP for Loopback   #OK.$ #Role10 - Role Name: configure_underlay_intfs $ &
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -168,7 +92,7 @@
       tags:
         - configure_loopbacks_ip
 
-    - name: Configure Physical Ethernet Ports   #OK.$ #Role11 - Role Name: configure_ports &
+    - name: Configure Physical Ethernet Ports   #OK.$ #Role10 - Role Name: configure_underlay_intfs $ &
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -181,7 +105,7 @@
       tags:
         - configure_ports
 
-    - name: Configure IP for Physical Ethernet Ports   #OK.$ #Role11 - Role Name: configure_ports &
+    - name: Configure IP for Physical Ethernet Ports   #OK.$ #Role10 - Role Name: configure_underlay_intfs $ &
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -192,155 +116,7 @@
       tags:
         - configure_physical_ports_ip
 
-    # - name: Configure LAG Interfaces   #OK.$
-    #   cisco.nxos.nxos_lag_interfaces:
-    #     config:
-    #       - name: "{{ item.intf_po }}"
-    #         members:
-    #           - member: "{{ item.intf_name }}"
-    #             mode: "{{ item.intf_lag_mode }}"   #CHECK
-    #     state: merged
-    #   loop: "{{ server_interfaces }}"
-    #   when: item.intf_po is defined
-    #   tags:
-    #     - configure_lag_interfaces
-
-    - name: Configure L2 Interfaces to Servers   #OK.$
-      cisco.nxos.nxos_l2_interfaces:
-        config:
-          - name: "port-channel{{ item.intf_po }}"
-            mode: "{{ item.switchport_mode }}"
-            access:
-              vlan: "{{ item.access_vlan }}"
-        state: merged
-      loop: "{{ server_interfaces }}"
-      when: item.switchport_mode == 'access' and item.intf_po is defined   #CHECK
-      tags:
-        - configure_l2_interfaces_access
-
-    - name: Configure L2 Interfaces to Servers   #OK.$
-      cisco.nxos.nxos_l2_interfaces:
-        config:
-          - name: "port-channel{{ item.intf_po }}"
-            mode: "{{ item.switchport_mode }}"
-            trunk:
-              allowed_vlans: "{{ item.trunk_vlan }}"
-              native_vlan: "{{ native_vlan_id }}"   #CHECK
-        state: replaced
-      loop: "{{ server_interfaces }}"
-      when: item.switchport_mode == 'trunk' and item.intf_po is defined   #CHECK
-      tags:
-        - configure_l2_interfaces_trunk
-
-    - name: Configure L2 Interfaces to Servers-No Port-Channel   #OK.$
-      cisco.nxos.nxos_l2_interfaces:
-        config:
-          - name: "{{ item.intf_name }}"
-            mode: "{{ item.switchport_mode }}"
-            trunk:
-              allowed_vlans: "{{ item.trunk_vlan }}"
-              native_vlan: "{{ native_vlan_id }}"   #CHECK
-        state: merged
-      loop: "{{ server_interfaces }}"
-      when: item.switchport_mode == 'trunk' and item.intf_po is not defined
-      tags:
-        - configure_l2_interfaces_trunk_nopo
-
-    - name: Configure L2 Interfaces to Servers-No Port-Channel   #OK.$
-      cisco.nxos.nxos_l2_interfaces:
-        config:
-          - name: "{{ item.intf_name }}"
-            mode: "{{ item.switchport_mode }}"
-            access:
-              vlan: "{{ item.access_vlan }}"
-        state: merged
-      loop: "{{ server_interfaces }}"
-      when: item.switchport_mode == 'access' and item.intf_po is not defined
-      tags:
-        - configure_l2_interfaces_access_nopo
-
-    - name: Configure VPC domain   #OK.$ #TESTED ON N5K, n6000-uk9-kickstart.7.3.13.N1.1.bin
-      cisco.nxos.nxos_vpc:
-        domain: "{{ vpc_domain }}"
-        pkl_dest: "{{ vpc_pkl_dest }}"
-        # pkl_src: "{{ vpc_pkl_src }}"
-        delay_restore: "{{ vpc_delay_restore }}"
-        auto_recovery_reload_delay: "{{ vpc_auto_recovery }}"
-      tags: vpc
-
-    - name: Configure VPC domain   #OK.$
-      cisco.nxos.nxos_config:
-        lines:
-          - peer-keepalive destination {{ vpc_pkl_dest }}
-          - delay restore {{vpc_delay_restore}}
-          - auto-recovery reload-delay {{vpc_auto_recovery}}
-        parents: vpc domain {{ vpc_domain }}
-        save_when: modified
-      tags:
-        - vpc_domain
-
-    - name: LEAF vpc peer link port channel configuration   #OK.$
-      cisco.nxos.nxos_lag_interfaces:
-        config:
-          - name: "{{ vpc_po_id }}"
-            members:
-              - member: "Ethernet{{ item.vpc_pl_mem }}"
-                mode: "{{ vpc_po_mode }}"
-        state: merged
-      loop: "{{ vpc_pl_po_members }}"
-      tags:
-        - vpc_peerlink_pc
-
-    - name: vpc peerlink configuration   #OK.$
-      cisco.nxos.nxos_vpc_interface:
-        portchannel: "{{ vpc_po_id }}"
-        peer_link: "{{ vpc_pl }}"
-        state: present
-      tags:
-        - vpc_pl_po
-
-    - name: vpc peerlink trunk configuration   #OK.$
-      cisco.nxos.nxos_l2_interfaces:
-        config:
-          - name: "port-channel{{ vpc_po_id }}"
-            mode: "{{ vpc_pl_sw_mode }}"
-            trunk:
-              native_vlan: "{{ vpc_native_vlan }}"
-        state: merged
-      tags:
-        - vpc_pl_trunk
-
-    - name: leafs vpc peer-link enabling   #OK.$
-      cisco.nxos.nxos_interfaces:
-        config:
-          - name: "Ethernet{{ item.vpc_pl_mem }}"
-            enabled: true
-        state: merged
-      loop: "{{ vpc_pl_po_members }}"
-      tags:
-        - vpc_pl_enable
-
-    - name: vpc-portchannel configuration   #OK.$
-      cisco.nxos.nxos_vpc_interface:
-        portchannel: "{{ item.intf_po }}"
-        vpc: "{{ item.intf_po }}"
-        state: present
-      loop: "{{ server_interfaces }}"
-      tags:
-        - vpc_po
-#CHECK
-
-    - name: Configure Interfaces, PIM   #OK.$
-      cisco.nxos.nxos_pim_interface:
-        interface: "{{ item.intf_name }}"
-        sparse: true
-      with_items:
-        - "{{ physical_interfaces }}"
-        - "{{ loopback_interfaces }}"
-      tags:
-        - configure_pim_ports
-
-    - name: Configure OSPF   #OK.$
+    - name: Configure OSPF   #OK.$ #Role14 - Role Name: configure_ospf
       cisco.nxos.nxos_ospfv2:
         config:
           processes:
@@ -349,7 +125,7 @@
       tags:
         - configure_ospf
 
-    - name: Configure Interfaces, OSPF   #OK.$
+    - name: Configure Interfaces, OSPF   #OK.$ #Role14 - Role Name: configure_ospf
       cisco.nxos.nxos_ospf_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -366,40 +142,30 @@
       tags:
         - configure_ospf_ports
 
-    - name: Configure NVE Interface for VXLAN   #OK.$
-      cisco.nxos.nxos_vxlan_vtep:
-        interface: "{{ nve_intf_name }}"
-        source_interface: "{{ nve_src_intf }}"
-        advertise_virtual_rmac: true
-        shutdown: "{{ nve_intf_status }}"
-        host_reachability: true
-        state: present
+    - name: anycast gateway configuration   #OK.$ #Role15 - Role Name: configure_anycast_gw
+      cisco.nxos.nxos_overlay_global:
+        anycast_gateway_mac: "{{ anycast_gw_mac }}"
       tags:
-        - configure_nve
+        - anycast_gateway
 
-    - name: Configure VNIs for NVE vlans   #OK.$
-      cisco.nxos.nxos_vxlan_vtep_vni:
-        interface: "{{ nve_intf_name }}"
-        vni: "{{ item.vnid }}"
-        multicast_group: "{{ vrf_config | selectattr('vrf_name', 'equalto', item.vrf_name) | map(attribute='vrf_mcast_group') | first }}"
-        state: present
-        suppress_arp: true   #CHECK
+    - name: Configure PIM RP address   #OK.$ #Role9 - Role Name: configure_pim_multicast &
+      cisco.nxos.nxos_pim_rp_address:
+        rp_address: "{{ pim_rp_ip }}"
+        group_list: "{{ pim_mgroup }}"
+      tags:
+        - pim_multicast
+        
+    - name: Configure Interfaces, PIM   #OK.$ #Role16 - Role Name: configure_pim_ports &
+      cisco.nxos.nxos_pim_interface:
+        interface: "{{ item.intf_name }}"
+        sparse: true
       with_items:
-        - "{{ l2vlans }}"
-        - "{{ l3vlans }}"
+        - "{{ physical_interfaces }}"
+        - "{{ loopback_interfaces }}"
       tags:
-        - configure_vlan_multicasts
+        - configure_pim_ports
 
-    - name: Configure VNIs for NVE vlans   #OK.$
-      cisco.nxos.nxos_vxlan_vtep_vni:
-        interface: "{{ nve_intf_name }}"
-        vni: "{{ item.vnid }}"
-        assoc_vrf: true
-      loop: "{{ vrf_config }}"
-      tags:
-        - configure_assoc_vrf
-
-    - name: Configure BGP templates   #OK.$
+    - name: Configure BGP templates   #OK.$ #Role17 - Role Name: configure_bgp_leaf
       cisco.nxos.nxos_bgp_templates:
         config:
           as_number: "{{ bgp_asn }}"
@@ -416,7 +182,7 @@
                   send_community: "extended"
       tags: configure_bgp_template
 
-    - name: Configure BGP Process and Neighbors   #OK.$
+    - name: Configure BGP Process and Neighbors   #OK.$ #Role17 - Role Name: configure_bgp_leaf
       cisco.nxos.nxos_bgp_global:
         config:
           as_number: "{{ bgp_asn }}"
@@ -432,7 +198,7 @@
       loop: "{{ bgp }}"
       tags: configure_bgp_af
 
-    - name: Configure BGP L3VNI VRFs   #OK.$
+    - name: Configure BGP L3VNI VRFs   #OK.$ #Role17 - Role Name: configure_bgp_leaf
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -447,7 +213,7 @@
       loop: "{{ l3vlans }}"
       tags: configure_bgp_vrf
 
-    - name: Advertise PIP in AF   #OK.$
+    - name: Advertise PIP in AF   #OK.$ #Role17 - Role Name: configure_bgp_leaf
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -458,7 +224,7 @@
         state: merged
       tags: adv_pip
 
-    - name: Configure BGP Maximum Paths   #OK.$
+    - name: Configure BGP Maximum Paths   #OK.$ #Role17 - Role Name: configure_bgp_leaf
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -474,7 +240,7 @@
         state: merged
       tags: configure_bgp_max_path
 
-    - name: Configure BGP neighbor   #OK.$
+    - name: Configure BGP neighbor   #OK.$ #Role17 - Role Name: configure_bgp_leaf
       cisco.nxos.nxos_bgp_neighbor_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -488,13 +254,248 @@
       loop: "{{ bgp }}"
       tags: bgp_neighbor
 
-    - name: Copy running config to startup config
+    - name: Ensure VLANs are configured   #OK.$ #Role18 - Role Name: configure_tenant
+      cisco.nxos.nxos_vlans:
+        config:
+          - vlan_id: "{{ item.vlan_id }}"
+            name: "{{ item.vlan_name }}"
+            mapped_vni: "{{ item.vnid }}"
+        state: merged
+      with_items:
+        - "{{ vrf_config }}"
+      tags:
+        - configure_tenant_l3vni
+
+    - name: Configure VRFs   #OK.$ #Role18 - Role Name: configure_tenant
+      cisco.nxos.nxos_vrf:
+        aggregate:
+          - name: "{{ item.vrf_name }}"
+            vni: "{{ item.vnid }}"
+            rd: "{{ item.vrf_rd }}"
+      loop: "{{ vrf_config }}"
+      tags:
+        - configure_vrf
+
+    - name: LEAF tenants_svi naming configuration   #OK.$ #Role18 - Role Name: configure_tenant
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: "vlan{{ item.vlan_id }}"
+            description: "{{ item.vlan_name }}"
+            enabled: true
+        state: merged
+      loop: "{{ vrf_config }}"
+      tags:
+        - tenant_svi_naming
+
+    - name: LEAF tenants_svi vrf membership configuration   #OK.$ #Role18 - Role Name: configure_tenant
+      cisco.nxos.nxos_vrf_interface:
+        interface: "vlan{{ item.vlan_id }}"
+        vrf: "{{ item.vrf_name }}"
+        state: present
+      loop: "{{ vrf_config }}"
+      tags:
+        - tenant_vrf_mem
+
+    - name: LEAF tenants_svi ip forward configuration   #OK.$ #Role18 - Role Name: configure_tenant
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: "vlan{{ item.vlan_id }}"
+            ip_forward: "{{ ipforward }}"
+            enabled: true
+        state: merged
+      loop: "{{ vrf_config }}"
+      tags:
+        - tenant_ip_forward
+
+    - name: Configure VRF_AF   #OK.$ #Role18 - Role Name: configure_tenant
+      cisco.nxos.nxos_vrf_af:
+        afi: ipv4
+        route_target_both_auto_evpn: true
+        route_targets:
+          - direction: both
+            rt: auto
+            state: present
+        state: present
+        vrf: "{{ item.vrf_name }}"
+      loop: "{{ vrf_config }}"
+      tags:
+        - configure_vrf_af
+
+    - name: Ensure VLANs are configured   #OK.$ #Role19 - Role Name: configure_fabric_vlans
+      cisco.nxos.nxos_vlans:
+        config:
+          - vlan_id: "{{ item.vlan_id }}"
+            name: "{{ item.vlan_name }}"
+            mapped_vni: "{{ item.vnid }}"
+        state: merged
+      with_items:
+        - "{{ l2vlans }}"
+        - "{{ l3vlans }}"
+      tags:
+        - configure_vlans
+
+    - name: VNI configuration   #OK.$ #Role19 - Role Name: configure_fabric_vlans
+      cisco.nxos.nxos_evpn_vni:
+        vni: "{{ item.vnid }}"
+        route_distinguisher: "{{ l2rd }}"
+        route_target_both: "{{ l2rt }}"
+        state: "present"
+      with_items:
+        - "{{ l2vlans }}"
+        - "{{ l3vlans }}"
+      tags:
+        - l2evpn
+
+    - name: LEAF SVI Naming   #OK.$ #Role19 - Role Name: configure_fabric_vlans
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: "vlan{{ item.vlan_id }}"
+            description: "{{ item.vlan_name }}"
+            fabric_forwarding_anycast_gateway: "{{ anycast_gw_mac_status }}"
+            enabled: "{{ svi_status }}"
+        state: merged
+      loop: "{{ l3vlans }}"
+      tags:
+        - svi_naming
+
+    - name: LEAF SVI VRF Membership   #OK.$ #Role19 - Role Name: configure_fabric_vlans
+      cisco.nxos.nxos_vrf_interface:
+        interface: "vlan{{ item.vlan_id }}"
+        vrf: "{{ item.vrf_name }}"
+        state: present
+      loop: "{{ l3vlans }}"
+      tags:
+        - svi_vrf_mem
+
+    - name: LEAF SVI IP Address   #OK.$ #Role19 - Role Name: configure_fabric_vlans
+      cisco.nxos.nxos_l3_interfaces:
+        config:
+          - name: "vlan{{ item.vlan_id }}"
+            ipv4:
+              - address: "{{ item.vlan_id_ip }}/{{ item.vlan_id_subnet }}"
+        state: merged
+      loop: "{{ l3vlans }}"
+      tags:
+        - svi_ip
+
+    - name: Configure NVE Interface for VXLAN   #OK.$ #Role20 - Role Name: configure_nve_intf
+      cisco.nxos.nxos_vxlan_vtep:
+        interface: "{{ nve_intf_name }}"
+        source_interface: "{{ nve_src_intf }}"
+        advertise_virtual_rmac: true
+        shutdown: "{{ nve_intf_status }}"
+        host_reachability: true
+        state: present
+      tags:
+        - configure_nve
+
+    - name: Configure VNIs for NVE vlans   #OK.$ #Role20 - Role Name: configure_nve_intf
+      cisco.nxos.nxos_vxlan_vtep_vni:
+        interface: "{{ nve_intf_name }}"
+        vni: "{{ item.vnid }}"
+        multicast_group: "{{ vrf_config | selectattr('vrf_name', 'equalto', item.vrf_name) | map(attribute='vrf_mcast_group') | first }}"
+        state: present
+        suppress_arp: true   #CHECK
+      with_items:
+        - "{{ l2vlans }}"
+        - "{{ l3vlans }}"
+      tags:
+        - configure_vlan_multicasts
+
+    - name: Configure VNIs for NVE vlans   #OK.$ #Role20 - Role Name: configure_nve_intf
+      cisco.nxos.nxos_vxlan_vtep_vni:
+        interface: "{{ nve_intf_name }}"
+        vni: "{{ item.vnid }}"
+        assoc_vrf: true
+      loop: "{{ vrf_config }}"
+      tags:
+        - configure_assoc_vrf
+
+    - name: Configure LAG Interfaces   #OK.$ #Role11 - Role Name: configure_local_segment_lag
+      cisco.nxos.nxos_lag_interfaces:
+        config:
+          - name: "{{ item.intf_po }}"
+            members:
+              - member: "{{ item.intf_name }}"
+                mode: "{{ item.intf_lag_mode }}"   #CHECK
+        state: merged
+      loop: "{{ server_interfaces }}"
+      when: item.intf_po is defined
+      tags:
+        - configure_lag_interfaces
+
+    - name: vpc-portchannel configuration   #OK.$ #Role11 - Role Name: configure_local_segment_lag
+      cisco.nxos.nxos_vpc_interface:
+        portchannel: "{{ item.intf_po }}"
+        vpc: "{{ item.intf_po }}"
+        state: present
+      loop: "{{ server_interfaces }}"
+      tags:
+        - vpc_po
+
+    - name: Configure L2 Interfaces to Servers   #OK.$ #Role11 - Role Name: configure_local_segment_lag
+      cisco.nxos.nxos_l2_interfaces:
+        config:
+          - name: "port-channel{{ item.intf_po }}"
+            mode: "{{ item.switchport_mode }}"
+            access:
+              vlan: "{{ item.access_vlan }}"
+        state: merged
+      loop: "{{ server_interfaces }}"
+      when: item.switchport_mode == 'access' and item.intf_po is defined   #CHECK
+      tags:
+        - configure_l2_interfaces_access
+
+    - name: Configure L2 Interfaces to Servers   #OK.$ #Role11 - Role Name: configure_local_segment_lag
+      cisco.nxos.nxos_l2_interfaces:
+        config:
+          - name: "port-channel{{ item.intf_po }}"
+            mode: "{{ item.switchport_mode }}"
+            trunk:
+              allowed_vlans: "{{ item.trunk_vlan }}"
+              native_vlan: "{{ native_vlan_id }}"   #CHECK
+        state: replaced
+      loop: "{{ server_interfaces }}"
+      when: item.switchport_mode == 'trunk' and item.intf_po is defined   #CHECK
+      tags:
+        - configure_l2_interfaces_trunk
+
+    - name: Configure L2 Interfaces to Servers-No Port-Channel   #OK.$ #Role12 - Role Name: configure_local_segment_orphan
+      cisco.nxos.nxos_l2_interfaces:
+        config:
+          - name: "{{ item.intf_name }}"
+            mode: "{{ item.switchport_mode }}"
+            trunk:
+              allowed_vlans: "{{ item.trunk_vlan }}"
+              native_vlan: "{{ native_vlan_id }}"   #CHECK
+        state: merged
+      loop: "{{ server_interfaces }}"
+      when: item.switchport_mode == 'trunk' and item.intf_po is not defined
+      tags:
+        - configure_l2_interfaces_trunk_nopo
+
+    - name: Configure L2 Interfaces to Servers-No Port-Channel   #OK.$ #Role12 - Role Name: configure_local_segment_orphan
+      cisco.nxos.nxos_l2_interfaces:
+        config:
+          - name: "{{ item.intf_name }}"
+            mode: "{{ item.switchport_mode }}"
+            access:
+              vlan: "{{ item.access_vlan }}"
+        state: merged
+      loop: "{{ server_interfaces }}"
+      when: item.switchport_mode == 'access' and item.intf_po is not defined
+      tags:
+        - configure_l2_interfaces_access_nopo
+
+#CHECK
+
+    - name: Copy running config to startup config #AVAILABLE IN ALL-ROLES
       cisco.nxos.nxos_config:
         backup: no
         save_when: always
       tags: write
 
-    # - name: Confiuration Saving   #OK.$
+    # - name: Confiuration Saving   #OK.$ #AVAILABLE IN ALL-ROLES
     #   cisco.nxos.nxos_config:
     #     lines:
     #       - copy running-config startup-config

@@ -1,0 +1,2 @@
+---
+- include_tasks: configure_underlay_intfs.yaml
