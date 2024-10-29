@@ -13,9 +13,10 @@ This project is structured to manage data center fabric infrastructure using Ans
 In the following structure, roles will be placed under the `roles` directory. each role has it's own readme in it's directory.
 readme file for each role can be found in the following location:
 ```bash
-`/opt/dcf_iac_project/roles/{role-name}/README.md`
+/opt/dcf_iac_project/roles/{role-name}/README.md
 ```
 
+in the following section we have the main structure of the Repository.
 ```bash
 ├── ansible.cfg
 ├── DCF-LAB.png
