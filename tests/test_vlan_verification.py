@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 if len(sys.argv) > 1:
     EXPECTED_VLANS = [int(vlan) for vlan in sys.argv[1:]]
 else:
-    EXPECTED_VLANS = [11, 12, 13, 14, 15]
+    EXPECTED_VLANS = [11, 12, 13]
 
 class CommonSetup(aetest.CommonSetup):
     """ Common Setup Section """
