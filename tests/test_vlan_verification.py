@@ -5,7 +5,6 @@ from unicon.core.errors import ConnectionError
 import logging
 from pyats.log.utils import banner
 
-
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
