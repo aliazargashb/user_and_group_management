@@ -1,6 +1,6 @@
 ---
 - name: Configure Cisco Nexus Switch - SIC Leaf
-  hosts: border_leafs
+  hosts: leafs
   gather_facts: false
   connection: network_cli
   vars:
