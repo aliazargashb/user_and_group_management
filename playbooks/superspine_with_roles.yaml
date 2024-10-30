@@ -1,0 +1,23 @@
+---
+- name: Configure Cisco Nexus Switch - ALL - WITH ROLES
+  hosts: superspines
+  gather_facts: false
+  connection: network_cli
+  vars:
+    ansible_network_os: cisco.nxos.nxos
+
+  tasks:
+    - import_role:
+        name: configure_underlay_intfs
+
+    - import_role:
+        name: configure_pim_multicast
+
+    - import_role:
+        name: configure_ospf_superspine
+
+    - import_role:
+        name: configure_bgp_superspine
+
+    - import_role:
+        name: write_bck

@@ -140,6 +140,7 @@ Contains variables that are specific to individual hosts.
 ### `playbooks`
 
 This directory contains the Ansible playbooks used to configure different network devices.
+- `all.yaml`: Playbook for configuring all switches.
 - `leafs.yaml`: Playbook for configuring leaf switches.
 - `spine.yaml`: Playbook for configuring spine switches.
 - `superspine.yaml`: Playbook for configuring superspine switches.

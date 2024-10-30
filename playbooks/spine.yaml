@@ -243,9 +243,6 @@
         state: merged
       tags: configure_route_map
 
-
-
-
     - name: Copy running config to startup config   #OK.$ #AVAILABLE IN ALL-ROLES
       cisco.nxos.nxos_config:
         backup: no

@@ -80,7 +80,7 @@
       tags:
         - configure_ospf
 
-    - name: Configure Interfaces, OSPF   #OK.$ (IMP) #Role3 - Role Name: configure_ospf_spine
+    - name: Configure Interfaces, OSPF   #OK.$ (IMP) #Role3 - Role Name: configure_ospf_superspine
       cisco.nxos.nxos_ospf_interfaces:
         config:
           - name: "{{ item.intf_name }}"
