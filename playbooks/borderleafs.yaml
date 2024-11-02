@@ -33,6 +33,17 @@
       tags:
         - configure_tenant_l3vni
 
+    - name: Ensure External VLANs are configured   #OK.$ #Check
+      cisco.nxos.nxos_vlans:
+        config:
+          - vlan_id: "{{ item.vlan_id }}"
+            name: "{{ item.vlan_name }}"
+        state: merged
+      with_items:
+        - "{{ external_l3vlans }}"
+      tags:
+        - configure_Tenants_to_External
+
     - name: Configure VRFs   #OK.$
       cisco.nxos.nxos_vrf:
         aggregate:
@@ -43,23 +54,27 @@
       tags:
         - configure_vrf
 
-    - name: LEAF tenants_svi naming configuration   #OK.$
+    - name: LEAF tenants_svi naming configuration   #OK.$ #Check
       cisco.nxos.nxos_interfaces:
         config:
           - name: "vlan{{ item.vlan_id }}"
             description: "{{ item.vlan_name }}"
             enabled: true
         state: merged
-      loop: "{{ vrf_config }}"
+      with_items: 
+        - "{{ vrf_config }}"
+        - "{{ external_l3vlans }}"
       tags:
-        - tenant_svi_naming
+        - tenants_and_external_svi_naming
 
-    - name: LEAF tenants_svi vrf membership configuration   #OK.$
+    - name: LEAF tenants_svi vrf membership configuration   #OK.$ #Check
       cisco.nxos.nxos_vrf_interface:
         interface: "vlan{{ item.vlan_id }}"
         vrf: "{{ item.vrf_name }}"
         state: present
-      loop: "{{ vrf_config }}"
+      with_items: 
+        - "{{ vrf_config }}"
+        - "{{ external_l3vlans }}"
       tags:
         - tenant_vrf_mem
 
@@ -125,23 +140,27 @@
       tags:
         - svi_naming
 
-    - name: LEAF SVI VRF Membership   #OK.$
+    - name: LEAF SVI VRF Membership   #OK.$ #Check
       cisco.nxos.nxos_vrf_interface:
         interface: "vlan{{ item.vlan_id }}"
         vrf: "{{ item.vrf_name }}"
         state: present
-      loop: "{{ l3vlans }}"
+      with_items: 
+        - "{{ l3vlans }}"
+        - "{{ external_l3vlans }}"
       tags:
         - svi_vrf_mem
 
-    - name: LEAF SVI IP Address   #OK.$
+    - name: LEAF SVI IP Address   #OK.$ #Check
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "vlan{{ item.vlan_id }}"
             ipv4:
               - address: "{{ item.vlan_id_ip }}/{{ item.vlan_id_subnet }}"
         state: merged
-      loop: "{{ l3vlans }}"
+      with_items:
+        - "{{ l3vlans }}"
+        - "{{ external_l3vlans }}"
       tags:
         - svi_ip
 
@@ -167,7 +186,7 @@
       tags:
         - configure_loopbacks_ip
 
-    - name: Configure Physical Ethernet Ports   #OK.$
+    - name: Configure Physical Ethernet Ports   #OK.$ #Check
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -178,7 +197,7 @@
         state: merged
       with_items:
         - "{{ physical_interfaces }}"
-        - "{{ external_interfaces }}"
+        - "{{ external_l2_interfaces }}"
       tags:
         - configure_ports
 
@@ -189,9 +208,7 @@
             ipv4:
               - address: "{{ item.intf_ip }}/{{ item.intf_subnet }}"
         state: merged
-      with_items:
-        - "{{ physical_interfaces }}"
-        - "{{ external_interfaces }}"
+      loop: "{{ physical_interfaces }}"
       tags:
         - configure_physical_ports_ip
 
@@ -235,7 +252,7 @@
       tags:
         - configure_l2_interfaces_trunk
 
-    - name: Configure L2 Interfaces to Servers-No Port-Channel   #OK.$
+    - name: Configure L2 Interfaces to Servers and Externals-No Port-Channel   #OK.$ #Check
       cisco.nxos.nxos_l2_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -244,7 +261,9 @@
               allowed_vlans: "{{ item.trunk_vlan }}"
               native_vlan: "{{ native_vlan_id }}"   #CHECK
         state: merged
-      loop: "{{ server_interfaces }}"
+      with_items:
+        - "{{ server_interfaces }}"
+        - "{{ external_l2_interfaces }}"
       when: item.switchport_mode == 'trunk' and item.intf_po is not defined
       tags:
         - configure_l2_interfaces_trunk_nopo
@@ -407,6 +426,118 @@
         state: merged
       loop: "{{ bgp }}"
       tags: bgp_neighbor
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - name: Border Leafs inbound prefix-lists   #OK.$ #Check
+      cisco.nxos.nxos_prefix_lists:  
+        config:
+          - afi: ipv4
+            prefix_lists:
+              - name: External_to_DC
+                description: External_to_DC_Prefixes
+                entries:
+                - sequence: "{{ item.prefix_list_seq }}"
+                  action: "{{ item.prefix_list_seq_action }}"
+                  prefix: "{{ item.prefix_list_prefixes }}"
+        state: merged
+      loop: "{{ inbound_prefix_lists }}"
+      tags: inbound_prefix_lists
+
+    - name: Border Leafs outbound prefix-lists   #OK.$ #Check
+      cisco.nxos.nxos_prefix_lists:  
+        config:
+          - afi: ipv4
+            prefix_lists:
+              - name: DC_to_External
+                description: DC_to_External_Prefixes
+                entries:
+                - sequence: "{{ item.prefix_list_seq }}"
+                  action: "{{ item.prefix_list_seq_action }}"
+                  prefix: "{{ item.prefix_list_prefixes }}"
+        state: merged
+      loop: "{{ outbound_prefix_lists }}"
+      tags: outbound_prefix_lists
+
+
+    - name: Border Leafs route-maps   #OK.$ #Check
+      cisco.nxos.nxos_route_maps:  
+        config:
+          - route_map: External_to_DC
+            entries:
+              - sequence: 10
+                action: permit
+                description: External_to_DC_route-maps
+                match:
+                  ip:
+                    address:
+                      prefix_lists: External_to_DC
+          - route_map: DC_to_External
+            entries:
+              - sequence: 10
+                action: permit
+                description: DC_to_External_route-maps
+                match:
+                  ip:
+                    address:
+                      prefix_lists: DC_to_External
+        state: merged
+      tags: bl_route_maps                            
+
+
+    - name: Configure BGP neighbor   #OK.$ #Check
+      cisco.nxos.nxos_bgp_neighbor_address_family:
+        config:
+          as_number: "{{ bgp_asn }}"
+          vrfs:
+            vrf: "{{ item.vrf_name }}"
+            neighbors:
+              - neighbor_address: "{{ item.bgp_neighbor_addr }}"
+                address_family:
+                  - afi: ipv4
+                    safi: unicast
+                    inherit:
+                      template: "{{ bgp_neighbor_template }}"
+                    route-map:
+                      inbound: "{{ inbound_route_map }}"
+                      outbound: "{{ outbound_route_map }}"
+                    soft_reconfiguration_inbound:
+                      always: true
+        state: merged
+      loop: "{{ bgp }}"
+      tags: bgp_neighbor
+
+
+    - name: Configure BGP Process and Neighbors   #OK.$ #Check
+      cisco.nxos.nxos_bgp_global:
+        config:
+          as_number: "{{ bgp_asn }}"
+          log_neighbor_changes: true
+          vrfs:
+            - vrf: "{{ item.vrf_name }}"
+              neighbors:
+                - neighbor_address: "{{ item.bgp_neighbor_addr }}"
+                  update_source: "{{ bgp_update_src }}"              
+              router_id: "{{ loopback_interfaces | selectattr('intf_name', 'match', 'Loopback0') | map(attribute='intf_ip') | first}}"
+        state: merged
+      loop: "{{ bgp }}"
+      tags: configure_bgp_af
+
+
+
+
+
+
 
     - name: Copy running config to startup config   #OK.$
       cisco.nxos.nxos_config:

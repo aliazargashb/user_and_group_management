@@ -1,8 +1,19 @@
+#function to load a testbed
 from genie.testbed import load
+
+#aetest for the creation of automated tests
 from pyats import aetest
+
+#interact with command-line arguments
 import sys
+
+#ConnectionError exception for handling connection issues
 from unicon.core.errors import ConnectionError
+
+#logging information, warnings, and errors
 import logging
+
+#banner utility for better visual separation of log outputs
 from pyats.log.utils import banner
 
 # Configure logging
@@ -15,6 +26,13 @@ if len(sys.argv) > 1:
 else:
     EXPECTED_VLANS = [11, 12, 13]
 
+"""
+-> Common Setup Class:
+Connects to all devices defined in the testbed YAML file.
+Stores the connected devices in self.parent.parameters['devices'].
+Logs a message upon a successful connection.
+Fails the script if it cannot connect to a device.
+"""
 class CommonSetup(aetest.CommonSetup):
     """ Common Setup Section """
 
@@ -30,6 +48,26 @@ class CommonSetup(aetest.CommonSetup):
             except ConnectionError as e:
                 self.failed(f"Failed to connect to device {device_name}: {e}")
 
+"""
+-> main test case for verifying VLAN configurations:
+
+-> setup Method:
+Attempts to get a specific device (sic_leaf1) from the testbed.
+If the device is not found, it fails the setup.
+Runs the show vlan command to get VLAN data and parses the output.
+If parsing fails, the setup is marked as failed.
+
+-> verify_vlans Test Method:
+Verifies that all expected VLANs (EXPECTED_VLANS) are present in the device's VLAN configuration.
+Converts VLAN IDs from the parsed output to integers and stores them in vlan_list.
+If any expected VLAN is missing, it adds it to missing_vlans.
+Uses an assert statement to raise an error if there are any missing VLANs.
+
+-> cleanup Method:
+Disconnects from sic_leaf1.
+Logs a message to confirm disconnection.
+Logs a warning if disconnection fails.
+"""
 class VLANVerificationTestcase(aetest.Testcase):
     """ VLAN Verification Test Case """
 
@@ -65,6 +103,12 @@ class VLANVerificationTestcase(aetest.Testcase):
         except Exception as e:
             logger.warning(f"Failed to disconnect device: {e}")
 
+"""
+-> Common Cleanup Class:
+Disconnects from all devices connected during CommonSetup.
+Logs a message to indicate that each device has been disconnected.
+Logs a warning if it cannot disconnect from a device.
+"""
 class CommonCleanup(aetest.CommonCleanup):
     """ Common Cleanup Section """
 

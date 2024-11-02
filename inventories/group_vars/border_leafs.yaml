@@ -95,3 +95,25 @@ bgp_neighbor_template: "Leaf_Spine_Peering"
 #OK.$
 nve_src_intf: Loopback1
 nve_intf_status: false
+
+
+
+
+inbound_prefix_lists:
+    - prefix_list_seq: "10"
+      prefix_list_seq_action: permit
+      prefix_list_prefixes: 172.18.12.0/24
+    - prefix_list_seq: "20"
+      prefix_list_seq_action: permit
+      prefix_list_prefixes: 0.0.0.0/0
+
+outbound_prefix_lists:
+    - prefix_list_seq: "10"
+      prefix_list_seq_action: permit
+      prefix_list_prefixes: 192.168.11.0/24
+    - prefix_list_seq: "20"
+      prefix_list_seq_action: permit
+      prefix_list_prefixes: 192.168.12.0/24
+    - prefix_list_seq: "30"
+      prefix_list_seq_action: permit
+      prefix_list_prefixes: 192.168.13.0/24
