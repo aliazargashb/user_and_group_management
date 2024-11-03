@@ -10,7 +10,7 @@ bgp_asn: 65202
 vpc_domain: 2
 vpc_pkl_dest: "100.120.23.202"
 
-#OK.$
+#OK.$ (sic_leaf1/sic_leaf1_underlaye_intfs.yaml)
 loopback_interfaces:
   - intf_name: Loopback0
     intf_ip: 10.0.0.201
@@ -23,7 +23,7 @@ loopback_interfaces:
     # ip_secondary: 10.2.2.2
     # sec_value: true
 
-#OK.$
+#OK.$ (sic_leaf1/sic_leaf1_underlay_intfs.yaml)
 physical_interfaces:
   - intf_name: Ethernet1/1
     intf_desc: "To_Spine-1"
@@ -38,7 +38,7 @@ physical_interfaces:
     intf_subnet: 30
     intf_mode: "layer3"
 
-#OK.$
+#OK.$ (sic_leaf1/sic_leaf1_local_segment_intfs.yaml)
 server_interfaces:
   - intf_name: Ethernet1/6
     intf_desc: "To_Subnet11-SRVs"

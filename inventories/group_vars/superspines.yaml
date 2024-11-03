@@ -1,5 +1,6 @@
 # ADD COMMENT
 
+# (superspines/features.yaml)
 features:
   - nv overlay
   - ospf
@@ -15,7 +16,7 @@ bgp_route_map: Retain_NH_Addr
 bgp_route_map_seq: 10
 bgp_route_map_action: permit
 
-#OK.$
+#OK.$ (superspines/configure_bgp.yaml)
 bgp:
  - neighbor_address: 10.0.0.21
    bgp_peer_asn: 65200

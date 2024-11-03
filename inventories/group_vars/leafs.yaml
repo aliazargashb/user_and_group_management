@@ -1,6 +1,6 @@
 # ADD COMMENT
 
-#OK.$
+#OK.$ (leafs/features.yaml)
 features:   
   - nv overlay
   - ospf
@@ -48,7 +48,7 @@ vpc_pl_po_members:
 #CHECK
 native_vlan_id: 222
 
-#OK.$
+#OK.$ (leafs/vlans.yaml)
 l2vlans:
   - vlan_id: 11
     vlan_name: "Subnet-11"
@@ -66,7 +66,7 @@ l2vlans:
     vrf_name: Tenant-2
     bgp_prefix: 192.168.13.0/24
 
-#OK.$
+#OK.$ (leafs/vlans.yaml)
 l3vlans:
   - vlan_id: 11
     vlan_name: "Subnet-11"
@@ -90,7 +90,7 @@ l3vlans:
     vlan_id_subnet: 24
     bgp_prefix: 192.168.13.0/24
 
-#OK.$
+#OK.$ (leafs/vrfs.yaml)
 vrf_config:
   - vrf_name: "Tenant-1"
     vlan_id: 200

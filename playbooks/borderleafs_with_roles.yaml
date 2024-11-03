@@ -1,0 +1,26 @@
+---
+- name: Configure Cisco Nexus Switch - SIC BorderLeaf
+  hosts: border_leafs
+  gather_facts: false
+  connection: network_cli
+  vars:
+    ansible_network_os: cisco.nxos.nxos
+  
+  tasks:
+    - import_role:
+        name: configure_underlay_intfs
+
+    - import_role:
+        name: configure_ospf
+
+    - import_role:
+        name: configure_anycast_gw
+
+    - import_role:
+        name: configure_pim_multicast
+
+    - import_role:
+        name: configure_pim_ports
+
+    - import_role:
+        name: configure_bgp_borderleaf

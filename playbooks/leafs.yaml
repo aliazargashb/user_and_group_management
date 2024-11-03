@@ -208,7 +208,9 @@
               safi: unicast
               networks:
                 - prefix: "{{ item.bgp_prefix }}"
-              advertise_l2vpn_evpn: true              
+              advertise_l2vpn_evpn: true
+              maximum_paths:
+                parallel_paths: "{{ bgp_maximum_path }}"                      
         state: merged
       loop: "{{ l3vlans }}"
       tags: configure_bgp_vrf

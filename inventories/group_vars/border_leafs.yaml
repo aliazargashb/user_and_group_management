@@ -1,6 +1,6 @@
 # ADD COMMENT
 
-#OK.$
+#OK.$ (borderleafs/features.yaml)
 features:   
   - nv overlay
   - ospf
@@ -27,7 +27,8 @@ svi_status: true
 #OK.$
 ipforward: true
 
-#OK.$
+
+#OK.$ (borderleafs/vlans.yaml)
 l2vlans:
   - vlan_id: 11
     vlan_name: "Subnet-11"
@@ -45,7 +46,7 @@ l2vlans:
     vrf_name: Tenant-2
     bgp_prefix: 192.168.13.0/24
 
-#OK.$
+#OK.$ (borderleafs/vlans.yaml)
 l3vlans:
   - vlan_id: 11
     vlan_name: "Subnet-11"
@@ -69,7 +70,7 @@ l3vlans:
     vlan_id_subnet: 24
     bgp_prefix: 192.168.13.0/24
 
-#OK.$
+#OK.$ (borderleafs/vrfs.yaml)
 vrf_config:
   - vrf_name: "Tenant-1"
     vlan_id: 200
@@ -90,15 +91,13 @@ vrf_config:
 nve_intf_name: nve1
 
 #OK.$
-bgp_neighbor_template: "Leaf_Spine_Peering"
-
-#OK.$
 nve_src_intf: Loopback1
 nve_intf_status: false
 
 
+bgp_neighbor_template_bl: "External-L3FW-Fusion"
 
-
+# (borderleafs/vrfs.yaml) ---REVISE THE STRUCTURE, CHANGE TO prefix_lists
 inbound_prefix_lists:
     - prefix_list_seq: "10"
       prefix_list_seq_action: permit
@@ -107,6 +106,7 @@ inbound_prefix_lists:
       prefix_list_seq_action: permit
       prefix_list_prefixes: 0.0.0.0/0
 
+# (borderleafs/vrfs.yaml) ---REVISE THE STRUCTURE, CHANGE TO prefix_lists
 outbound_prefix_lists:
     - prefix_list_seq: "10"
       prefix_list_seq_action: permit
@@ -117,3 +117,47 @@ outbound_prefix_lists:
     - prefix_list_seq: "30"
       prefix_list_seq_action: permit
       prefix_list_prefixes: 192.168.13.0/24
+
+inbound_route_map: External_to_DC
+outbound_route_map: DC_to_External
+
+
+
+# (borderleafs/vrfs.yaml) ---REVISE THE STRUCTURE
+prefix_lists:
+    tenant1:
+      inbound_pf:
+        - prefix_list_seq: "10"
+          prefix_list_seq_action: permit
+          prefix_list_prefixes: 172.18.12.0/24
+        - prefix_list_seq: "20"
+          prefix_list_seq_action: permit
+          prefix_list_prefixes: 0.0.0.0/0
+      outbound_pf:
+        - prefix_list_seq: "10"
+          prefix_list_seq_action: permit
+          prefix_list_prefixes: 192.168.11.0/24
+        - prefix_list_seq: "20"
+          prefix_list_seq_action: permit
+          prefix_list_prefixes: 192.168.12.0/24
+        - prefix_list_seq: "30"
+          prefix_list_seq_action: permit
+          prefix_list_prefixes: 192.168.13.0/24
+    # tenant2:
+    #   inbound_pf:
+    #     - prefix_list_seq: "10"
+    #       prefix_list_seq_action: permit
+    #       prefix_list_prefixes: 172.18.12.0/24
+    #     - prefix_list_seq: "20"
+    #       prefix_list_seq_action: permit
+    #       prefix_list_prefixes: 0.0.0.0/0
+    #   outbound_pf:
+    #     - prefix_list_seq: "10"
+    #       prefix_list_seq_action: permit
+    #       prefix_list_prefixes: 192.168.11.0/24
+    #     - prefix_list_seq: "20"
+    #       prefix_list_seq_action: permit
+    #       prefix_list_prefixes: 192.168.12.0/24
+    #     - prefix_list_seq: "30"
+    #       prefix_list_seq_action: permit
+    #       prefix_list_prefixes: 192.168.13.0/24

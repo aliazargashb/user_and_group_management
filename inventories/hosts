@@ -28,6 +28,8 @@ all:
           ansible_host: 100.120.23.203
         sic_BL:
           ansible_host: 100.120.23.211
+        switch_test:
+          ansible_host: 100.120.23.242
 
     bmi:
       hosts:
@@ -63,6 +65,8 @@ all:
           ansible_host: 100.120.23.111
         sic_BL:
           ansible_host: 100.120.23.211
+        switch_test:
+          ansible_host: 100.120.23.242
 
     superspines:
       hosts:
@@ -104,7 +108,9 @@ all:
           ansible_host: 100.120.23.101
         bmi_BL:
           ansible_host: 100.120.23.111
-
+        switch_test:
+          ansible_host: 100.120.23.242
+          
     sic_spines:
       hosts:
         sic_spine1:

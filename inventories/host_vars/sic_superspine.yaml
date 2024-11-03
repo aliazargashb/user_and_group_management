@@ -3,14 +3,14 @@
 #OK.$
 hostname: sic_superspine
 
-#OK.$
+#OK.$ (sic_superspine/sic_superspine_underlay_intfs.yaml)
 loopback_interfaces:
   - intf_name: Loopback0
     intf_ip: 10.0.0.2
     intf_subnet: 32
     intf_desc: LP0_RID
 
-#OK.$
+#OK.$ (sic_superspine/sic_superspine_underlay_intfs.yaml)
 physical_interfaces:
   - intf_name: Ethernet1/1
     intf_desc: "To_SIC_Spine-1"
