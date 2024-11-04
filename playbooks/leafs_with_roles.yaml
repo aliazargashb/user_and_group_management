@@ -1,5 +1,5 @@
 ---
-- name: Configure Cisco Nexus Switch - ALL - WITH ROLES
+- name: Configure Cisco Nexus Switch - LEAFS - WITH ROLES
   hosts: leafs
   gather_facts: false
   connection: network_cli

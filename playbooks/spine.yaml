@@ -8,7 +8,7 @@
 
   tasks:
 
-    - name: Configure Loopback Interface Descriptions   #OK.$ #Role1 - Role Name: configure_underlay_intfs &
+    - name: Configure Loopback Interface Descriptions   #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "Loopback{{ item.intf_name }}"
@@ -19,7 +19,7 @@
       tags:
         - configure_loopbacks
 
-    - name: Configure IP for Loopback   #OK.$ #Role1 - Role Name: configure_underlay_intfs &
+    - name: Configure IP for Loopback   #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -30,7 +30,7 @@
       tags:
         - configure_loopbacks_ip
 
-    - name: Configure Physical Ethernet Ports   #OK.$ #Role1 - Role Name: configure_underlay_intfs &
+    - name: Configure Physical Ethernet Ports   #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -43,7 +43,7 @@
       tags:
         - configure_ports
 
-    - name: Configure IP for Physical Ethernet Ports   #OK.$ #Role1 - Role Name: configure_underlay_intfs &
+    - name: Configure IP for Physical Ethernet Ports   #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -54,14 +54,14 @@
       tags:
         - configure_physical_ports_ip
 
-    - name: Configure PIM RP address   #OK.$ #Role2 - Role Name: configure_pim_multicast &
+    - name: Configure PIM RP address   #OK.$
       cisco.nxos.nxos_pim_rp_address:
         rp_address: "{{ pim_rp_ip }}"
         group_list: "{{ pim_mgroup }}"
       tags: 
         - pim_multicast
 
-    - name: Configure PIM Anycast-RP addresses   #OK.$ #Role2 - Role Name: configure_pim_multicast &
+    - name: Configure PIM Anycast-RP addresses   #OK.$
       cisco.nxos.nxos_config:
         lines:
           - ip pim anycast-rp {{ anycast_rp_addr }} {{ item }}
@@ -69,7 +69,7 @@
       tags: 
         - pim_anycast_rp
 
-    - name: Configure Interfaces, PIM   #OK.$ #Role2 - Role Name: configure_pim_multicast &
+    - name: Configure Interfaces, PIM   #OK.$
       cisco.nxos.nxos_pim_interface:
         interface: "{{ item.intf_name }}"
         sparse: true
@@ -79,7 +79,7 @@
       tags:
         - configure_pim_ports
 
-    - name: Configure OSPF   #OK.$ #Role3 - Role Name: configure_ospf_spine
+    - name: Configure OSPF   #OK.$
       cisco.nxos.nxos_ospfv2:
         config:
           processes:
@@ -105,7 +105,7 @@
     #   tags:
     #     - configure_ospf_ports
 
-    - name: Configure Interfaces, OSPF   #OK.$ (IMP) #Role3 - Role Name: configure_ospf_spine
+    - name: Configure Interfaces, OSPF   #OK.$ (IMP)
       cisco.nxos.nxos_ospf_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -120,7 +120,7 @@
       tags:
         - configure_loopback_ospf_ports
 
-    - name: Configure Interfaces, OSPF   #OK.$ (IMP) #Role3 - Role Name: configure_ospf_spine
+    - name: Configure Interfaces, OSPF   #OK.$ (IMP)
       cisco.nxos.nxos_ospf_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -135,7 +135,7 @@
       tags:
         - configure_site_ospf_ports
 
-    - name: Configure Interfaces, OSPF   #OK.$ (IMP) #Role3 - Role Name: configure_ospf_spine
+    - name: Configure Interfaces, OSPF   #OK.$ (IMP)
       cisco.nxos.nxos_ospf_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -150,7 +150,7 @@
       tags:
         - configure_dci_ospf_ports
 
-    - name: Configure BGP templates   #OK.$ #Role4 - Role Name: configure_bgp_spine
+    - name: Configure BGP templates   #OK.$
       cisco.nxos.nxos_bgp_templates:
         config:
           as_number: "{{ bgp_asn }}"
@@ -170,7 +170,7 @@
       loop: "{{ bgp }}"
       tags: configure_bgp_template
 
-    - name: Configure BGP Process and Neighbors   #OK.$ #Role4 - Role Name: configure_bgp_spine
+    - name: Configure BGP Process and Neighbors   #OK.$
       cisco.nxos.nxos_bgp_global:
         config:
           as_number: "{{ bgp_asn }}"
@@ -186,7 +186,7 @@
       loop: "{{ bgp }}"
       tags: configure_bgp_af
 
-    - name: Configure BGP neighbor   #OK.$ #Role4 - Role Name: configure_bgp_spine
+    - name: Configure BGP neighbor   #OK.$
       cisco.nxos.nxos_bgp_neighbor_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -200,7 +200,7 @@
       loop: "{{ bgp }}"
       tags: bgp_neighbor
 
-    - name: Configure BGP route target   #OK.$ #Role4 - Role Name: configure_bgp_spine
+    - name: Configure BGP route target   #OK.$
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -213,7 +213,7 @@
         state: merged
       tags: bgp_route_target
 
-    - name: Configure BGP Maximum Paths   #OK.$ #Role4 - Role Name: configure_bgp_spine
+    - name: Configure BGP Maximum Paths   #OK.$
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -229,7 +229,7 @@
         state: merged
       tags: configure_bgp_max_path
 
-    - name: Configure Route-Map   #OK.$ #Role4 - Role Name: configure_bgp_spine
+    - name: Configure Route-Map   #OK.$
       cisco.nxos.nxos_route_maps:
         config:
           - route_map: "{{ bgp_route_map }}"

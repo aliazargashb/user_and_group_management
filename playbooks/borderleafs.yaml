@@ -1,5 +1,5 @@
 ---
-- name: Configure Cisco Nexus Switch - SIC BorderLeaf
+- name: Configure Cisco Nexus Switch - BorderLeaf
   hosts: border_leafs
   gather_facts: false
   connection: network_cli
@@ -29,7 +29,7 @@
       tags:
         - configure_loopbacks_ip
 
-    - name: Configure Physical Ethernet Ports   #OK.$ #Check (Role Name: configure_underlay_intfs)
+    - name: Configure Physical Ethernet Ports   #OK.$ (Role Name: configure_underlay_intfs)
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -182,7 +182,7 @@
       loop: "{{ bgp }}"
       tags: bgp_neighbor
 
-    - name: Border Leafs inbound prefix-lists   #OK.$ #standalone Cheked #Check #standalone Cheked (Role Name: configure_bgp_borderleaf)
+    - name: Border Leafs inbound prefix-lists   #OK.$ (Role Name: configure_bgp_borderleaf)
       cisco.nxos.nxos_prefix_lists:  
         config:
           - afi: ipv4
@@ -197,7 +197,7 @@
       loop: "{{ inbound_prefix_lists }}"
       tags: inbound_prefix_lists
 
-    - name: Border Leafs outbound prefix-lists   #OK.$ #standalone Cheked  #Check (Role Name: configure_bgp_borderleaf)
+    - name: Border Leafs outbound prefix-lists   #OK.$ (Role Name: configure_bgp_borderleaf)
       cisco.nxos.nxos_prefix_lists:  
         config:
           - afi: ipv4
@@ -212,7 +212,7 @@
       loop: "{{ outbound_prefix_lists }}"
       tags: outbound_prefix_lists
 
-    - name: Border Leafs route-maps   #OK.$ #standalone Cheked  #Check (Role Name: configure_bgp_borderleaf)
+    - name: Border Leafs route-maps   #OK.$ (Role Name: configure_bgp_borderleaf)
       cisco.nxos.nxos_route_maps:  
         config:
           - route_map: External_to_DC
@@ -236,7 +236,7 @@
         state: merged
       tags: bl_route_maps                            
 
-    - name: Configure BGP templates External   #OK.$ #standalone Cheked  #Check (Role Name: configure_bgp_borderleaf)
+    - name: Configure BGP templates External   #OK.$ (Role Name: configure_bgp_borderleaf)
       cisco.nxos.nxos_bgp_templates:
         config:
           as_number: "{{ bgp_asn }}"
@@ -254,7 +254,7 @@
                     always: true  
       tags: configure_bgp_template_ext
 
-    - name: Configure BGP Process and Neighbors External   #OK.$ #standalone Cheked  #Check (Role Name: configure_bgp_borderleaf)
+    - name: Configure BGP Process and Neighbors External   #OK.$ (Role Name: configure_bgp_borderleaf)
       cisco.nxos.nxos_bgp_global:
         config:
           as_number: "{{ bgp_asn }}"
@@ -273,7 +273,7 @@
       loop: "{{ external_l3vlans }}"
       tags: configure_bgp_af_ext
 
-    - name: Configure BGP L3VNI VRFs External   #OK.$ #standalone Cheked  #Check (Role Name: configure_bgp_borderleaf)
+    - name: Configure BGP L3VNI VRFs External   #OK.$ (Role Name: configure_bgp_borderleaf)
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -288,7 +288,7 @@
       loop: "{{ external_l3vlans }}"
       tags: configure_bgp_vrf_ext
 
-    - name: Ensure VLANs are configured   #OK.$ !HERE!
+    - name: Ensure VLANs are configured   #OK.$ ---> !HERE! <---
       cisco.nxos.nxos_vlans:
         config:
           - vlan_id: "{{ item.vlan_id }}"
@@ -300,7 +300,7 @@
       tags:
         - configure_tenant_l3vni
 
-    - name: Ensure External VLANs are configured   #OK.$ #Check
+    - name: Ensure External VLANs are configured   #OK.$
       cisco.nxos.nxos_vlans:
         config:
           - vlan_id: "{{ item.vlan_id }}"
@@ -321,7 +321,7 @@
       tags:
         - configure_vrf
 
-    - name: LEAF tenants_svi naming configuration   #OK.$ #Check 
+    - name: LEAF tenants_svi naming configuration   #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "vlan{{ item.vlan_id }}"
@@ -334,7 +334,7 @@
       tags:
         - tenants_and_external_svi_naming
 
-    - name: LEAF internal and external tenants_svi vrf membership configuration   #OK.$ #Check
+    - name: LEAF internal and external tenants_svi vrf membership configuration   #OK.$
       cisco.nxos.nxos_vrf_interface:
         interface: "vlan{{ item.vlan_id }}"
         vrf: "{{ item.vrf_name }}"
@@ -407,7 +407,7 @@
       tags:
         - svi_naming
 
-    - name: LEAF internal and external SVI VRF Membership   #OK.$ #Check
+    - name: LEAF internal and external SVI VRF Membership   #OK.$
       cisco.nxos.nxos_vrf_interface:
         interface: "vlan{{ item.vlan_id }}"
         vrf: "{{ item.vrf_name }}"
@@ -418,7 +418,7 @@
       tags:
         - svi_vrf_mem
 
-    - name: LEAF internal and external SVI IP Address   #OK.$ #Check
+    - name: LEAF internal and external SVI IP Address   #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "vlan{{ item.vlan_id }}"
@@ -469,7 +469,7 @@
           - name: "{{ item.intf_po }}"
             members:
               - member: "{{ item.intf_name }}"
-                mode: "{{ item.intf_lag_mode }}"   #CHECK
+                mode: "{{ item.intf_lag_mode }}"
         state: merged
       loop: "{{ server_interfaces }}"
       when: item.intf_po is defined
@@ -485,7 +485,7 @@
               vlan: "{{ item.access_vlan }}"
         state: merged
       loop: "{{ server_interfaces }}"
-      when: item.switchport_mode == 'access' and item.intf_po is defined   #CHECK
+      when: item.switchport_mode == 'access' and item.intf_po is defined
       tags:
         - configure_l2_interfaces_access
 
@@ -496,21 +496,21 @@
             mode: "{{ item.switchport_mode }}"
             trunk:
               allowed_vlans: "{{ item.trunk_vlan }}"
-              native_vlan: "{{ native_vlan_id }}"   #CHECK
+              native_vlan: "{{ native_vlan_id }}"
         state: replaced
       loop: "{{ server_interfaces }}"
-      when: item.switchport_mode == 'trunk' and item.intf_po is defined   #CHECK
+      when: item.switchport_mode == 'trunk' and item.intf_po is defined 
       tags:
         - configure_l2_interfaces_trunk
 
-    - name: Configure internal and external L2 Interfaces to Servers and Externals-No Port-Channel   #OK.$ #Check
+    - name: Configure internal and external L2 Interfaces to Servers and Externals-No Port-Channel   #OK.$
       cisco.nxos.nxos_l2_interfaces:
         config:
           - name: "{{ item.intf_name }}"
             mode: "{{ item.switchport_mode }}"
             trunk:
               allowed_vlans: "{{ item.trunk_vlan }}"
-              native_vlan: "{{ native_vlan_id }}"   #CHECK
+              native_vlan: "{{ native_vlan_id }}" 
         state: merged
       with_items:
         - "{{ server_interfaces }}"

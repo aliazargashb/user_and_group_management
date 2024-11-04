@@ -1,5 +1,5 @@
 ---
-- name: Configure Cisco Nexus Switch - SIC BorderLeaf
+- name: Configure Cisco Nexus Switch - BorderLeaf
   hosts: border_leafs
   gather_facts: false
   connection: network_cli
