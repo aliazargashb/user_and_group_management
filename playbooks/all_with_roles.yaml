@@ -17,10 +17,10 @@
         name: create_user
 
     - import_role:
-        name: aaa_config
+        name: configure_aaa
 
     - import_role:
-        name: ntp_config
+        name: configure_ntp
 
     - import_role:
         name: telemetry

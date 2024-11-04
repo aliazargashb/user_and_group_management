@@ -1,2 +1,10 @@
 ---
-- include_tasks: configure_ntp.yaml
+    - name: Configure NTP   #OK.$ #Role3 - Role Name: ntp_config
+      cisco.nxos.nxos_ntp_global:
+        config:
+          servers:
+            - server: "{{ item }}"
+              vrf: "{{ ntp_vrf }}"
+      loop: "{{ ntp_server }}"
+      tags:
+        - ntp_config

@@ -1,2 +1,57 @@
 ---
-- include_tasks: configure_fabric_vlans.yaml
+    - name: Ensure VLANs are configured   #OK.$ #Role19 - Role Name: configure_fabric_vlans
+      cisco.nxos.nxos_vlans:
+        config:
+          - vlan_id: "{{ item.vlan_id }}"
+            name: "{{ item.vlan_name }}"
+            mapped_vni: "{{ item.vnid }}"
+        state: merged
+      with_items:
+        - "{{ l2vlans }}"
+        - "{{ l3vlans }}"
+      tags:
+        - configure_vlans
+
+    - name: VNI configuration   #OK.$ #Role19 - Role Name: configure_fabric_vlans
+      cisco.nxos.nxos_evpn_vni:
+        vni: "{{ item.vnid }}"
+        route_distinguisher: "{{ l2rd }}"
+        route_target_both: "{{ l2rt }}"
+        state: "present"
+      with_items:
+        - "{{ l2vlans }}"
+        - "{{ l3vlans }}"
+      tags:
+        - l2evpn
+
+    - name: LEAF SVI Naming   #OK.$ #Role19 - Role Name: configure_fabric_vlans
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: "vlan{{ item.vlan_id }}"
+            description: "{{ item.vlan_name }}"
+            fabric_forwarding_anycast_gateway: "{{ anycast_gw_mac_status }}"
+            enabled: "{{ svi_status }}"
+        state: merged
+      loop: "{{ l3vlans }}"
+      tags:
+        - svi_naming
+
+    - name: LEAF SVI VRF Membership   #OK.$ #Role19 - Role Name: configure_fabric_vlans
+      cisco.nxos.nxos_vrf_interface:
+        interface: "vlan{{ item.vlan_id }}"
+        vrf: "{{ item.vrf_name }}"
+        state: present
+      loop: "{{ l3vlans }}"
+      tags:
+        - svi_vrf_mem
+
+    - name: LEAF SVI IP Address   #OK.$ #Role19 - Role Name: configure_fabric_vlans
+      cisco.nxos.nxos_l3_interfaces:
+        config:
+          - name: "vlan{{ item.vlan_id }}"
+            ipv4:
+              - address: "{{ item.vlan_id_ip }}/{{ item.vlan_id_subnet }}"
+        state: merged
+      loop: "{{ l3vlans }}"
+      tags:
+        - svi_ip

@@ -1,2 +1,10 @@
 ---
-- include_tasks: configure_pim_ports.yaml
+    - name: Configure Interfaces, PIM   #OK.$ #Role16 - Role Name: configure_pim_ports &
+      cisco.nxos.nxos_pim_interface:
+        interface: "{{ item.intf_name }}"
+        sparse: true
+      with_items:
+        - "{{ physical_interfaces }}"
+        - "{{ loopback_interfaces }}"
+      tags:
+        - configure_pim_ports

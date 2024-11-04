@@ -1,2 +1,61 @@
 ---
-- include_tasks: configure_vpc.yaml
+    - name: Configure VPC domain   #OK.$ #TESTED ON N5K, n6000-uk9-kickstart.7.3.13.N1.1.bin #Role13 - Role Name: vpc_config
+      cisco.nxos.nxos_vpc:
+        domain: "{{ vpc_domain }}"
+        pkl_dest: "{{ vpc_pkl_dest }}"
+        # pkl_src: "{{ vpc_pkl_src }}"
+        delay_restore: "{{ vpc_delay_restore }}"
+        auto_recovery_reload_delay: "{{ vpc_auto_recovery }}"
+      tags: vpc
+
+    # - name: Configure VPC domain   #OK.$ #Role13 - Role Name: vpc_config
+    #   cisco.nxos.nxos_config:
+    #     lines:
+    #       - peer-keepalive destination {{ vpc_pkl_dest }}
+    #       - delay restore {{vpc_delay_restore}}
+    #       - auto-recovery reload-delay {{vpc_auto_recovery}}
+    #     parents: vpc domain {{ vpc_domain }}
+    #     save_when: modified
+    #   tags:
+    #     - vpc_domain
+
+    - name: LEAF vpc peer link port channel configuration   #OK.$ #Role13 - Role Name: vpc_config
+      cisco.nxos.nxos_lag_interfaces:
+        config:
+          - name: "{{ vpc_po_id }}"
+            members:
+              - member: "Ethernet{{ item.vpc_pl_mem }}"
+                mode: "{{ vpc_po_mode }}"
+        state: merged
+      loop: "{{ vpc_pl_po_members }}"
+      tags:
+        - vpc_peerlink_pc
+
+    - name: vpc peerlink configuration   #OK.$ #Role13 - Role Name: vpc_config
+      cisco.nxos.nxos_vpc_interface:
+        portchannel: "{{ vpc_po_id }}"
+        peer_link: "{{ vpc_pl }}"
+        state: present
+      tags:
+        - vpc_pl_po
+
+    - name: vpc peerlink trunk configuration   #OK.$ #Role13 - Role Name: vpc_config
+      cisco.nxos.nxos_l2_interfaces:
+        config:
+          - name: "port-channel{{ vpc_po_id }}"
+            mode: "{{ vpc_pl_sw_mode }}"
+            trunk:
+              native_vlan: "{{ vpc_native_vlan }}"
+        state: merged
+      tags:
+        - vpc_pl_trunk
+
+    - name: leafs vpc peer-link enabling   #OK.$ #Role13 - Role Name: vpc_config
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: "Ethernet{{ item.vpc_pl_mem }}"
+            enabled: true
+        state: merged
+      loop: "{{ vpc_pl_po_members }}"
+      tags:
+        - vpc_pl_enable

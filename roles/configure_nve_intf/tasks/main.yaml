@@ -1,2 +1,33 @@
 ---
-- include_tasks: configure_nve_intf.yaml
+    - name: Configure NVE Interface for VXLAN   #OK.$ #Role20 - Role Name: configure_nve_intf
+      cisco.nxos.nxos_vxlan_vtep:
+        interface: "{{ nve_intf_name }}"
+        source_interface: "{{ nve_src_intf }}"
+        advertise_virtual_rmac: true
+        shutdown: "{{ nve_intf_status }}"
+        host_reachability: true
+        state: present
+      tags:
+        - configure_nve
+
+    - name: Configure VNIs for NVE vlans   #OK.$ #Role20 - Role Name: configure_nve_intf
+      cisco.nxos.nxos_vxlan_vtep_vni:
+        interface: "{{ nve_intf_name }}"
+        vni: "{{ item.vnid }}"
+        multicast_group: "{{ vrf_config | selectattr('vrf_name', 'equalto', item.vrf_name) | map(attribute='vrf_mcast_group') | first }}"
+        state: present
+        suppress_arp: true   #CHECK
+      with_items:
+        - "{{ l2vlans }}"
+        - "{{ l3vlans }}"
+      tags:
+        - configure_vlan_multicasts
+
+    - name: Configure VNIs for NVE vlans   #OK.$ #Role20 - Role Name: configure_nve_intf
+      cisco.nxos.nxos_vxlan_vtep_vni:
+        interface: "{{ nve_intf_name }}"
+        vni: "{{ item.vnid }}"
+        assoc_vrf: true
+      loop: "{{ vrf_config }}"
+      tags:
+        - configure_assoc_vrf

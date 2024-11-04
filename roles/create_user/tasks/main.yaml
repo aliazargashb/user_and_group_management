@@ -1,2 +1,8 @@
 ---
-- include_tasks: create_user.yaml
+    - name: Create user account   #OK.$ #Role5 - Role Name: create_user
+      cisco.nxos.nxos_user:
+        name: "{{ device_user }}"
+        configured_password: "{{ device_pass }}"
+        role: "{{ user_role }}"
+      tags:
+        - create_user
