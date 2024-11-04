@@ -1,0 +1,10 @@
+#OK.$
+features:   
+  - nv overlay
+  - ospf
+  - bgp
+  - pim
+  - interface-vlan
+  - vn-segment-vlan-based
+  - lacp
+  - tacacs+

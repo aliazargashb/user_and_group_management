@@ -1,0 +1,16 @@
+#OK.$
+vrf_config:
+  - vrf_name: "Tenant-1"
+    vlan_id: 200
+    vlan_name: "Tenant-1"
+    vnid: "1000200"
+    vrf_rd: "auto"
+    address_family: "ipv4"
+    vrf_mcast_group: 239.0.0.1
+  - vrf_name: "Tenant-2"
+    vlan_id: 201
+    vlan_name: "Tenant-2"
+    vnid: "1000201"
+    vrf_rd: "auto"
+    address_family: "ipv4"
+    vrf_mcast_group: 239.0.0.2
