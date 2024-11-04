@@ -1,3 +1,4 @@
+# REVISE THE PLAY AND MOVE THEM TO MAIN.YAML (DO IT FOR ALL PLAYS)
 ---
     - name: Configure BGP templates   #OK.$ #Role4 - Role Name: configure_bgp_spine
       cisco.nxos.nxos_bgp_templates:
