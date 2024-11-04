@@ -1,5 +1,5 @@
 ---
-- name: Enable necessary features   #OK.$ #Role1 - Role Name: enable_features
+- name: Enable necessary features   #OK.$
   cisco.nxos.nxos_feature:
     feature: "{{ item }}"
     state: enabled
@@ -7,7 +7,7 @@
   tags:
     - enable_features
   
-- name: Enable NV Overlay EVPN   #OK.$ #Role1 - Role Name: enable_features
+- name: Enable NV Overlay EVPN   #OK.$
   cisco.nxos.nxos_evpn_global:
     nv_overlay_evpn: true
   tags: evpn_feature

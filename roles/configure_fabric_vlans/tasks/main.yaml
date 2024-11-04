@@ -1,5 +1,5 @@
 ---
-    - name: Ensure VLANs are configured   #OK.$ #Role19 - Role Name: configure_fabric_vlans
+    - name: Ensure VLANs are configured   #OK.$
       cisco.nxos.nxos_vlans:
         config:
           - vlan_id: "{{ item.vlan_id }}"
@@ -12,7 +12,7 @@
       tags:
         - configure_vlans
 
-    - name: VNI configuration   #OK.$ #Role19 - Role Name: configure_fabric_vlans
+    - name: VNI configuration   #OK.$
       cisco.nxos.nxos_evpn_vni:
         vni: "{{ item.vnid }}"
         route_distinguisher: "{{ l2rd }}"
@@ -24,7 +24,7 @@
       tags:
         - l2evpn
 
-    - name: LEAF SVI Naming   #OK.$ #Role19 - Role Name: configure_fabric_vlans
+    - name: LEAF SVI Naming   #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "vlan{{ item.vlan_id }}"
@@ -36,7 +36,7 @@
       tags:
         - svi_naming
 
-    - name: LEAF SVI VRF Membership   #OK.$ #Role19 - Role Name: configure_fabric_vlans
+    - name: LEAF SVI VRF Membership   #OK.$
       cisco.nxos.nxos_vrf_interface:
         interface: "vlan{{ item.vlan_id }}"
         vrf: "{{ item.vrf_name }}"
@@ -45,7 +45,7 @@
       tags:
         - svi_vrf_mem
 
-    - name: LEAF SVI IP Address   #OK.$ #Role19 - Role Name: configure_fabric_vlans
+    - name: LEAF SVI IP Address   #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "vlan{{ item.vlan_id }}"

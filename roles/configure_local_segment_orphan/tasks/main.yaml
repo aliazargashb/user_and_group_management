@@ -1,20 +1,19 @@
-# Role for Configuring L2 Interfaces
 ---
-    - name: Configure L2 Interfaces to Servers-No Port-Channel   #OK.$ #Role12 - Role Name: local_segment_orphan
+    - name: Configure L2 Interfaces to Servers-No Port-Channel   #OK.$
       cisco.nxos.nxos_l2_interfaces:
         config:
           - name: "{{ item.intf_name }}"
             mode: "{{ item.switchport_mode }}"
             trunk:
               allowed_vlans: "{{ item.trunk_vlan }}"
-              native_vlan: "{{ native_vlan_id }}"   #CHECK
+              native_vlan: "{{ native_vlan_id }}"
         state: merged
       loop: "{{ server_interfaces }}"
       when: item.switchport_mode == 'trunk' and item.intf_po is not defined
       tags:
         - configure_l2_interfaces_trunk_nopo
 
-    - name: Configure L2 Interfaces to Servers-No Port-Channel   #OK.$ #Role12 - Role Name: local_segment_orphan
+    - name: Configure L2 Interfaces to Servers-No Port-Channel   #OK.$
       cisco.nxos.nxos_l2_interfaces:
         config:
           - name: "{{ item.intf_name }}"

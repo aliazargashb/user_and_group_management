@@ -76,7 +76,8 @@
       loop: "{{ bgp }}"
       tags: bgp_neighbor
 
-    - name: Border Leafs inbound prefix-lists   #OK.$ #standalone Cheked #Check #standalone Cheked
+# NEED To REVISE
+    - name: Border Leafs inbound prefix-lists   #OK.$
       cisco.nxos.nxos_prefix_lists:  
         config:
           - afi: ipv4
@@ -91,7 +92,8 @@
       loop: "{{ inbound_prefix_lists }}"
       tags: inbound_prefix_lists
 
-    - name: Border Leafs outbound prefix-lists   #OK.$ #standalone Cheked  #Check
+# NEED To REVISE
+    - name: Border Leafs outbound prefix-lists   #OK.$
       cisco.nxos.nxos_prefix_lists:  
         config:
           - afi: ipv4
@@ -106,7 +108,8 @@
       loop: "{{ outbound_prefix_lists }}"
       tags: outbound_prefix_lists
 
-    - name: Border Leafs route-maps   #OK.$ #standalone Cheked  #Check
+# NEED To REVISE
+    - name: Border Leafs route-maps   #OK.$
       cisco.nxos.nxos_route_maps:  
         config:
           - route_map: External_to_DC
@@ -130,7 +133,7 @@
         state: merged
       tags: bl_route_maps                            
 
-    - name: Configure BGP templates External   #OK.$ #standalone Cheked  #Check
+    - name: Configure BGP templates External   #OK.$
       cisco.nxos.nxos_bgp_templates:
         config:
           as_number: "{{ bgp_asn }}"
@@ -141,14 +144,14 @@
                 - afi: "ipv4"
                   safi: "unicast"
                   send_community: "extended"
-                  # route_map: WILL BE REMOVED
+                  # route_map: #WILL BE REMOVED
                   #   inbound: "{{ inbound_route_map }}"
                   #   outbound: "{{ outbound_route_map }}"
                   soft_reconfiguration_inbound:
                     always: true  
       tags: configure_bgp_template_ext
 
-    - name: Configure BGP Process and Neighbors External   #OK.$ #standalone Cheked  #Check
+    - name: Configure BGP Process and Neighbors External   #OK.$
       cisco.nxos.nxos_bgp_global:
         config:
           as_number: "{{ bgp_asn }}"
@@ -167,7 +170,7 @@
       loop: "{{ external_l3vlans }}"
       tags: configure_bgp_af_ext
 
-    - name: Configure BGP L3VNI VRFs External   #OK.$ #standalone Cheked  #Check
+    - name: Configure BGP L3VNI VRFs External   #OK.$
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"

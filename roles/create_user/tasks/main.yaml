@@ -1,5 +1,5 @@
 ---
-    - name: Create user account   #OK.$ #Role5 - Role Name: create_user
+    - name: Create user account   #OK.$
       cisco.nxos.nxos_user:
         name: "{{ device_user }}"
         configured_password: "{{ device_pass }}"

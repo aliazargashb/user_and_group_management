@@ -1,5 +1,5 @@
 ---
-    - name: Configure NVE Interface for VXLAN   #OK.$ #Role20 - Role Name: configure_nve_intf
+    - name: Configure NVE Interface for VXLAN   #OK.$
       cisco.nxos.nxos_vxlan_vtep:
         interface: "{{ nve_intf_name }}"
         source_interface: "{{ nve_src_intf }}"
@@ -10,20 +10,20 @@
       tags:
         - configure_nve
 
-    - name: Configure VNIs for NVE vlans   #OK.$ #Role20 - Role Name: configure_nve_intf
+    - name: Configure VNIs for NVE vlans   #OK.$
       cisco.nxos.nxos_vxlan_vtep_vni:
         interface: "{{ nve_intf_name }}"
         vni: "{{ item.vnid }}"
         multicast_group: "{{ vrf_config | selectattr('vrf_name', 'equalto', item.vrf_name) | map(attribute='vrf_mcast_group') | first }}"
         state: present
-        suppress_arp: true   #CHECK
+        suppress_arp: true
       with_items:
         - "{{ l2vlans }}"
         - "{{ l3vlans }}"
       tags:
         - configure_vlan_multicasts
 
-    - name: Configure VNIs for NVE vlans   #OK.$ #Role20 - Role Name: configure_nve_intf
+    - name: Configure VNIs for NVE vlans   #OK.$
       cisco.nxos.nxos_vxlan_vtep_vni:
         interface: "{{ nve_intf_name }}"
         vni: "{{ item.vnid }}"

@@ -1,5 +1,5 @@
 ---
-    - name: telemetry configuration destination_groups   #OK.$ #Role6 - Role Name: telemetry
+    - name: telemetry configuration destination_groups   #OK.$
       cisco.nxos.nxos_telemetry:
         config:
           # source_interface: "{{ telemetry_src_intf }}"
@@ -15,7 +15,7 @@
       tags:
         - telemetry_destination_groups
 
-    - name: telemetry configuration sensor_groups   #OK.$ #Role6 - Role Name: telemetry
+    - name: telemetry configuration sensor_groups   #OK.$
       cisco.nxos.nxos_telemetry:
         config:
           # source_interface: "{{ telemetry_src_intf }}"
@@ -30,7 +30,7 @@
       tags:
         - telemetry_sensor_groups
 
-    - name: telemetry configuration subscriptions   #OK.$ #Role6 - Role Name: telemetry
+    - name: telemetry configuration subscriptions   #OK.$
       cisco.nxos.nxos_telemetry:
         config:
           # source_interface: "{{ telemetry_src_intf }}"

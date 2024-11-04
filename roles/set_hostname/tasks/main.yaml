@@ -1,5 +1,5 @@
 ---
-    - name: Set Hostname   #OK.$ #Role4 - Role Name: set_hostname
+    - name: Set Hostname   #OK.$
       cisco.nxos.nxos_hostname:
         config:
           hostname: "{{ hostname }}"

@@ -1,18 +1,18 @@
 ---
-    - name: Configure LAG Interfaces   #OK.$ #Role11 - Role Name: local_segment_lag
+    - name: Configure LAG Interfaces   #OK.$
       cisco.nxos.nxos_lag_interfaces:
         config:
           - name: "{{ item.intf_po }}"
             members:
               - member: "{{ item.intf_name }}"
-                mode: "{{ item.intf_lag_mode }}"   #CHECK
+                mode: "{{ item.intf_lag_mode }}"
         state: merged
       loop: "{{ server_interfaces }}"
       when: item.intf_po is defined
       tags:
         - configure_lag_interfaces
 
-    - name: vpc-portchannel configuration   #OK.$ #Role11 - Role Name: local_segment_lag
+    - name: vpc-portchannel configuration   #OK.$
       cisco.nxos.nxos_vpc_interface:
         portchannel: "{{ item.intf_po }}"
         vpc: "{{ item.intf_po }}"
@@ -21,7 +21,7 @@
       tags:
         - vpc_po
 
-    - name: Configure L2 Interfaces to Servers   #OK.$ #Role11 - Role Name: local_segment_lag
+    - name: Configure L2 Interfaces to Servers   #OK.$
       cisco.nxos.nxos_l2_interfaces:
         config:
           - name: "port-channel{{ item.intf_po }}"
@@ -30,20 +30,20 @@
               vlan: "{{ item.access_vlan }}"
         state: merged
       loop: "{{ server_interfaces }}"
-      when: item.switchport_mode == 'access' and item.intf_po is defined   #CHECK
+      when: item.switchport_mode == 'access' and item.intf_po is defined
       tags:
         - configure_l2_interfaces_access
 
-    - name: Configure L2 Interfaces to Servers   #OK.$ #Role11 - Role Name: local_segment_lag
+    - name: Configure L2 Interfaces to Servers   #OK.$
       cisco.nxos.nxos_l2_interfaces:
         config:
           - name: "port-channel{{ item.intf_po }}"
             mode: "{{ item.switchport_mode }}"
             trunk:
               allowed_vlans: "{{ item.trunk_vlan }}"
-              native_vlan: "{{ native_vlan_id }}"   #CHECK
+              native_vlan: "{{ native_vlan_id }}"
         state: replaced
       loop: "{{ server_interfaces }}"
-      when: item.switchport_mode == 'trunk' and item.intf_po is defined   #CHECK
+      when: item.switchport_mode == 'trunk' and item.intf_po is defined
       tags:
         - configure_l2_interfaces_trunk

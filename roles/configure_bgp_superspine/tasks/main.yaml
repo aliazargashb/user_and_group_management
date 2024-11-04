@@ -1,5 +1,5 @@
 ---
-    - name: Configure BGP templates   #OK.$ #Role4 - Role Name: configure_bgp_superspine
+    - name: Configure BGP templates   #OK.$
       cisco.nxos.nxos_bgp_templates:
         config:
           as_number: "{{ bgp_asn }}"
@@ -19,7 +19,7 @@
       loop: "{{ bgp }}"
       tags: configure_bgp_template
 
-    - name: Configure BGP Process and Neighbors   #OK.$ #Role4 - Role Name: configure_bgp_superspine
+    - name: Configure BGP Process and Neighbors   #OK.$
       cisco.nxos.nxos_bgp_global:
         config:
           as_number: "{{ bgp_asn }}"
@@ -35,7 +35,7 @@
       loop: "{{ bgp }}"
       tags: configure_bgp_af
 
-    - name: Configure BGP neighbor   #OK.$ #Role4 - Role Name: configure_bgp_superspine
+    - name: Configure BGP neighbor   #OK.$
       cisco.nxos.nxos_bgp_neighbor_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -49,7 +49,7 @@
       loop: "{{ bgp }}"
       tags: bgp_neighbor
 
-    - name: Configure bgp route target   #OK.$ #Role4 - Role Name: configure_bgp_superspine
+    - name: Configure bgp route target   #OK.$
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -62,7 +62,7 @@
         state: merged
       tags: bgp_route_target
 
-    - name: Configure BGP Maximum Paths   #OK.$ #Role4 - Role Name: configure_bgp_superspine
+    - name: Configure BGP Maximum Paths   #OK.$
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -78,7 +78,7 @@
         state: merged
       tags: configure_bgp_max_path
 
-    - name: Configure Route-Map   #OK.$ #Role4 - Role Name: configure_bgp_superspine
+    - name: Configure Route-Map   #OK.$
       cisco.nxos.nxos_route_maps:
         config:
           - route_map: "{{ bgp_route_map }}"

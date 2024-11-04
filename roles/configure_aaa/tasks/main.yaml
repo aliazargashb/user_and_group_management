@@ -1,5 +1,5 @@
 ---
-    - name: Configure AAA   #OK.$ #Role2 - Role Name: aaa_config
+    - name: Configure AAA   #OK.$
       cisco.nxos.nxos_config:
         lines:
           - aaa authentication login default group {{ aaa_srv_grp }} local
@@ -14,7 +14,7 @@
       tags: 
         - aaa_config
 
-    - name: Configure TACACS   #OK.$ #Role2 - Role Name: aaa_config
+    - name: Configure TACACS   #OK.$
       cisco.nxos.nxos_config:
         lines:
           - server {{ tacacs_srv_host }}

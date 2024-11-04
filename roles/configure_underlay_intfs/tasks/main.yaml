@@ -1,6 +1,5 @@
-# Role for Configuring Interfaces (Underlay)
 ---
-    - name: Configure Loopback Interface Descriptions   #OK.$ #Role10 - Role Name: configure_underlay_intfs $ &
+    - name: Configure Loopback Interface Descriptions   #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -11,7 +10,7 @@
       tags:
         - configure_loopbacks
 
-    - name: Configure IP for Loopback   #OK.$ #Role10 - Role Name: configure_underlay_intfs $ &
+    - name: Configure IP for Loopback   #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -24,7 +23,7 @@
       tags:
         - configure_loopbacks_ip
 
-    - name: Configure Physical Ethernet Ports   #OK.$ #Role10 - Role Name: configure_underlay_intfs $ &
+    - name: Configure Physical Ethernet Ports   #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -37,7 +36,7 @@
       tags:
         - configure_ports
 
-    - name: Configure IP for Physical Ethernet Ports   #OK.$ #Role10 - Role Name: configure_underlay_intfs $ &
+    - name: Configure IP for Physical Ethernet Ports   #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"

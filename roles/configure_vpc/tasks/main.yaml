@@ -1,5 +1,5 @@
 ---
-    - name: Configure VPC domain   #OK.$ #TESTED ON N5K, n6000-uk9-kickstart.7.3.13.N1.1.bin #Role13 - Role Name: vpc_config
+    - name: Configure VPC domain   #OK.$ #TESTED ON N5K, n6000-uk9-kickstart.7.3.13.N1.1.bin
       cisco.nxos.nxos_vpc:
         domain: "{{ vpc_domain }}"
         pkl_dest: "{{ vpc_pkl_dest }}"
@@ -8,7 +8,7 @@
         auto_recovery_reload_delay: "{{ vpc_auto_recovery }}"
       tags: vpc
 
-    # - name: Configure VPC domain   #OK.$ #Role13 - Role Name: vpc_config
+    # - name: Configure VPC domain   #OK.$
     #   cisco.nxos.nxos_config:
     #     lines:
     #       - peer-keepalive destination {{ vpc_pkl_dest }}
@@ -19,7 +19,7 @@
     #   tags:
     #     - vpc_domain
 
-    - name: LEAF vpc peer link port channel configuration   #OK.$ #Role13 - Role Name: vpc_config
+    - name: LEAF vpc peer link port channel configuration   #OK.$
       cisco.nxos.nxos_lag_interfaces:
         config:
           - name: "{{ vpc_po_id }}"
@@ -31,7 +31,7 @@
       tags:
         - vpc_peerlink_pc
 
-    - name: vpc peerlink configuration   #OK.$ #Role13 - Role Name: vpc_config
+    - name: vpc peerlink configuration   #OK.$
       cisco.nxos.nxos_vpc_interface:
         portchannel: "{{ vpc_po_id }}"
         peer_link: "{{ vpc_pl }}"
@@ -39,7 +39,7 @@
       tags:
         - vpc_pl_po
 
-    - name: vpc peerlink trunk configuration   #OK.$ #Role13 - Role Name: vpc_config
+    - name: vpc peerlink trunk configuration   #OK.$
       cisco.nxos.nxos_l2_interfaces:
         config:
           - name: "port-channel{{ vpc_po_id }}"
@@ -50,7 +50,7 @@
       tags:
         - vpc_pl_trunk
 
-    - name: leafs vpc peer-link enabling   #OK.$ #Role13 - Role Name: vpc_config
+    - name: leafs vpc peer-link enabling   #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "Ethernet{{ item.vpc_pl_mem }}"

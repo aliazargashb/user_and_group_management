@@ -1,5 +1,5 @@
 ---
-    - name: Ensure VLANs are configured   #OK.$ #Role18 - Role Name: configure_tenant
+    - name: Ensure VLANs are configured   #OK.$
       cisco.nxos.nxos_vlans:
         config:
           - vlan_id: "{{ item.vlan_id }}"
@@ -11,7 +11,7 @@
       tags:
         - configure_tenant_l3vni
 
-    - name: Configure VRFs   #OK.$ #Role18 - Role Name: configure_tenant
+    - name: Configure VRFs   #OK.$
       cisco.nxos.nxos_vrf:
         aggregate:
           - name: "{{ item.vrf_name }}"
@@ -21,7 +21,7 @@
       tags:
         - configure_vrf
 
-    - name: LEAF tenants_svi naming configuration   #OK.$ #Role18 - Role Name: configure_tenant
+    - name: LEAF tenants_svi naming configuration   #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "vlan{{ item.vlan_id }}"
@@ -32,7 +32,7 @@
       tags:
         - tenant_svi_naming
 
-    - name: LEAF tenants_svi vrf membership configuration   #OK.$ #Role18 - Role Name: configure_tenant
+    - name: LEAF tenants_svi vrf membership configuration   #OK.$
       cisco.nxos.nxos_vrf_interface:
         interface: "vlan{{ item.vlan_id }}"
         vrf: "{{ item.vrf_name }}"
@@ -41,7 +41,7 @@
       tags:
         - tenant_vrf_mem
 
-    - name: LEAF tenants_svi ip forward configuration   #OK.$ #Role18 - Role Name: configure_tenant
+    - name: LEAF tenants_svi ip forward configuration   #OK.$
       cisco.nxos.nxos_interfaces:
         config:
           - name: "vlan{{ item.vlan_id }}"
@@ -52,7 +52,7 @@
       tags:
         - tenant_ip_forward
 
-    - name: Configure VRF_AF   #OK.$ #Role18 - Role Name: configure_tenant
+    - name: Configure VRF_AF   #OK.$
       cisco.nxos.nxos_vrf_af:
         afi: ipv4
         route_target_both_auto_evpn: true

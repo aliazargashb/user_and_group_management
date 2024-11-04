@@ -1,5 +1,5 @@
 ---
-    - name: Configure Interfaces, PIM   #OK.$ #Role16 - Role Name: configure_pim_ports &
+    - name: Configure Interfaces, PIM   #OK.$
       cisco.nxos.nxos_pim_interface:
         interface: "{{ item.intf_name }}"
         sparse: true

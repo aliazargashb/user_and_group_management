@@ -1,5 +1,5 @@
 ---
-    - name: Configure BGP templates   #OK.$ #Role17 - Role Name: configure_bgp_leaf
+    - name: Configure BGP templates   #OK.$
       cisco.nxos.nxos_bgp_templates:
         config:
           as_number: "{{ bgp_asn }}"
@@ -16,7 +16,7 @@
                   send_community: "extended"
       tags: configure_bgp_template
 
-    - name: Configure BGP Process and Neighbors   #OK.$ #Role17 - Role Name: configure_bgp_leaf
+    - name: Configure BGP Process and Neighbors   #OK.$
       cisco.nxos.nxos_bgp_global:
         config:
           as_number: "{{ bgp_asn }}"
@@ -32,7 +32,7 @@
       loop: "{{ bgp }}"
       tags: configure_bgp_af
 
-    - name: Configure BGP L3VNI VRFs   #OK.$ #Role17 - Role Name: configure_bgp_leaf
+    - name: Configure BGP L3VNI VRFs   #OK.$
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -47,7 +47,7 @@
       loop: "{{ l3vlans }}"
       tags: configure_bgp_vrf
 
-    - name: Advertise PIP in AF   #OK.$ #Role17 - Role Name: configure_bgp_leaf
+    - name: Advertise PIP in AF   #OK.$
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -58,7 +58,7 @@
         state: merged
       tags: adv_pip
 
-    - name: Configure BGP Maximum Paths   #OK.$ #Role17 - Role Name: configure_bgp_leaf
+    - name: Configure BGP Maximum Paths   #OK.$
       cisco.nxos.nxos_bgp_address_family:
         config:
           as_number: "{{ bgp_asn }}"
@@ -74,7 +74,7 @@
         state: merged
       tags: configure_bgp_max_path
 
-    - name: Configure BGP neighbor   #OK.$ #Role17 - Role Name: configure_bgp_leaf
+    - name: Configure BGP neighbor   #OK.$
       cisco.nxos.nxos_bgp_neighbor_address_family:
         config:
           as_number: "{{ bgp_asn }}"

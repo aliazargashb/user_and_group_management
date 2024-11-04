@@ -1,5 +1,5 @@
 ---
-    - name: Configure NTP   #OK.$ #Role3 - Role Name: ntp_config
+    - name: Configure NTP   #OK.$
       cisco.nxos.nxos_ntp_global:
         config:
           servers:
