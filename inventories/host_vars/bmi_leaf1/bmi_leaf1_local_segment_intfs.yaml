@@ -1,0 +1,23 @@
+#OK.$
+server_interfaces:
+  - intf_name: Ethernet1/6
+    intf_desc: "Tenant1_Subnet11-SRVs"
+    intf_status: true
+    switchport_mode: "access"
+    access_vlan: 11
+    intf_mode: "layer2"
+    intf_po: 11
+  - intf_name: Ethernet1/7
+    intf_desc: "Tenant1_Subnet12-SRVs"
+    intf_status: true
+    switchport_mode: "access"
+    access_vlan: 12
+    intf_mode: "layer2"
+    intf_po: 12
+  - intf_name: Ethernet1/5
+    intf_desc: "Tenant2_Subnet13-SRVs"
+    intf_status: true
+    switchport_mode: "access"
+    access_vlan: 13
+    intf_mode: "layer2"
+    intf_po: 13

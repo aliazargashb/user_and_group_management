@@ -1,0 +1,14 @@
+#OK.$
+bgp:
+ - neighbor_address: 10.0.0.101
+   bgp_peer_asn: 65101
+   bgp_neighbor_template: Leaf_Spine_Peering
+ - neighbor_address: 10.0.0.111
+   bgp_peer_asn: 65111
+   bgp_neighbor_template: Leaf_Spine_Peering
+ - neighbor_address: 10.0.0.2
+   bgp_peer_asn: 65000
+   bgp_neighbor_template: Spine_SuperSpine_Peering
+ - neighbor_address: 10.0.0.1
+   bgp_peer_asn: 65000
+   bgp_neighbor_template: Spine_SuperSpine_Peering
