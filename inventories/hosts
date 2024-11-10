@@ -8,6 +8,8 @@ all:
       hosts:
         bmi_superspine:
           ansible_host: 100.120.23.100
+        sic_internet:
+          ansible_host: 100.120.23.245
         bmi_spine1:
           ansible_host: 100.120.23.11
         bmi_spine2:
