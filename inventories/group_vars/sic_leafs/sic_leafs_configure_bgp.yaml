@@ -1,0 +1,7 @@
+#OK.$   #BIND TO THE SPINE VAR
+bgp_peer_asn: 65200
+
+#OK.$ 
+bgp:   #MUST CHANGE / BIND TO SPINE LOOPBACK0 IP
+  - bgp_neighbor_addr: 10.0.0.21
+  - bgp_neighbor_addr: 10.0.0.22
