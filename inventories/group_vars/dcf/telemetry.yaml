@@ -1,0 +1,34 @@
+#OK.$
+# telemetry_src_intf: "mgmt0" 
+telemetry_src_vrf: "management"
+
+#OK.$
+telemetry_destination_groups:
+  - dst_grp_id: 1
+    destination:
+      - dst_grp_ip: 192.168.100.1
+        dst_grp_port: 50001
+        dst_grp_protocol: gRPC
+        dst_grp_encoding: GPB
+  - dst_grp_id: 2
+    destination:
+      - dst_grp_ip: 192.168.100.2
+        dst_grp_port: 60001
+        dst_grp_protocol: gRPC
+        dst_grp_encoding: GPB
+
+#OK.$
+telemetry_sensor_groups:
+  - sns_grp_id: 1
+    sns_grp_data_src: DME
+    path:
+      - sns_grp_path_name: sys/ch
+        sns_grp_path_depth: unbounded
+
+#OK.$
+telemetry_subscriptions:
+  - sub_grp_id: 1
+    dst_grp_id: 2
+    sensor_group:
+      - sns_grp_id: 1
+        sub_interval: 1000

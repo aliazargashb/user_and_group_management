@@ -1,0 +1,6 @@
+#OK.$
+ospf_pro_id: underlay
+ospf_net_type: point-to-point
+
+#OK.$
+ospf_dci_area_id: 0.0.0.0 

@@ -1,50 +1,50 @@
 # ADD COMMENT
 
-#OK.$
+#OK.$ (dcf/tacacs_aaa.yaml)
 aaa_srv_grp: AAA_Servers
 
-#OK.$
+#OK.$ (dcf/tacacs_aaa.yaml)
 tacacs_srv_host: "172.27.0.1"
 tacacs_srv_key: key1
 
-#OK.$
+#OK.$ (dcf/dcf_configure_ospf.yaml)
 ospf_pro_id: underlay
 ospf_net_type: point-to-point
 
-#OK.$
+#OK.$ (dcf/configure_user.yaml)
 device_user: "admin"
 device_pass: "1qaz!QAZ"
 user_role: "network-admin"
 
-#OK.$
+#OK.$ (dcf/rest.yaml)
 ntp_server:
   - 192.168.95.96
   - 192.168.95.95
 
-#OK.$
+#OK.$ (dcf/rest.yaml)
 ntp_vrf: "management"
 
-#OK.$
+#OK.$ (dcf/rest.yaml)
 pim_rp_ip: "10.3.0.254"
 pim_mgroup: "239.0.0.0/8"
 
-#OK.$
+#OK.$ (dcf/telemetry.yaml)
 # telemetry_src_intf: "mgmt0" 
 telemetry_src_vrf: "management"
 
-#OK.$
+#OK.$ (dcf/rest.yaml)
 intf_mtu: 9216
 
-#OK.$
+#OK.$ (dcf/dcf_configure_ospf.yaml)
 ospf_dci_area_id: 0.0.0.0 
 
-#OK.$
+#OK.$ (dcf/dcf_configure_bgp.yaml)
 bgp_update_src: "loopback0"
 ebgp_multihop: 2
 peer_status: "false"
 bgp_maximum_path: 10
 
-#OK.$
+#OK.$ (dcf/telemetry.yaml)
 telemetry_destination_groups:
   - dst_grp_id: 1
     destination:
@@ -59,7 +59,7 @@ telemetry_destination_groups:
         dst_grp_protocol: gRPC
         dst_grp_encoding: GPB
 
-#OK.$
+#OK.$ (dcf/telemetry.yaml)
 telemetry_sensor_groups:
   - sns_grp_id: 1
     sns_grp_data_src: DME
@@ -67,7 +67,7 @@ telemetry_sensor_groups:
       - sns_grp_path_name: sys/ch
         sns_grp_path_depth: unbounded
 
-#OK.$
+#OK.$ (dcf/telemetry.yaml)
 telemetry_subscriptions:
   - sub_grp_id: 1
     dst_grp_id: 2
