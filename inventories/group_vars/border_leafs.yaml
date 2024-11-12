@@ -1,6 +1,6 @@
 # ADD COMMENT
 
-#OK.$
+#OK.$ (border_leaf/features.yaml)
 features:   
   - nv overlay
   - ospf
@@ -11,24 +11,24 @@ features:
   - lacp
   - tacacs+
 
-#OK.$
+#OK.$ (border_leaf/rest.yaml)
 anycast_gw_mac: "0000.0000.1111" 
 
-#OK.$
+#OK.$ (border_leaf/rest.yaml)
 l2rd: "auto"
 l2rt: "auto"
 
-#OK.$
+#OK.$ (border_leaf/rest.yaml)
 anycast_gw_mac_status: true
 
-#OK.$
+#OK.$ (border_leaf/rest.yaml)
 svi_status: true
 
-#OK.$
+#OK.$ (border_leaf/rest.yaml)
 ipforward: true
 
 
-#OK.$ (borderleafs/vlans.yaml)
+#OK.$ (border_leaf/vlans.yaml)
 l2vlans:
   - vlan_id: 11
     vlan_name: "Subnet-11"
@@ -46,7 +46,7 @@ l2vlans:
     vrf_name: Tenant-2
     bgp_prefix: 192.168.13.0/24
 
-#OK.$ (borderleafs/vlans.yaml)
+#OK.$ (border_leaf/vlans.yaml)
 l3vlans:
   - vlan_id: 11
     vlan_name: "Subnet-11"
@@ -70,7 +70,7 @@ l3vlans:
     vlan_id_subnet: 24
     bgp_prefix: 192.168.13.0/24
 
-#OK.$ (borderleafs/vrfs.yaml)
+#OK.$ (border_leaf/vrfs.yaml)
 vrf_config:
   - vrf_name: "Tenant-1"
     vlan_id: 200
@@ -87,17 +87,17 @@ vrf_config:
     address_family: "ipv4"
     vrf_mcast_group: 239.0.0.2
 
-#OK.$
+#OK.$ (border_leaf/nve.yaml)
 nve_intf_name: nve1
 
-#OK.$
+#OK.$ (border_leaf/nve.yaml)
 nve_src_intf: Loopback1
 nve_intf_status: false
 
 
 bgp_neighbor_template_bl: "External-L3FW-Fusion"
 
-# (borderleafs/vrfs.yaml) ---REVISE THE STRUCTURE, CHANGE TO prefix_lists
+# (border_leaf/vrfs.yaml) ---REVISE THE STRUCTURE, CHANGE TO prefix_lists
 inbound_prefix_lists:
     - prefix_list_seq: "10"
       prefix_list_seq_action: permit
@@ -106,7 +106,7 @@ inbound_prefix_lists:
       prefix_list_seq_action: permit
       prefix_list_prefixes: 0.0.0.0/0
 
-# (borderleafs/vrfs.yaml) ---REVISE THE STRUCTURE, CHANGE TO prefix_lists
+# (border_leaf/vrfs.yaml) ---REVISE THE STRUCTURE, CHANGE TO prefix_lists
 outbound_prefix_lists:
     - prefix_list_seq: "10"
       prefix_list_seq_action: permit
@@ -123,7 +123,7 @@ outbound_route_map: DC_to_External
 
 
 
-# (borderleafs/vrfs.yaml) ---REVISE THE STRUCTURE
+# (border_leaf/vrfs.yaml) ---REVISE THE STRUCTURE
 # prefix_lists:
 #     tenant1:
 #       inbound_pf:

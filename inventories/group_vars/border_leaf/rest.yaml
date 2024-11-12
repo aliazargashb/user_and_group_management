@@ -1,0 +1,15 @@
+#OK.$
+anycast_gw_mac: "0000.0000.1111" 
+
+#OK.$
+l2rd: "auto"
+l2rt: "auto"
+
+#OK.$
+anycast_gw_mac_status: true
+
+#OK.$
+svi_status: true
+
+#OK.$
+ipforward: true
