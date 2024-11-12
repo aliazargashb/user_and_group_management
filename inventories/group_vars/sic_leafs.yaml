@@ -1,12 +1,12 @@
 # ADD COMMENT
 
-#OK.$
+#OK.$ (sic_leafs/sic_leafs_configure_ospf.yaml)
 ospf_site_area_id: 0.0.0.2
 
-#OK.$   #BIND TO THE SPINE VAR
+#OK.$   #BIND TO THE SPINE VAR (sic_leafs/sic_leafs_configure_bgp.yaml)
 bgp_peer_asn: 65200
 
-#OK.$ 
+#OK.$ (sic_leafs/sic_leafs_configure_bgp.yaml)
 bgp:   #MUST CHANGE / BIND TO SPINE LOOPBACK0 IP
   - bgp_neighbor_addr: 10.0.0.21
   - bgp_neighbor_addr: 10.0.0.22
