@@ -1,0 +1,7 @@
+#OK.$
+bgp_peer_asn: 65100
+
+#OK.$
+bgp:
+  - bgp_neighbor_addr: 10.0.0.11
+  - bgp_neighbor_addr: 10.0.0.12
