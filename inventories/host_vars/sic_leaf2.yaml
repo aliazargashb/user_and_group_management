@@ -1,16 +1,16 @@
 # ADD COMMENT
 
-#OK.$
+#OK.$ (sic_leaf2/rest.yaml)
 hostname: sic_leaf2
 
-#OK.$
+#OK.$ (sic_leaf2/rest.yaml)
 bgp_asn: 65203
 
-#OK.$
+#OK.$ (sic_leaf2/vpc.yaml)
 vpc_domain: 2
 vpc_pkl_dest: "100.120.23.201"
 
-#OK.$
+#OK.$ (sic_leaf2/sic_leaf2_underlay_intfs.yaml)
 loopback_interfaces:
   - intf_name: Loopback0
     intf_ip: 10.0.0.203
@@ -23,7 +23,7 @@ loopback_interfaces:
     # ip_secondary: 10.2.2.2
     # sec_value: true
 
-#OK.$
+#OK.$ (sic_leaf2/sic_leaf2_underlay_intfs.yaml)
 physical_interfaces:
   - intf_name: Ethernet1/1
     intf_desc: "To_Spine-1"
@@ -38,7 +38,7 @@ physical_interfaces:
     intf_subnet: 30
     intf_mode: "layer3"
 
-#OK.$
+#OK.$ (sic_leaf2/sic_leaf2_local_segment_intfs.yaml)
 server_interfaces:
   - intf_name: Ethernet1/6
     intf_desc: "To_Subnet11-SRVs"
