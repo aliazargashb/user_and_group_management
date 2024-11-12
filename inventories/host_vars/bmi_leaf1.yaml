@@ -1,16 +1,16 @@
 # ADD COMMENT
 
-#OK.$
+#OK.$ (bmi_leaf1/rest.yaml)
 hostname: bmi_leaf1
 
-#OK.$
+#OK.$ (bmi_leaf1/rest.yaml)
 bgp_asn: 65101
 
-#OK.$
+#OK.$ (bmi_leaf1/vpc.yaml)
 vpc_domain: 1
 vpc_pkl_dest: "100.120.23.102"
 
-#OK.$
+#OK.$ (bmi_leaf1/bmi_leaf1_underlay_intfs.yaml)
 loopback_interfaces:
   - intf_name: Loopback0
     intf_ip: 10.0.0.101
@@ -23,7 +23,7 @@ loopback_interfaces:
     # ip_secondary: 10.2.2.1
     # sec_value: true
 
-#OK.$
+#OK.$ (bmi_leaf1/bmi_leaf1_underlay_intfs.yaml)
 physical_interfaces:
   - intf_name: Ethernet1/1
     intf_desc: "To_Spine-1"
@@ -38,7 +38,7 @@ physical_interfaces:
     intf_subnet: 30
     intf_mode: "layer3"
 
-#OK.$
+#OK.$ (bmi_leaf1/bmi_leaf1_local_segment_intfs.yaml)
 server_interfaces:
   - intf_name: Ethernet1/6
     intf_desc: "Tenant1_Subnet11-SRVs"
