@@ -28,19 +28,19 @@ svi_status: true
 #OK.$
 ipforward: true
 
-#OK.$
+#OK.$ (leafs/vpc.yaml)
 vpc_po_id: 1
 vpc_pl_sw_mode: trunk
 vpc_po_mode: active
 vpc_native_vlan: 3333
 vpc_pl: true
 
-#OK.$
+#OK.$ (leafs/vpc.yaml)
 vpc_pkl_src: mgmt0
 vpc_delay_restore: 150
 vpc_auto_recovery: 360
 
-#OK.$
+#OK.$ (leafs/vpc.yaml)
 vpc_pl_po_members:
   - vpc_pl_mem: "1/3"
   - vpc_pl_mem: "1/4"
