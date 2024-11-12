@@ -1,0 +1,6 @@
+#OK.$
+nve_intf_name: nve1
+
+#OK.$
+nve_src_intf: Loopback1
+nve_intf_status: false
