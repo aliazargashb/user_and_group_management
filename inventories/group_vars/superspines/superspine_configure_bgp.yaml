@@ -12,3 +12,11 @@ bgp:
  - neighbor_address: 10.0.0.12
    bgp_peer_asn: 65100
    bgp_neighbor_template: Spine_SuperSpine_Peering
+
+#OK.$
+bgp_asn: 65000
+
+# #OK.$
+bgp_route_map: Retain_NH_Addr
+bgp_route_map_seq: 10
+bgp_route_map_action: permit
