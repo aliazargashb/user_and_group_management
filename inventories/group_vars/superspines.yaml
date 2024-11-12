@@ -8,15 +8,15 @@ features:
   - pim
   - tacacs+
 
-#OK.$
+#OK.$ (superspines/superspine_configure_bgp.yaml)
 bgp_asn: 65000
 
-# #OK.$
+# #OK.$ (superspines/superspine_configure_bgp.yaml)
 bgp_route_map: Retain_NH_Addr
 bgp_route_map_seq: 10
 bgp_route_map_action: permit
 
-#OK.$ (superspines/configure_bgp.yaml)
+#OK.$ (superspines/superspine_configure_bgp.yaml)
 bgp:
  - neighbor_address: 10.0.0.21
    bgp_peer_asn: 65200
