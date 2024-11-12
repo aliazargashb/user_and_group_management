@@ -8,7 +8,7 @@ features:
   - pim
   - tacacs+
 
-#OK.$
+#OK.$ (spines/features.yaml)
 bgp_route_map: Retain_NH_Addr
 bgp_route_map_seq: 10
 bgp_route_map_action: permit
