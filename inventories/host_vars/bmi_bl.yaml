@@ -39,7 +39,8 @@ physical_interfaces:
     intf_ip: 10.0.1.170
     intf_subnet: 30
     intf_mode: "layer3"
-      
+
+# (bmi_bl/bmi_bl_external_connection.yaml)
 external_l2_interfaces:
   - intf_name: Ethernet1/6
     intf_desc: "BMI-DC-L3FW-1-Port1"
@@ -72,6 +73,7 @@ external_l2_interfaces:
   #   intf_mode: "layer2"
   #   # intf_po: 50
 
+# (bmi_bl/bmi_bl_external_connection.yaml)
 external_l3vlans:
   - vlan_id: 500
     vlan_name: "External-Tenant-1"
