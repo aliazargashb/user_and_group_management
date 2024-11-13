@@ -55,7 +55,7 @@
       tags:
         - configure_physical_ports_ip
 
-    - name: Configure OSPF   #OK.$ (Role Name: configure_ospf)
+    - name: Configure OSPF   #OK.$ (Role Name: configure_ospf_leaf)
       cisco.nxos.nxos_ospfv2:
         config:
           processes:
@@ -64,7 +64,7 @@
       tags:
         - configure_ospf
 
-    - name: Configure Interfaces, OSPF   #OK.$ (Role Name: configure_ospf)
+    - name: Configure Interfaces, OSPF   #OK.$ (Role Name: configure_ospf_leaf)
       cisco.nxos.nxos_ospf_interfaces:
         config:
           - name: "{{ item.intf_name }}"
