@@ -288,7 +288,7 @@
       loop: "{{ external_l3vlans }}"
       tags: configure_bgp_vrf_ext
 
-    - name: Ensure VLANs are configured   #OK.$ ---> !HERE! <---
+    - name: Ensure VLANs are configured   #OK.$
       cisco.nxos.nxos_vlans:
         config:
           - vlan_id: "{{ item.vlan_id }}"
@@ -431,7 +431,7 @@
       tags:
         - svi_ip
 
-    - name: Configure NVE Interface for VXLAN   #OK.$
+    - name: Configure NVE Interface for VXLAN   #OK.$ (Role Name: configure_nve_intf)
       cisco.nxos.nxos_vxlan_vtep:
         interface: "{{ nve_intf_name }}"
         source_interface: "{{ nve_src_intf }}"
@@ -441,7 +441,7 @@
       tags:
         - configure_nve
 
-    - name: Configure VNIs for NVE vlans   #OK.$
+    - name: Configure VNIs for NVE vlans   #OK.$ (Role Name: configure_nve_intf)
       cisco.nxos.nxos_vxlan_vtep_vni:
         interface: "{{ nve_intf_name }}"
         vni: "{{ item.vnid }}"
@@ -454,7 +454,7 @@
       tags:
         - configure_vlan_multicasts
 
-    - name: Configure VNIs for NVE vlans   #OK.$
+    - name: Configure VNIs for NVE vlans   #OK.$ (Role Name: configure_nve_intf)
       cisco.nxos.nxos_vxlan_vtep_vni:
         interface: "{{ nve_intf_name }}"
         vni: "{{ item.vnid }}"
@@ -463,7 +463,7 @@
       tags:
         - configure_assoc_vrf
 
-    - name: Configure LAG Interfaces   #OK.$
+    - name: Configure LAG Interfaces   #OK.$ (Role Name: configure_bl_local_segment_lag)
       cisco.nxos.nxos_lag_interfaces:
         config:
           - name: "{{ item.intf_po }}"
@@ -476,7 +476,7 @@
       tags:
         - configure_lag_interfaces
 
-    - name: Configure L2 Interfaces to Servers   #OK.$
+    - name: Configure L2 Interfaces to Servers   #OK.$ (Role Name: configure_bl_local_segment_lag)
       cisco.nxos.nxos_l2_interfaces:
         config:
           - name: "port-channel{{ item.intf_po }}"
@@ -489,7 +489,7 @@
       tags:
         - configure_l2_interfaces_access
 
-    - name: Configure L2 Interfaces to Servers   #OK.$
+    - name: Configure L2 Interfaces to Servers   #OK.$ (Role Name: configure_bl_local_segment_lag)
       cisco.nxos.nxos_l2_interfaces:
         config:
           - name: "port-channel{{ item.intf_po }}"
@@ -503,7 +503,7 @@
       tags:
         - configure_l2_interfaces_trunk
 
-    - name: Configure internal and external L2 Interfaces to Servers and Externals-No Port-Channel   #OK.$
+    - name: Configure internal and external L2 Interfaces to Servers and Externals-No Port-Channel   #OK.$ (Role Name: configure_bl_local_segment_orphan)
       cisco.nxos.nxos_l2_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -519,7 +519,7 @@
       tags:
         - configure_l2_interfaces_trunk_nopo
 
-    - name: Configure L2 Interfaces to Servers-No Port-Channel   #OK.$
+    - name: Configure L2 Interfaces to Servers-No Port-Channel   #OK.$ (Role Name: configure_bl_local_segment_orphan)
       cisco.nxos.nxos_l2_interfaces:
         config:
           - name: "{{ item.intf_name }}"
@@ -532,7 +532,7 @@
       tags:
         - configure_l2_interfaces_access_nopo
 
-    - name: Copy running config to startup config   #OK.$
+    - name: Copy running config to startup config   #OK.$ (Role Name: write_bck)
       cisco.nxos.nxos_config:
         backup: no
         save_when: always
