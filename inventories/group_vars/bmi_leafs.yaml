@@ -1,4 +1,4 @@
-# ADD COMMENT
+# the variables for bmi_leafs
 
 #OK.$ (bmi_leafs/bmi_leafs_configure_ospf.yaml)
 ospf_site_area_id: 0.0.0.1

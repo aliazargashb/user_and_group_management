@@ -1,3 +1,5 @@
+# the variables for bmi_leafs-bgp configuration
+
 #OK.$
 bgp_peer_asn: 65100
 
