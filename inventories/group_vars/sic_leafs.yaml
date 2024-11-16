@@ -1,4 +1,4 @@
-# ADD COMMENT
+# the variables for sic_leafs
 
 #OK.$ (sic_leafs/sic_leafs_configure_ospf.yaml)
 ospf_site_area_id: 0.0.0.2

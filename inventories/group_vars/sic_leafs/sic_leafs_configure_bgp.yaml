@@ -1,3 +1,5 @@
+# the variables for sic_leafs-bgp configuration
+
 #OK.$   #BIND TO THE SPINE VAR
 bgp_peer_asn: 65200
 
