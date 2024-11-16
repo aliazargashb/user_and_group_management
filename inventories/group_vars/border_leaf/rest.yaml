@@ -1,3 +1,5 @@
+# other variables include anycast_gw_mac, and so on
+
 #OK.$
 anycast_gw_mac: "0000.0000.1111" 
 

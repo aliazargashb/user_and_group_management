@@ -1,3 +1,5 @@
+# the variables for vrfs
+
 #OK.$
 vrf_config:
   - vrf_name: "Tenant-1"
