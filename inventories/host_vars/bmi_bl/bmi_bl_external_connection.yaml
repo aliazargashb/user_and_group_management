@@ -1,3 +1,5 @@
+# the variables for external connection
+
 external_l2_interfaces:
   - intf_name: Ethernet1/6
     intf_desc: "BMI-DC-L3FW-1-Port1"
