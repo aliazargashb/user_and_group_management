@@ -1,3 +1,5 @@
+# the variables for underlay interfaces
+
 #OK.$
 loopback_interfaces:
   - intf_name: Loopback0
