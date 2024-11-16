@@ -1,2 +1,4 @@
+# the variables for bmi_spines-bgp configuration
+
 #OK.$
 bgp_asn: 65100
