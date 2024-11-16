@@ -1,4 +1,4 @@
-# ADD COMMENT
+# the variables for sic_spines
 
 #OK.$ (sic_spines/sic_spines_configure_ospf.yaml)
 bgp_asn: 65200
