@@ -1,3 +1,5 @@
+# other variables include hostname and bgp_asn
+
 #OK.$
 hostname: sic_bl
 
