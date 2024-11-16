@@ -1,3 +1,5 @@
+# the variables for spines-bgp configuration
+
 #OK.$
 bgp_route_map: Retain_NH_Addr
 bgp_route_map_seq: 10

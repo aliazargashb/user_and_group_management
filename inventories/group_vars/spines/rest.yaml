@@ -1,3 +1,5 @@
+# other variables include anycast_rp_addr and rp_addr
+
 #OK.$
 anycast_rp_addr: 10.3.0.254
 rp_addr:
