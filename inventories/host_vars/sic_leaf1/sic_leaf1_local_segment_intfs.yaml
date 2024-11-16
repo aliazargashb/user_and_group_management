@@ -1,3 +1,5 @@
+# the avriables for local segment interfaces
+
 #OK.$
 server_interfaces:
   - intf_name: Ethernet1/6
