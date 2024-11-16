@@ -1,3 +1,5 @@
+# the variables for tacacs, aaa
+
 #OK.$
 aaa_srv_grp: AAA_Servers
 

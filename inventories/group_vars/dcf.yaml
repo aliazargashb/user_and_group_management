@@ -1,4 +1,4 @@
-# ADD COMMENT
+# the variables for dcf (all)
 
 #OK.$ (dcf/tacacs_aaa.yaml)
 aaa_srv_grp: AAA_Servers

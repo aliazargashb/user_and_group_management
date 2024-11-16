@@ -1,3 +1,5 @@
+# the variables for dcf-ospf configuration
+
 #OK.$
 ospf_pro_id: underlay
 ospf_net_type: point-to-point

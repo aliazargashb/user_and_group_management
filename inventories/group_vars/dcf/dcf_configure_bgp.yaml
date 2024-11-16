@@ -1,3 +1,5 @@
+# the variables for dcf-bgp configuration
+
 #OK.$
 bgp_update_src: "loopback0"
 ebgp_multihop: 2

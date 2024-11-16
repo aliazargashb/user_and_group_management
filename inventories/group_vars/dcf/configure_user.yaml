@@ -1,3 +1,5 @@
+# the variables for user configuration
+
 #OK.$
 device_user: "admin"
 device_pass: "1qaz!QAZ"

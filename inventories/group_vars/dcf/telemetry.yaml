@@ -1,3 +1,5 @@
+# the variables for telemetry
+
 #OK.$
 # telemetry_src_intf: "mgmt0" 
 telemetry_src_vrf: "management"

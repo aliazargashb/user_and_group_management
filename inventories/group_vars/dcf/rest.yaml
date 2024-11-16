@@ -1,3 +1,5 @@
+# other variables include intf_mtu, ntp_server, and so on
+
 #OK.$ (dcf/rest.yaml)
 intf_mtu: 9216
 
