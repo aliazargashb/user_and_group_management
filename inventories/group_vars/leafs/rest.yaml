@@ -1,3 +1,5 @@
+# other variables include native_vlan_id, and so on
+
 #CHECK
 native_vlan_id: 222
 

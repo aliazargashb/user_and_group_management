@@ -1,3 +1,5 @@
+# the variables for vpc
+
 #OK.$
 vpc_po_id: 1
 vpc_pl_sw_mode: trunk

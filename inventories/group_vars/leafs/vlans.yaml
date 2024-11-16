@@ -1,3 +1,5 @@
+# the variables for vlans
+
 #OK.$
 l2vlans:
   - vlan_id: 11

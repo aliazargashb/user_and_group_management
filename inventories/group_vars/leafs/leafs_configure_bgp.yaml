@@ -1,2 +1,4 @@
+# the variables for leafs-bgp configuration
+
 #OK.$
 bgp_neighbor_template: "Leaf_Spine_Peering"
