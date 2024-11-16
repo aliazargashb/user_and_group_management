@@ -1,3 +1,5 @@
+# the variables for ospf interfaces
+
 #OK.$
 to_site_ospf_intf:
   - intf_name: Ethernet1/1
