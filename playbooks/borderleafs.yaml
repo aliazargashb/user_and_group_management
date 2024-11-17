@@ -288,7 +288,7 @@
       loop: "{{ external_l3vlans }}"
       tags: configure_bgp_vrf_ext
 
-    - name: Ensure VLANs are configured   #OK.$
+    - name: Ensure VLANs are configured   #OK.$ (Role Name: configure_tenant_bl)
       cisco.nxos.nxos_vlans:
         config:
           - vlan_id: "{{ item.vlan_id }}"
@@ -300,7 +300,7 @@
       tags:
         - configure_tenant_l3vni
 
-    - name: Ensure External VLANs are configured   #OK.$
+    - name: Ensure External VLANs are configured   #OK.$ (Role Name: configure_tenant_bl)
       cisco.nxos.nxos_vlans:
         config:
           - vlan_id: "{{ item.vlan_id }}"
@@ -311,7 +311,7 @@
       tags:
         - configure_Tenants_to_External
 
-    - name: Configure VRFs   #OK.$
+    - name: Configure VRFs   #OK.$ (Role Name: configure_tenant_bl)
       cisco.nxos.nxos_vrf:
         aggregate:
           - name: "{{ item.vrf_name }}"
@@ -321,7 +321,7 @@
       tags:
         - configure_vrf
 
-    - name: LEAF tenants_svi naming configuration   #OK.$
+    - name: LEAF tenants_svi naming configuration   #OK.$ (Role Name: configure_tenant_bl)
       cisco.nxos.nxos_interfaces:
         config:
           - name: "vlan{{ item.vlan_id }}"
@@ -334,7 +334,7 @@
       tags:
         - tenants_and_external_svi_naming
 
-    - name: LEAF internal and external tenants_svi vrf membership configuration   #OK.$
+    - name: LEAF internal and external tenants_svi vrf membership configuration   #OK.$ (Role Name: configure_tenant_bl)
       cisco.nxos.nxos_vrf_interface:
         interface: "vlan{{ item.vlan_id }}"
         vrf: "{{ item.vrf_name }}"
@@ -345,7 +345,7 @@
       tags:
         - tenant_vrf_mem
 
-    - name: LEAF tenants_svi ip forward configuration   #OK.$
+    - name: LEAF tenants_svi ip forward configuration   #OK.$ (Role Name: configure_tenant_bl)
       cisco.nxos.nxos_interfaces:
         config:
           - name: "vlan{{ item.vlan_id }}"
@@ -356,7 +356,7 @@
       tags:
         - tenant_ip_forward
 
-    - name: Ensure VLANs are configured   #OK.$
+    - name: Ensure VLANs are configured   #OK.$ (Role Name: configure_fabric_vlans_bl)
       cisco.nxos.nxos_vlans:
         config:
           - vlan_id: "{{ item.vlan_id }}"
@@ -369,7 +369,7 @@
       tags:
         - configure_vlans
 
-    - name: Configure VRF_AF   #OK.$
+    - name: Configure VRF_AF   #OK.$ (Role Name: configure_tenant_bl)
       cisco.nxos.nxos_vrf_af:
         afi: ipv4
         route_target_both_auto_evpn: true
@@ -383,7 +383,7 @@
       tags:
         - configure_vrf_af
 
-    - name: VNI configuration   #OK.$
+    - name: VNI configuration   #OK.$ (Role Name: configure_fabric_vlans_bl)
       cisco.nxos.nxos_evpn_vni:
         vni: "{{ item.vnid }}"
         route_distinguisher: "{{ l2rd }}"
@@ -395,7 +395,7 @@
       tags:
         - l2evpn
 
-    - name: LEAF SVI Naming   #OK.$
+    - name: LEAF SVI Naming   #OK.$ (Role Name: configure_fabric_vlans_bl)
       cisco.nxos.nxos_interfaces:
         config:
           - name: "vlan{{ item.vlan_id }}"
@@ -407,7 +407,7 @@
       tags:
         - svi_naming
 
-    - name: LEAF internal and external SVI VRF Membership   #OK.$
+    - name: LEAF internal and external SVI VRF Membership   #OK.$ (Role Name: configure_fabric_vlans_bl)
       cisco.nxos.nxos_vrf_interface:
         interface: "vlan{{ item.vlan_id }}"
         vrf: "{{ item.vrf_name }}"
@@ -418,7 +418,7 @@
       tags:
         - svi_vrf_mem
 
-    - name: LEAF internal and external SVI IP Address   #OK.$
+    - name: LEAF internal and external SVI IP Address   #OK.$ (Role Name: configure_fabric_vlans_bl)
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "vlan{{ item.vlan_id }}"
