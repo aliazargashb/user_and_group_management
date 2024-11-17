@@ -11,6 +11,17 @@
       tags:
         - configure_tenant_l3vni
 
+    - name: Ensure External VLANs are configured   #OK.$
+      cisco.nxos.nxos_vlans:
+        config:
+          - vlan_id: "{{ item.vlan_id }}"
+            name: "{{ item.vlan_name }}"
+        state: merged
+      with_items:
+        - "{{ external_l3vlans }}"
+      tags:
+        - configure_Tenants_to_External
+
     - name: Configure VRFs   #OK.$
       cisco.nxos.nxos_vrf:
         aggregate:
@@ -28,16 +39,20 @@
             description: "{{ item.vlan_name }}"
             enabled: true
         state: merged
-      loop: "{{ vrf_config }}"
+      with_items: 
+        - "{{ vrf_config }}"
+        - "{{ external_l3vlans }}"
       tags:
-        - tenant_svi_naming
+        - tenants_and_external_svi_naming
 
-    - name: LEAF tenants_svi vrf membership configuration   #OK.$
+    - name: LEAF internal and external tenants_svi vrf membership configuration   #OK.$
       cisco.nxos.nxos_vrf_interface:
         interface: "vlan{{ item.vlan_id }}"
         vrf: "{{ item.vrf_name }}"
         state: present
-      loop: "{{ vrf_config }}"
+      with_items: 
+        - "{{ vrf_config }}"
+        - "{{ external_l3vlans }}"
       tags:
         - tenant_vrf_mem
 
@@ -51,31 +66,3 @@
       loop: "{{ vrf_config }}"
       tags:
         - tenant_ip_forward
-
-    - name: Configure VRF_AF   #OK.$
-      cisco.nxos.nxos_vrf_af:
-        afi: ipv4
-        route_target_both_auto_evpn: true
-        route_targets:
-          - direction: both
-            rt: auto
-            state: present
-        state: present
-        vrf: "{{ item.vrf_name }}"
-      loop: "{{ vrf_config }}"
-      tags:
-        - configure_vrf_af
-
-    - name: Configure VRF_AF   #OK.$
-      cisco.nxos.nxos_vrf_af:
-        afi: ipv4
-        route_target_both_auto_evpn: true
-        route_targets:
-          - direction: both
-            rt: auto
-            state: present
-        state: present
-        vrf: "{{ item.vrf_name }}"
-      loop: "{{ vrf_config }}"
-      tags:
-        - configure_vrf_af
