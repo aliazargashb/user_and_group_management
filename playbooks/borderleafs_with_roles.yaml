@@ -38,4 +38,10 @@
         name: configure_bgp_borderleaf
 
     - import_role:
+        name: configure_tenant_bl
+
+    - import_role:
+        name: configure_fabric_vlans_bl
+
+    - import_role:
         name: write_bck
