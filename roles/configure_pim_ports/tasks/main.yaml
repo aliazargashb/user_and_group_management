@@ -3,8 +3,8 @@
       cisco.nxos.nxos_pim_interface:
         interface: "{{ item.intf_name }}"
         sparse: true
-      with_items:
-        - "{{ physical_interfaces }}"
-        - "{{ loopback_interfaces }}"
+      # with_items:
+      #   - "{{ physical_interfaces }}"
+      #   - "{{ loopback_interfaces }}"
       tags:
         - configure_pim_ports

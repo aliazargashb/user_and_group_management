@@ -8,26 +8,35 @@
     ansible_network_os: cisco.nxos.nxos
   
   tasks:
-    - import_role:
+    - import_role: #LOOP INSIDE
         name: configure_underlay_intfs
 
-    - import_role:
+    - import_role: #LOOP INSIDE
         name: configure_ospf_leaf
 
-    - import_role:
+    - import_role: #NO LOOP
         name: configure_anycast_gw
 
-    - import_role:
+    - import_role: #NO LOOP
         name: configure_pim_multicast
 
-    - import_role:
+    - import_role: #LOOP OUTSIDE
         name: configure_pim_ports
+      with_items:
+        - "{{ physical_interfaces }}"
+        - "{{ loopback_interfaces }}"
 
-    - import_role:
+    - import_role: #LOOP INSIDE
         name: configure_bgp_borderleaf
 
-    - import_role:
+    - import_role: #LOOP INSIDE
         name: configure_nve_intf
+
+    - import_role: #LOOP INSIDE
+        name: configure_tenant_bl
+
+    - import_role: #LOOP INSIDE
+        name: configure_fabric_vlans_bl
 
     - import_role:
         name: configure_bl_local_segment_lag
@@ -35,14 +44,5 @@
     - import_role:
         name: configure_bl_local_segment_orphan
 
-    - import_role:
-        name: configure_bgp_borderleaf
-
-    - import_role:
-        name: configure_tenant_bl
-
-    - import_role:
-        name: configure_fabric_vlans_bl
-
-    - import_role:
+    - import_role: #NO LOOP
         name: write_bck

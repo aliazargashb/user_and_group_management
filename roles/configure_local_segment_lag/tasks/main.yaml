@@ -7,7 +7,7 @@
               - member: "{{ item.intf_name }}"
                 mode: "{{ item.intf_lag_mode }}"
         state: merged
-      loop: "{{ server_interfaces }}"
+      # loop: "{{ server_interfaces }}"
       when: item.intf_po is defined
       tags:
         - configure_lag_interfaces
@@ -17,7 +17,7 @@
         portchannel: "{{ item.intf_po }}"
         vpc: "{{ item.intf_po }}"
         state: present
-      loop: "{{ server_interfaces }}"
+      # loop: "{{ server_interfaces }}"
       tags:
         - vpc_po
 
@@ -29,7 +29,7 @@
             access:
               vlan: "{{ item.access_vlan }}"
         state: merged
-      loop: "{{ server_interfaces }}"
+      # loop: "{{ server_interfaces }}"
       when: item.switchport_mode == 'access' and item.intf_po is defined
       tags:
         - configure_l2_interfaces_access
@@ -43,7 +43,7 @@
               allowed_vlans: "{{ item.trunk_vlan }}"
               native_vlan: "{{ native_vlan_id }}"
         state: replaced
-      loop: "{{ server_interfaces }}"
+      # loop: "{{ server_interfaces }}"
       when: item.switchport_mode == 'trunk' and item.intf_po is defined
       tags:
         - configure_l2_interfaces_trunk

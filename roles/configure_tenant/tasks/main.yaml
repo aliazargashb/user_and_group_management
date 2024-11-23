@@ -6,8 +6,8 @@
             name: "{{ item.vlan_name }}"
             mapped_vni: "{{ item.vnid }}"
         state: merged
-      with_items:
-        - "{{ vrf_config }}"
+      # with_items:
+      #   - "{{ vrf_config }}"
       tags:
         - configure_tenant_l3vni
 
@@ -17,7 +17,7 @@
           - name: "{{ item.vrf_name }}"
             vni: "{{ item.vnid }}"
             rd: "{{ item.vrf_rd }}"
-      loop: "{{ vrf_config }}"
+      # loop: "{{ vrf_config }}"
       tags:
         - configure_vrf
 
@@ -28,7 +28,7 @@
             description: "{{ item.vlan_name }}"
             enabled: true
         state: merged
-      loop: "{{ vrf_config }}"
+      # loop: "{{ vrf_config }}"
       tags:
         - tenant_svi_naming
 
@@ -37,7 +37,7 @@
         interface: "vlan{{ item.vlan_id }}"
         vrf: "{{ item.vrf_name }}"
         state: present
-      loop: "{{ vrf_config }}"
+      # loop: "{{ vrf_config }}"
       tags:
         - tenant_vrf_mem
 
@@ -48,7 +48,7 @@
             ip_forward: "{{ ipforward }}"
             enabled: true
         state: merged
-      loop: "{{ vrf_config }}"
+      # loop: "{{ vrf_config }}"
       tags:
         - tenant_ip_forward
 
@@ -62,7 +62,7 @@
             state: present
         state: present
         vrf: "{{ item.vrf_name }}"
-      loop: "{{ vrf_config }}"
+      # loop: "{{ vrf_config }}"
       tags:
         - configure_vrf_af
 
@@ -76,6 +76,6 @@
             state: present
         state: present
         vrf: "{{ item.vrf_name }}"
-      loop: "{{ vrf_config }}"
+      # loop: "{{ vrf_config }}"
       tags:
         - configure_vrf_af

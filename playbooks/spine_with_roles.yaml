@@ -7,17 +7,17 @@
     ansible_network_os: cisco.nxos.nxos
 
   tasks:
-    - import_role:
+    - import_role: #LOOP INSIDE
         name: configure_underlay_intfs
 
-    - import_role:
+    - import_role: #NO LOOP
         name: configure_pim_multicast
 
-    - import_role:
+    - import_role: #LOOP INSIDE
         name: configure_ospf_spine
 
-    - import_role:
+    - import_role: #LOOP INSIDE
         name: configure_bgp_spine
 
-    - import_role:
+    - import_role: #NO LOOP
         name: write_bck
