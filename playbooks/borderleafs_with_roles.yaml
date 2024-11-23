@@ -38,10 +38,11 @@
     - import_role: #LOOP INSIDE
         name: configure_fabric_vlans_bl
 
-    - import_role:
+    - import_role: #LOOP OUTSIDE
         name: configure_bl_local_segment_lag
+      loop: "{{ server_interfaces }}"
 
-    - import_role:
+    - import_role: #LOOP INSIDE
         name: configure_bl_local_segment_orphan
 
     - import_role: #NO LOOP
