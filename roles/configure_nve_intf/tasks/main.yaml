@@ -16,7 +16,7 @@
         vni: "{{ item.vnid }}"
         multicast_group: "{{ vrf_config | selectattr('vrf_name', 'equalto', item.vrf_name) | map(attribute='vrf_mcast_group') | first }}"
         state: present
-        suppress_arp: true
+        # suppress_arp: true
       with_items:
         - "{{ l2vlans }}"
         - "{{ l3vlans }}"

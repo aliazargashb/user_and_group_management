@@ -1,0 +1,58 @@
+# the data for inbound and outbound prefix-lists/route-maps
+
+#OK.$
+nve_intf_name: nve1
+
+#OK.$
+nve_src_intf: Loopback1
+nve_intf_status: false
+
+# # (border_leaf/vrfs.yaml) ---REVISE THE STRUCTURE, CHANGE TO prefix_lists
+# inbound_prefix_lists:
+#     - prefix_list_seq: "10"
+#       prefix_list_seq_action: permit
+#       prefix_list_prefixes: 172.18.12.0/24
+#     - prefix_list_seq: "20"
+#       prefix_list_seq_action: permit
+#       prefix_list_prefixes: 0.0.0.0/0
+
+# # (border_leaf/vrfs.yaml) ---REVISE THE STRUCTURE, CHANGE TO prefix_lists
+# outbound_prefix_lists:
+#     - prefix_list_seq: "10"
+#       prefix_list_seq_action: permit
+#       prefix_list_prefixes: 192.168.11.0/24
+#     - prefix_list_seq: "20"
+#       prefix_list_seq_action: permit
+#       prefix_list_prefixes: 192.168.12.0/24
+#     - prefix_list_seq: "30"
+#       prefix_list_seq_action: permit
+#       prefix_list_prefixes: 192.168.13.0/24
+
+inbound_route_map: External_to_DC
+outbound_route_map: DC_to_External
+
+
+prefix_lists_data:
+  - name: External_to_DC
+    description: External_to_DC_Prefixes
+    type: inbound
+    entries:
+      - prefix_list_seq: 10
+        prefix_list_seq_action: permit
+        prefix_list_prefixes: 172.16.0.0/12
+      - prefix_list_seq: 20
+        prefix_list_seq_action: permit
+        prefix_list_prefixes: 0.0.0.0/0
+  - name: DC_to_External
+    description: DC_to_External_Prefixes
+    type: outbound
+    entries:
+      - prefix_list_seq: 10
+        prefix_list_seq_action: permit
+        prefix_list_prefixes: 192.168.11.0/24
+      - prefix_list_seq: 20
+        prefix_list_seq_action: permit
+        prefix_list_prefixes: 192.168.12.0/24
+      - prefix_list_seq: 30
+        prefix_list_seq_action: permit
+        prefix_list_prefixes: 192.168.13.0/24

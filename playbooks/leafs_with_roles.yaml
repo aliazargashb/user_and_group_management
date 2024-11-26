@@ -7,8 +7,8 @@
     ansible_network_os: cisco.nxos.nxos
 
   tasks:
-    - import_role: #LOOP INSIDE
-        name: configure_vpc
+    # - import_role: #LOOP INSIDE
+    #     name: configure_vpc
 
     - import_role: #LOOP INSIDE
         name: configure_underlay_intfs
@@ -22,7 +22,7 @@
     - import_role: #NO LOOP
         name: configure_pim_multicast
 
-    - import_role: #LOOP OUTSIDE
+    - include_role: #LOOP OUTSIDE
         name: configure_pim_ports
       with_items:
         - "{{ physical_interfaces }}"
@@ -31,7 +31,7 @@
     - import_role: #LOOP INSIDE
         name: configure_bgp_leaf
 
-    - import_role: #LOOP OUTSIDE
+    - include_role: #LOOP OUTSIDE
         name: configure_tenant
       loop: "{{ vrf_config }}"
 
@@ -41,11 +41,13 @@
     - import_role: #LOOP INSIDE
         name: configure_nve_intf
 
-    - import_role: #LOOP OUTSIDE
+    - include_role: #LOOP OUTSIDE
         name: configure_local_segment_lag
       loop: "{{ server_interfaces }}"
-
-    - import_role: #LOOP OUTSIDE
+      tags:
+        - configure_lag_interfaces
+        
+    - include_role: #LOOP OUTSIDE
         name: configure_local_segment_orphan
       loop: "{{ server_interfaces }}"
 
