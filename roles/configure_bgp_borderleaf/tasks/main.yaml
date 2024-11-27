@@ -1,3 +1,202 @@
+    - name: Configure BGP templates   #OK.$ (Role Name: configure_bgp_borderleaf)
+      cisco.nxos.nxos_bgp_templates:
+        config:
+          as_number: "{{ bgp_asn }}"
+          neighbor:
+            - name: "{{ bgp_neighbor_template }}"
+              update_source: "{{ bgp_update_src }}"
+              ebgp_multihop: "{{ ebgp_multihop }}"
+              address_family:
+                - afi: "ipv4"
+                  safi: "unicast"
+                  send_community: "extended"
+                - afi: "l2vpn"
+                  safi: "evpn"
+                  send_community: "extended"
+      tags: configure_bgp_template
+
+    - name: Configure BGP Process and Neighbors   #OK.$ (Role Name: configure_bgp_borderleaf)
+      cisco.nxos.nxos_bgp_global:
+        config:
+          as_number: "{{ bgp_asn }}"
+          log_neighbor_changes: true
+          router_id: "{{ loopback_interfaces | selectattr('intf_name', 'match', 'Loopback0') | map(attribute='intf_ip') | first}}"
+          neighbors:
+            - neighbor_address: "{{ item.bgp_neighbor_addr }}"
+              remote_as: "{{ bgp_peer_asn }}"
+              inherit:
+                peer: "{{ bgp_neighbor_template }}"
+              shutdown: "{{ peer_status }}"
+        state: merged
+      loop: "{{ bgp }}"
+      tags: configure_bgp_af
+
+    - name: Configure BGP L3VNI VRFs   #OK.$ (Role Name: configure_bgp_borderleaf)
+      cisco.nxos.nxos_bgp_address_family:
+        config:
+          as_number: "{{ bgp_asn }}"
+          address_family:
+            - vrf: "{{ item.vrf_name }}"
+              afi: ipv4
+              safi: unicast
+              networks:
+                - prefix: "{{ item.bgp_prefix }}"
+              advertise_l2vpn_evpn: true              
+        state: merged
+      loop: "{{ l3vlans }}"
+      tags: configure_bgp_vrf
+
+    - name: Configure BGP Maximum Paths   #OK.$ (Role Name: configure_bgp_borderleaf)
+      cisco.nxos.nxos_bgp_address_family:
+        config:
+          as_number: "{{ bgp_asn }}"
+          address_family:
+            - afi: l2vpn
+              safi: evpn
+              maximum_paths:
+                parallel_paths: "{{ bgp_maximum_path }}"
+            - afi: ipv4
+              safi: unicast
+              maximum_paths:
+                parallel_paths: "{{ bgp_maximum_path }}"
+        state: merged
+      tags: configure_bgp_max_path
+
+    - name: Configure BGP neighbor   #OK.$ (Role Name: configure_bgp_borderleaf)
+      cisco.nxos.nxos_bgp_neighbor_address_family:
+        config:
+          as_number: "{{ bgp_asn }}"
+          neighbors:
+            - neighbor_address: "{{ item.bgp_neighbor_addr }}"
+              address_family:
+                - afi: l2vpn
+                  safi: evpn
+                  rewrite_evpn_rt_asn: true
+        state: merged
+      loop: "{{ bgp }}"
+      tags: bgp_neighbor
+
+    - name: Configure Border Leafs Prefix-Lists
+      cisco.nxos.nxos_prefix_lists:
+        config:
+          - afi: ipv4
+            prefix_lists:
+              - name: "{{ item.0.name }}"
+                description: "{{ item.0.description }}"
+                entries:
+                - sequence: "{{ item.1.prefix_list_seq }}"
+                  action: "{{ item.1.prefix_list_seq_action }}"
+                  prefix: "{{ item.1.prefix_list_prefixes }}"
+        state: merged
+      loop: "{{ prefix_lists_data | subelements('entries') }}"
+      tags: configure_prefix_lists
+
+    # - name: Border Leafs inbound prefix-lists   #OK.$ (Role Name: configure_bgp_borderleaf)
+    #   cisco.nxos.nxos_prefix_lists:  
+    #     config:
+    #       - afi: ipv4
+    #         prefix_lists:
+    #           - name: External_to_DC
+    #             description: External_to_DC_Prefixes
+    #             entries:
+    #             - sequence: "{{ item.prefix_list_seq }}"
+    #               action: "{{ item.prefix_list_seq_action }}"
+    #               prefix: "{{ item.prefix_list_prefixes }}"
+    #     state: merged
+    #   loop: "{{ inbound_prefix_lists }}"
+    #   tags: inbound_prefix_lists
+
+    # - name: Border Leafs outbound prefix-lists   #OK.$ (Role Name: configure_bgp_borderleaf)
+    #   cisco.nxos.nxos_prefix_lists:  
+    #     config:
+    #       - afi: ipv4
+    #         prefix_lists:
+    #           - name: DC_to_External
+    #             description: DC_to_External_Prefixes
+    #             entries:
+    #             - sequence: "{{ item.prefix_list_seq }}"
+    #               action: "{{ item.prefix_list_seq_action }}"
+    #               prefix: "{{ item.prefix_list_prefixes }}"
+    #     state: merged
+    #   loop: "{{ outbound_prefix_lists }}"
+    #   tags: outbound_prefix_lists
+
+    - name: Border Leafs route-maps   #OK.$ (Role Name: configure_bgp_borderleaf)
+      cisco.nxos.nxos_route_maps:  
+        config:
+          - route_map: External_to_DC
+            entries:
+              - sequence: 10
+                action: permit
+                description: External_to_DC_route-maps
+                match:
+                  ip:
+                    address:
+                      prefix_lists: External_to_DC
+          - route_map: DC_to_External
+            entries:
+              - sequence: 10
+                action: permit
+                description: DC_to_External_route-maps
+                match:
+                  ip:
+                    address:
+                      prefix_lists: DC_to_External
+        state: merged
+      tags: bl_route_maps                            
+
+    - name: Configure BGP templates External   #OK.$ (Role Name: configure_bgp_borderleaf)
+      cisco.nxos.nxos_bgp_templates:
+        config:
+          as_number: "{{ bgp_asn }}"
+          neighbor:
+            - name: "{{ bgp_neighbor_template_bl }}"
+              ebgp_multihop: "{{ ebgp_multihop }}"
+              address_family:
+                - afi: "ipv4"
+                  safi: "unicast"
+                  send_community: "extended"
+                  route_map:
+                    inbound: "{{ inbound_route_map }}"
+                    outbound: "{{ outbound_route_map }}"
+                  soft_reconfiguration_inbound:
+                    always: true  
+      tags: configure_bgp_template_ext
+
+    - name: Configure BGP Process and Neighbors External   #OK.$ (Role Name: configure_bgp_borderleaf)
+      cisco.nxos.nxos_bgp_global:
+        config:
+          as_number: "{{ bgp_asn }}"
+          log_neighbor_changes: true
+          vrfs:
+            - vrf: "{{ item.vrf_name }}"
+              neighbors:
+                - neighbor_address: "{{ item.bgp_neighbor_addr_ext }}"
+                  update_source: "{{ item.bgp_update_src_ext }}"
+                  remote_as: "{{ item.bgp_peer_asn_ext }}"
+                  inherit:
+                    peer: "{{ bgp_neighbor_template_bl }}"
+                  shutdown: "{{ peer_status }}"           
+              router_id: "{{ loopback_interfaces | selectattr('intf_name', 'match', 'Loopback0') | map(attribute='intf_ip') | first}}"
+        state: merged
+      loop: "{{ external_l3vlans }}"
+      tags: configure_bgp_af_ext
+
+    - name: Configure BGP L3VNI VRFs External   #OK.$ (Role Name: configure_bgp_borderleaf)
+      cisco.nxos.nxos_bgp_address_family:
+        config:
+          as_number: "{{ bgp_asn }}"
+          address_family:
+            - vrf: "{{ item.vrf_name }}"
+              afi: ipv4
+              safi: unicast
+              advertise_l2vpn_evpn: true
+              maximum_paths:
+                parallel_paths: "{{ bgp_maximum_path }}"              
+        state: merged
+      loop: "{{ external_l3vlans }}"
+      tags: configure_bgp_vrf_ext
+
     - name: Configure BGP templates   #OK.$
       cisco.nxos.nxos_bgp_templates:
         config:
@@ -41,10 +240,23 @@
               safi: unicast
               networks:
                 - prefix: "{{ item.bgp_prefix }}"
-              advertise_l2vpn_evpn: true              
+              advertise_l2vpn_evpn: true
+              maximum_paths:
+                parallel_paths: "{{ bgp_maximum_path }}"                      
         state: merged
       loop: "{{ l3vlans }}"
       tags: configure_bgp_vrf
+
+    - name: Advertise PIP in AF   #OK.$
+      cisco.nxos.nxos_bgp_address_family:
+        config:
+          as_number: "{{ bgp_asn }}"
+          address_family:
+            - afi: l2vpn
+              safi: evpn
+              advertise_pip: true
+        state: merged
+      tags: adv_pip
 
     - name: Configure BGP Maximum Paths   #OK.$
       cisco.nxos.nxos_bgp_address_family:
@@ -75,112 +287,3 @@
         state: merged
       loop: "{{ bgp }}"
       tags: bgp_neighbor
-
-# NEED To REVISE
-    - name: Border Leafs inbound prefix-lists   #OK.$
-      cisco.nxos.nxos_prefix_lists:  
-        config:
-          - afi: ipv4
-            prefix_lists:
-              - name: External_to_DC
-                description: External_to_DC_Prefixes
-                entries:
-                - sequence: "{{ item.prefix_list_seq }}"
-                  action: "{{ item.prefix_list_seq_action }}"
-                  prefix: "{{ item.prefix_list_prefixes }}"
-        state: merged
-      loop: "{{ inbound_prefix_lists }}"
-      tags: inbound_prefix_lists
-
-# NEED To REVISE
-    - name: Border Leafs outbound prefix-lists   #OK.$
-      cisco.nxos.nxos_prefix_lists:  
-        config:
-          - afi: ipv4
-            prefix_lists:
-              - name: DC_to_External
-                description: DC_to_External_Prefixes
-                entries:
-                - sequence: "{{ item.prefix_list_seq }}"
-                  action: "{{ item.prefix_list_seq_action }}"
-                  prefix: "{{ item.prefix_list_prefixes }}"
-        state: merged
-      loop: "{{ outbound_prefix_lists }}"
-      tags: outbound_prefix_lists
-
-# NEED To REVISE
-    - name: Border Leafs route-maps   #OK.$
-      cisco.nxos.nxos_route_maps:  
-        config:
-          - route_map: External_to_DC
-            entries:
-              - sequence: 10
-                action: permit
-                description: External_to_DC_route-maps
-                match:
-                  ip:
-                    address:
-                      prefix_lists: External_to_DC
-          - route_map: DC_to_External
-            entries:
-              - sequence: 10
-                action: permit
-                description: DC_to_External_route-maps
-                match:
-                  ip:
-                    address:
-                      prefix_lists: DC_to_External
-        state: merged
-      tags: bl_route_maps                            
-
-    - name: Configure BGP templates External   #OK.$
-      cisco.nxos.nxos_bgp_templates:
-        config:
-          as_number: "{{ bgp_asn }}"
-          neighbor:
-            - name: "{{ bgp_neighbor_template_bl }}"
-              ebgp_multihop: "{{ ebgp_multihop }}"
-              address_family:
-                - afi: "ipv4"
-                  safi: "unicast"
-                  send_community: "extended"
-                  # route_map: #WILL BE REMOVED
-                  #   inbound: "{{ inbound_route_map }}"
-                  #   outbound: "{{ outbound_route_map }}"
-                  soft_reconfiguration_inbound:
-                    always: true  
-      tags: configure_bgp_template_ext
-
-    - name: Configure BGP Process and Neighbors External   #OK.$
-      cisco.nxos.nxos_bgp_global:
-        config:
-          as_number: "{{ bgp_asn }}"
-          log_neighbor_changes: true
-          vrfs:
-            - vrf: "{{ item.vrf_name }}"
-              neighbors:
-                - neighbor_address: "{{ item.bgp_neighbor_addr_ext }}"
-                  update_source: "{{ item.bgp_update_src_ext }}"
-                  remote_as: "{{ item.bgp_peer_asn_ext }}"
-                  inherit:
-                    peer: "{{ bgp_neighbor_template_bl }}"
-                  shutdown: "{{ peer_status }}"           
-              router_id: "{{ loopback_interfaces | selectattr('intf_name', 'match', 'Loopback0') | map(attribute='intf_ip') | first}}"
-        state: merged
-      loop: "{{ external_l3vlans }}"
-      tags: configure_bgp_af_ext
-
-    - name: Configure BGP L3VNI VRFs External   #OK.$
-      cisco.nxos.nxos_bgp_address_family:
-        config:
-          as_number: "{{ bgp_asn }}"
-          address_family:
-            - vrf: "{{ item.vrf_name }}"
-              afi: ipv4
-              safi: unicast
-              advertise_l2vpn_evpn: true
-              maximum_paths:
-                parallel_paths: "{{ bgp_maximum_path }}"              
-        state: merged
-      loop: "{{ external_l3vlans }}"
-      tags: configure_bgp_vrf_ext
