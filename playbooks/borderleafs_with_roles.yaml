@@ -20,7 +20,7 @@
     - import_role: #NO LOOP
         name: configure_pim_multicast
 
-    - import_role: #LOOP OUTSIDE
+    - include_role: #LOOP OUTSIDE
         name: configure_pim_ports
       with_items:
         - "{{ physical_interfaces }}"
@@ -38,7 +38,7 @@
     - import_role: #LOOP INSIDE
         name: configure_fabric_vlans_bl
 
-    - import_role: #LOOP OUTSIDE
+    - include_role: #LOOP OUTSIDE
         name: configure_bl_local_segment_lag
       loop: "{{ server_interfaces }}"
 

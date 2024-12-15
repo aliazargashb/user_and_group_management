@@ -2,25 +2,46 @@
 
 #OK.$
 server_interfaces:
-  - intf_name: Ethernet1/10
+  - intf_name: Ethernet1/16
     intf_desc: "To_Subnet11-SRVs"
     intf_status: true
     switchport_mode: "access"
     access_vlan: 11
     intf_mode: "layer2"
     intf_po: 11
-  - intf_name: Ethernet1/11
+  - intf_name: Ethernet1/17
     intf_desc: "To_Subnet12-SRVs"
     intf_status: true
     switchport_mode: "access"
     access_vlan: 12
     intf_mode: "layer2"
     intf_po: 12
-  - intf_name: Ethernet1/22
-    intf_desc: "To_Subnet11-SRVs"
+  - intf_name: Ethernet1/18
+    intf_desc: "To_Subnet13-SRVs"
     intf_status: true
-    switchport_mode: "trunk"
-    native_vlan_id: 3333
+    switchport_mode: "access"
+    access_vlan: 13
     intf_mode: "layer2"
-    trunk_vlan: 12
-    intf_po: 22
+    intf_po: 13
+  # - intf_name: Ethernet1/10
+  #   intf_desc: "To_Subnet11-SRVs"
+  #   intf_status: true
+  #   switchport_mode: "access"
+  #   access_vlan: 11
+  #   intf_mode: "layer2"
+  #   intf_po: 11
+  # - intf_name: Ethernet1/11
+  #   intf_desc: "To_Subnet12-SRVs"
+  #   intf_status: true
+  #   switchport_mode: "access"
+  #   access_vlan: 12
+  #   intf_mode: "layer2"
+  #   intf_po: 12
+  # - intf_name: Ethernet1/22
+  #   intf_desc: "To_Subnet11-SRVs"
+  #   intf_status: true
+  #   switchport_mode: "trunk"
+  #   native_vlan_id: 3333
+  #   intf_mode: "layer2"
+  #   trunk_vlan: 12
+  #   intf_po: 22

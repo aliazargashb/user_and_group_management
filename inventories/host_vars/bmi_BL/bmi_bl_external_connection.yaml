@@ -35,11 +35,17 @@ external_l2_interfaces:
 external_l3vlans:
   - vlan_id: 500
     vlan_name: "External-Tenant-1"
-    vlan_id_ip: 10.0.4.246
+    vlan_id_ip: 10.0.4.245
     vlan_id_subnet: 30
     vrf_name: "Tenant-1"
+    bgp_neighbor_addr_ext: 10.0.4.246
+    bgp_update_src_ext: "VLAN500"
+    bgp_peer_asn_ext: 65420
   - vlan_id: 501
     vlan_name: "External-Tenant-2"
-    vlan_id_ip: 10.0.4.242
+    vlan_id_ip: 10.0.4.241
     vlan_id_subnet: 30
     vrf_name: "Tenant-2"
+    bgp_neighbor_addr_ext: 10.0.4.242
+    bgp_update_src_ext: "VLAN501"
+    bgp_peer_asn_ext: 65420
