@@ -1,36 +1,50 @@
 # the variables for external connections
 
 external_l2_interfaces:
-  - intf_name: Ethernet1/6
+  - intf_name: Ethernet1/11
     intf_desc: "SIC-DC-L3FW-1-Port1"
     intf_status: true
     switchport_mode: "trunk"
     intf_lag_mode: active
     trunk_vlan: 500,501
     intf_mode: "layer2"
-    native_vlan_id: 3333
-  - intf_name: Ethernet1/7
+  - intf_name: Ethernet1/12
     intf_desc: "SIC-DC-L3FW-2-Port1"
     intf_status: true
     switchport_mode: "trunk"
     intf_lag_mode: active
     trunk_vlan: 500,501
     intf_mode: "layer2"
-    native_vlan_id: 3333
-  - intf_name: Ethernet1/9
+  - intf_name: Ethernet1/13
     intf_desc: "SIC-External-L3FW-1"
     intf_status: true
     switchport_mode: "access"
     access_vlan: 500
     intf_mode: "layer2"
     intf_po: 50
-  # - intf_name: Ethernet1/9
-  #   intf_desc: "SIC-External-L3FW-2"
-  #   intf_status: true
-  #   switchport_mode: "access"
-  #   access_vlan: 500
-  #   intf_mode: "layer2"
-  #   # intf_po: 50
+  - intf_name: Ethernet1/14
+    intf_desc: "SIC-External-L3FW-2"
+    intf_status: true
+    switchport_mode: "access"
+    access_vlan: 501
+    intf_mode: "layer2"
+    intf_po: 51
+  - intf_name: Ethernet1/15
+    intf_desc: "SIC-DC-L3FW-1-Port1"
+    intf_status: true
+    switchport_mode: "trunk"
+    intf_lag_mode: active
+    trunk_vlan: 500,501
+    intf_mode: "layer2"
+    intf_po: 60
+  - intf_name: Ethernet1/16
+    intf_desc: "SIC-DC-L3FW-2-Port1"
+    intf_status: true
+    switchport_mode: "trunk"
+    intf_lag_mode: active
+    trunk_vlan: 500,501
+    intf_mode: "layer2"
+    intf_po: 61
 
 external_l3vlans:
   - vlan_id: 500

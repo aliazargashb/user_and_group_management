@@ -41,3 +41,5 @@ l3vlans:
     vlan_id_ip: 192.168.13.1
     vlan_id_subnet: 24
     bgp_prefix: 192.168.13.0/24
+
+native_vlan_id: "3333"

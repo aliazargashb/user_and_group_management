@@ -33,7 +33,7 @@
             trunk:
               allowed_vlans: "{{ item.trunk_vlan }}"
               native_vlan: "{{ native_vlan_id }}"
-        state: replaced
+        state: merged
       # loop: "{{ server_interfaces }}"
       when: item.switchport_mode == 'trunk' and item.intf_po is defined 
       tags:
