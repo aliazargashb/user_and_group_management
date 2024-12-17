@@ -17,13 +17,13 @@ external_l2_interfaces:
     trunk_vlan: 500,501
     intf_mode: "layer2"
     # intf_po: 13
-  # - intf_name: Ethernet1/8
-  #   intf_desc: "BMI-External-L3FW-1"
-  #   intf_status: true
-  #   switchport_mode: "trunk"
-  #   access_vlan: 500
-  #   intf_mode: "layer2"
-  #   # intf_po: 50
+  - intf_name: Ethernet1/9
+    intf_desc: "BMI-External-L3FW-1"
+    intf_status: true
+    switchport_mode: "trunk"
+    access_vlan: 500
+    intf_mode: "layer2"
+    intf_po: 50
   # - intf_name: Ethernet1/9
   #   intf_desc: "BMI-External-L3FW-2"
   #   intf_status: true

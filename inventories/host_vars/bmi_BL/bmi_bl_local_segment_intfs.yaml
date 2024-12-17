@@ -5,6 +5,7 @@ server_interfaces:
   - intf_name: Ethernet1/16
     intf_desc: "To_Subnet11-SRVs"
     intf_status: true
+    intf_lag_mode: "active"
     switchport_mode: "access"
     access_vlan: 11
     intf_mode: "layer2"
@@ -12,6 +13,7 @@ server_interfaces:
   - intf_name: Ethernet1/17
     intf_desc: "To_Subnet12-SRVs"
     intf_status: true
+    intf_lag_mode: "active"
     switchport_mode: "access"
     access_vlan: 12
     intf_mode: "layer2"
@@ -19,7 +21,18 @@ server_interfaces:
   - intf_name: Ethernet1/18
     intf_desc: "To_Subnet13-SRVs"
     intf_status: true
+    intf_lag_mode: "active"
     switchport_mode: "access"
     access_vlan: 13
     intf_mode: "layer2"
     intf_po: 13
+
+  - intf_name: Ethernet1/22
+    intf_desc: "To_Subnet11-SRVs"
+    intf_status: true
+    switchport_mode: "trunk"
+    native_vlan_id: 3333
+    intf_mode: "layer2"
+    trunk_vlan: 12
+    intf_lag_mode: "active"
+    intf_po: 22
