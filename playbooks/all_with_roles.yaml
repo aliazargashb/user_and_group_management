@@ -9,6 +9,7 @@
   tasks:
     - import_role:
         name: enable_features
+        # modification
 
     # - import_role:
     #     name: set_hostname
