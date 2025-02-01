@@ -20,6 +20,9 @@
         - configure_loopbacks
 
     - name: Configure IP for Loopback   #OK.$
+
+ali comment 
+    
       cisco.nxos.nxos_l3_interfaces:
         config:
           - name: "{{ item.intf_name }}"
