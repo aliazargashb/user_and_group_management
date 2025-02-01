@@ -30,6 +30,12 @@
         nv_overlay_evpn: true
       tags: evpn_feature
 
+    - name: remote branch   #OK.$
+      cisco.nxos.nxos_evpn_global:
+        nv_overlay_evpn: true
+      tags: evpn_feature
+
+
     - name: Configure AAA   #OK.$
       cisco.nxos.nxos_config:
         lines:
