@@ -9,7 +9,7 @@
   tasks:
     - import_role:
         name: enable_features
-
+      # modification on master beranch
     # - import_role:
     #     name: set_hostname
 
