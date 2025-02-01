@@ -16,6 +16,14 @@
       loop: "{{ features }}"
       tags:
         - enable_features
+
+    - name: tast 2    #OK.$
+      cisco.nxos.nxos_feature:
+        feature: "{{ item }}"
+        state: enabled
+      loop: "{{ features }}"
+      tags:
+        - enable_features
   
     - name: Enable NV Overlay EVPN   #OK.$
       cisco.nxos.nxos_evpn_global:
