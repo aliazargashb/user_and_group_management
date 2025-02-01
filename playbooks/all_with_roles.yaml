@@ -10,6 +10,8 @@
     - import_role:
         name: enable_features
       # modification on master beranch
+        # modification
+
     # - import_role:
     #     name: set_hostname
 
