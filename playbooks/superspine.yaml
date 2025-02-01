@@ -19,6 +19,18 @@
       tags:
         - configure_loopbacks
 
+    - name: ali task  #OK.$
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: "Loopback{{ item.intf_name }}"
+            description: "{{ item.intf_desc }}"
+            enabled: true
+        state: merged
+      loop: "{{ loopback_interfaces }}"
+      tags:
+        - configure_loopbacks
+
+
     - name: Configure IP for Loopback   #OK.$
       cisco.nxos.nxos_l3_interfaces:
         config:
