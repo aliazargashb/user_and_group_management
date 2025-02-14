@@ -9,23 +9,21 @@
   tasks:
     - import_role:
         name: enable_features
-      # modification on master beranch
-        # modification
-
-    # - import_role:
-    #     name: set_hostname
-
-    # - import_role:
-    #     name: create_user
-
-    # - import_role:
-    #     name: configure_aaa
-
-    # - import_role:
-    #     name: configure_ntp
-
-    # - import_role:
-    #     name: telemetry
         
-    # - import_role:
-    #     name: write_bck
+    - import_role:
+        name: set_hostname
+
+    - import_role:
+        name: create_user
+
+    - import_role:
+        name: configure_aaa
+
+    - import_role:
+        name: configure_ntp
+
+    - import_role:
+        name: telemetry
+        
+    - import_role:
+        name: write_bck
