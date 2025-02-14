@@ -6,8 +6,6 @@
   vars:
     ansible_network_os: cisco.nxos.nxos
 
-
-# testing branch
   tasks:
     - name: Enable necessary features   #OK.$
       cisco.nxos.nxos_feature:
