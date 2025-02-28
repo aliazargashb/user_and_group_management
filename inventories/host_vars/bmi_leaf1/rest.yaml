@@ -1,7 +1,0 @@
-# other variables include hostname and bgp_asn
-
-#OK.$
-hostname: bmi_leaf1
-
-#OK.$
-bgp_asn: 65101

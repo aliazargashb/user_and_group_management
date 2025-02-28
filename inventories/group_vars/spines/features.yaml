@@ -1,9 +1,0 @@
-# the variables for features 
-
-#OK.$
-features:
-  - nv overlay
-  - ospf
-  - bgp
-  - pim
-  - tacacs+

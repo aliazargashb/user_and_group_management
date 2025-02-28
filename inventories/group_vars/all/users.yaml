@@ -1,0 +1,9 @@
+admin_users:
+  - name: test_admin
+    password: '123'
+    groups: ['sudo', 'admin']
+
+readonly_users:
+  - name: test
+    password: '123'
+    groups: ['show']

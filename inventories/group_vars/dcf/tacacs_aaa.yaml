@@ -1,8 +1,0 @@
-# the variables for tacacs, aaa
-
-#OK.$
-aaa_srv_grp: AAA_Servers
-
-#OK.$
-tacacs_srv_host: "172.27.0.1"
-tacacs_srv_key: key1

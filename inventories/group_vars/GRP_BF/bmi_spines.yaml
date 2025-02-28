@@ -1,7 +1,0 @@
-# the variables for bmi_spines
-
-#OK.$ (bmi_spines/bmi_spines_configure_bgp.yaml)
-bgp_asn: 65100
-
-#OK.$ (bmi_spines/bmi_spines_configure_ospf.yaml)
-ospf_site_area_id: 0.0.0.1

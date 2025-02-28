@@ -1,5 +1,0 @@
-# the variables for leafs-bgp configuration
-
-#OK.$
-bgp_neighbor_template: "Leaf_Spine_Peering"
-bgp_neighbor_template_bl: "Border_Leaf_to_Fusion_Point"

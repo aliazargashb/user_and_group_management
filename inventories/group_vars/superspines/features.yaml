@@ -1,8 +1,0 @@
-# the variables for features
-
-features:
-  - nv overlay
-  - ospf
-  - bgp
-  - pim
-  - tacacs+

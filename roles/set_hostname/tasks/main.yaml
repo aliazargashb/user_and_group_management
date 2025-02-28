@@ -1,7 +1,0 @@
----
-    - name: Set Hostname   #OK.$
-      cisco.nxos.nxos_hostname:
-        config:
-          hostname: "{{ hostname }}"
-      tags:
-        - set_hostname

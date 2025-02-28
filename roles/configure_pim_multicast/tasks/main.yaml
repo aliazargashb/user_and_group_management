@@ -1,7 +1,0 @@
----
-    - name: Configure PIM RP address   #OK.$
-      cisco.nxos.nxos_pim_rp_address:
-        rp_address: "{{ pim_rp_ip }}"
-        group_list: "{{ pim_mgroup }}"
-      tags:
-        - pim_multicast
