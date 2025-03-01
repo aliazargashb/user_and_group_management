@@ -2,6 +2,9 @@ admin_users:
   - name: test_admin
     password: '123'
     groups: ['sudo', 'admin']
+  - name: ali
+    password: '5512'
+    groups: ['sudo', 'admin']
 
 readonly_users:
   - name: test
