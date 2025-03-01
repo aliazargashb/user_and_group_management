@@ -5,57 +5,57 @@
   become: yes 
 
   tasks:
-    - name: Create admin and show groups
-      group:
-        name: "{{ item }}"
-        state: present
-      loop:
-        - admin
-        - show
-
-    - name: Create admin users
-      ansible.builtin.user:
-        name: "{{ item.name }}"
-        password: "{{ item.password | password_hash('sha512') }}"
-        groups: "{{ item.groups }}"
-        shell: /bin/bash
-        append: yes
-        state: present
-        create_home: yes
-      loop: "{{ admin_users }}"
-      
-    - name: Create readonly users
-      user:
-        name: "{{ item.name }}"
-        password: "{{ item.password | password_hash('sha512') }}"
-        groups: "{{ item.groups }}"
-        append: yes
-        shell: /bin/bash
-        state: present
-        create_home: yes
-      loop: "{{ readonly_users }}"
-
-    - name: Set sudo permissions for admin users
-      copy:
-        dest: "/etc/sudoers.d/admin_users"
-        content: |
-          %sudo ALL=(ALL:ALL) ALL
-        mode: 0440
-        
-    - name: Set readonly permissions
-      copy:
-        dest: "/etc/sudoers.d/readonly_users" 
-        content: |
-          %users ALL=(ALL) NOPASSWD: /usr/bin/ls, /usr/bin/cat, /usr/bin/less, /usr/bin/wg show, /usr/bin/vtysh -c "show *"
-        mode: 0440
-
-    ## delete users
-    # - name: Delete users
-    #   ansible.builtin.user:
+    # - name: Create admin and show groups
+    #   group:
     #     name: "{{ item }}"
-    #     state: absent
-    #     remove: yes
-    #     force: yes
+    #     state: present
     #   loop:
-    #     - test
-    #     - test_admin
+    #     - admin
+    #     - show
+
+    # - name: Create admin users
+    #   ansible.builtin.user:
+    #     name: "{{ item.name }}"
+    #     password: "{{ item.password | password_hash('sha512') }}"
+    #     groups: "{{ item.groups }}"
+    #     shell: /bin/bash
+    #     append: yes
+    #     state: present
+    #     create_home: yes
+    #   loop: "{{ admin_users }}"
+      
+    # - name: Create readonly users
+    #   user:
+    #     name: "{{ item.name }}"
+    #     password: "{{ item.password | password_hash('sha512') }}"
+    #     groups: "{{ item.groups }}"
+    #     append: yes
+    #     shell: /bin/bash
+    #     state: present
+    #     create_home: yes
+    #   loop: "{{ readonly_users }}"
+
+    # - name: Set sudo permissions for admin users
+    #   copy:
+    #     dest: "/etc/sudoers.d/admin_users"
+    #     content: |
+    #       %sudo ALL=(ALL:ALL) ALL
+    #     mode: 0440
+        
+    # - name: Set readonly permissions
+    #   copy:
+    #     dest: "/etc/sudoers.d/readonly_users" 
+    #     content: |
+    #       %users ALL=(ALL) NOPASSWD: /usr/bin/ls, /usr/bin/cat, /usr/bin/less, /usr/bin/wg show, /usr/bin/vtysh -c "show *"
+    #     mode: 0440
+
+    # delete users
+    - name: Delete users
+      ansible.builtin.user:
+        name: "{{ item }}"
+        state: absent
+        remove: yes
+        force: yes
+      loop:
+        - test
+        - test_admin
