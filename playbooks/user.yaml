@@ -5,7 +5,7 @@
   become: yes 
 
   tasks:
-    - name: Create new admin and show groups
+    - name: Create admin and show groups
       group:
         name: "{{ item }}"
         state: present
@@ -13,7 +13,7 @@
         - admin
         - show
 
-    - name: Create new admin users
+    - name: Create admin users
       ansible.builtin.user:
         name: "{{ item.name }}"
         password: "{{ item.password | password_hash('sha512') }}"
